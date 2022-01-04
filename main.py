@@ -1,9 +1,20 @@
 import argparse
+import logging
 
 import python.custom.main_custom
 import python.data.main_data
 import python.figure.main_figure
 import python.nu.main_nu
+import python.utils.log_helper
+
+
+def print_args(args):
+    logger = logging.getLogger(__name__)
+    logger.info('Running script with following parameters:')
+    logger.info(f'  Command: {args.Command}')
+    logger.info(f'  Algorithm: {args.algorithm}')
+    logger.info(f'  System: {args.system}')
+    logger.info(f'  Parallel: {args.parallel}')
 
 
 def parse_cli_arguments():
@@ -30,12 +41,21 @@ def parse_cli_arguments():
         action='store_true',
         help='parellelize code execution')
 
+    arg_parser.add_argument(
+        '-l',
+        '--loglevel',
+        help='logging level',
+        choices=['debug', 'info', 'warning', 'error'],
+        default='info')
+
     args = arg_parser.parse_args()
     return args
 
 
 def main():
     args = parse_cli_arguments()
+    python.utils.log_helper.init_logging(args.loglevel)
+    print_args(args)
 
     if args.Command == 'custom':
         python.custom.main_custom.main(args)

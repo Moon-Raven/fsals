@@ -2,7 +2,7 @@ use clap::{Parser, Subcommand};
 use std::fmt;
 use std::fmt::Display;
 use std::{str::FromStr};
-use log::info;
+use log::{info, LevelFilter};
 
 
 #[derive(Parser)]
@@ -17,6 +17,10 @@ struct Args {
     /// Algorithm which should be run on the given system
     #[clap(short, long)]
     algorithm: Option<Algorithm>,
+
+    /// Logging Level
+    #[clap(short, long, default_value_t = LevelFilter::Info)]
+    loglevel: LevelFilter,
 
     /// Parallelize code execution
     #[clap(short, long)]
@@ -81,14 +85,15 @@ fn print_args_verbose(args: Args) {
         None => String::from("unspecified"),
     });
     info!("  {:<12} {}", "Parallel:", args.parallel);
+    info!("  {:<12} {}", "LogLevel:", args.loglevel);
 }
 
 
 fn main() {
-    simple_logger::SimpleLogger::new().env().init().unwrap();
     let args = Args::parse();
+    simple_logger::SimpleLogger::new().with_level(args.loglevel).init().unwrap();
 
-    info!("Starting rust program; input parameters:");
+    info!("Starting rust program");
     print_args_verbose(args);
     info!("Rust program complete");
 }

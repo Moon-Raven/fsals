@@ -1,2 +1,8 @@
+import logging
+
+
+logger = logging.getLogger(__name__)
+
+
 def main(args):
-    print(f'Running data!')
+    logger.info(f'Running data!')

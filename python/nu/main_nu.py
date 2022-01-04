@@ -1,2 +1,8 @@
+import logging
+
+
+logger = logging.getLogger(__name__)
+
+
 def main(args):
-    print(f'Running nu!')
+    logger.info(f'Running nu!')
