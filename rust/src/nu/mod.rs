@@ -8,6 +8,10 @@ use std::collections::HashMap;
 use lazy_static::lazy_static;
 use iter_num_tools::{log_space, lin_space, grid_space};
 use std::f64::consts::PI;
+use serde::{Deserialize, Serialize};
+use serde_json::Result;
+use std::fs;
+use std::path::{Path,PathBuf};
 
 
 pub struct Configuration {
@@ -20,7 +24,7 @@ pub struct Configuration {
 }
 
 
-#[derive(Debug)]
+#[derive(Debug, serde::Serialize, Deserialize)]
 pub struct NuResult {
     p: Par,
     nu: i32,
@@ -102,12 +106,26 @@ fn calculate_nu(conf: &Configuration) -> Vec <NuResult> {
 }
 
 
-pub fn store_results<I>(results: I, filename: &'static str)
-where I: IntoIterator<Item=NuResult>
+pub fn store_results<I>(results: I, filename: &String)
+where I: IntoIterator<Item=NuResult> + Serialize
 {
-    for nu in results {
-        info!("{:?}", nu);
-    }
+    let results = serde_json::to_string(&results).unwrap();
+    info!("Storing results into {}", filename);
+    fs::write(filename, results).expect("Unable to store nu results");
+}
+
+
+fn get_nu_path(config_name: &String) -> String {
+    let root = "../";
+    let output = "output";
+    let nu = "nu";
+    let temp = "temp_data";
+    let extension = "nudata";
+
+    let mut path: PathBuf = [root, output, nu, temp, config_name].iter().collect();
+    path.set_extension(extension);
+    fs::create_dir_all(path.parent().unwrap()).expect("Unable to create path");
+    path.into_os_string().into_string().unwrap()
 }
 
 
@@ -119,5 +137,6 @@ pub fn run(args: &Args) {
     let results = calculate_nu(&config);
 
     /* Store results in file */
-    store_results(results, "hello");
+    let filename = get_nu_path(config_name);
+    store_results(results, &filename);
 }
