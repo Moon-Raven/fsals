@@ -36,7 +36,7 @@ def str2loglevel(loglevel_str):
         return logging.DEBUG
     elif loglevel_str == 'info':
         return logging.INFO
-    elif loglevel_str == 'warning':
+    elif loglevel_str == 'warn':
         return logging.WARNING
     elif loglevel_str == 'error':
         return logging.ERROR

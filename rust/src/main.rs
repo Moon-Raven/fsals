@@ -1,8 +1,11 @@
+#![allow(dead_code)]
+#![allow(unused_imports)]
+
 use clap::{Parser, Subcommand};
 use std::fmt;
 use std::fmt::Display;
 use std::{str::FromStr};
-use log::{info, LevelFilter};
+use log::{debug, info, warn, error, LevelFilter};
 
 
 #[derive(Parser)]
@@ -19,7 +22,7 @@ struct Args {
     algorithm: Option<Algorithm>,
 
     /// Logging Level
-    #[clap(short, long, default_value_t = LevelFilter::Info)]
+    #[clap(short, long, default_value_t = LevelFilter::Debug)]
     loglevel: LevelFilter,
 
     /// Parallelize code execution
@@ -95,5 +98,5 @@ fn main() {
 
     info!("Starting rust program");
     print_args_verbose(args);
-    info!("Rust program complete");
+    debug!("Rust program complete");
 }
