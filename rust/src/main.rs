@@ -1,6 +1,8 @@
 #![allow(dead_code)]
 #![allow(unused_imports)]
 
+mod nu;
+
 use clap::{Parser, Subcommand};
 use std::fmt;
 use std::fmt::Display;
@@ -12,7 +14,7 @@ use log::{debug, info, warn, error, LevelFilter};
 #[clap(author = "Vukan Turkulov <vukant@gmail.com>")]
 #[clap(about = "Framework for stability analysis of linear systems")]
 #[clap(name = "fsals")]
-struct Args {
+pub struct Args {
     /// Name of the system which the program should analyze
     #[clap(short, long)]
     system: Option<String>,
@@ -35,7 +37,7 @@ struct Args {
 
 
 #[derive(Subcommand, Debug)]
-enum Command {
+pub enum Command {
     /// Determines the number of unstable poles for the given system
     Nu,
     /// Runs the specified algorithm
@@ -46,7 +48,7 @@ enum Command {
 
 
 #[derive(Debug)]
-enum Algorithm {
+pub enum Algorithm {
     /// Line algorithm
     Line,
     /// Region algorithm
@@ -76,15 +78,15 @@ impl Display for Algorithm {
 }
 
 
-fn print_args_verbose(args: Args) {
+fn print_args_verbose(args: &Args) {
     info!("Input parameters:");
     info!("  {:<12} {:?}", "Command:", args.command);
-    info!("  {:<12} {}", "Algorithm:" , match args.algorithm {
+    info!("  {:<12} {}", "Algorithm:" , match &args.algorithm {
         Some(algo) => algo.to_string(),
         None =>  String::from("unspecified"),
     });
-    info!("  {:<12} {}", "System:", match args.system {
-        Some(name) => name,
+    info!("  {:<12} {}", "System:", match &args.system {
+        Some(name) => String::from(name),
         None => String::from("unspecified"),
     });
     info!("  {:<12} {}", "Parallel:", args.parallel);
@@ -97,6 +99,11 @@ fn main() {
     simple_logger::SimpleLogger::new().with_level(args.loglevel).init().unwrap();
 
     info!("Starting rust program");
-    print_args_verbose(args);
-    debug!("Rust program complete");
+    print_args_verbose(&args);
+    match args.command {
+        Command::Nu => nu::calculate_nu(&args),
+        Command::Data => info!("Should run data"),
+        Command::Custom => info!("Should run custom"),
+    };
+    info!("Rust program complete");
 }
