@@ -2,6 +2,8 @@
 #![allow(unused_imports)]
 
 mod nu;
+mod systems;
+mod types;
 
 use clap::{Parser, Subcommand};
 use std::fmt;
@@ -101,7 +103,7 @@ fn main() {
     info!("Starting rust program");
     print_args_verbose(&args);
     match args.command {
-        Command::Nu => nu::calculate_nu(&args),
+        Command::Nu => nu::run(&args),
         Command::Data => info!("Should run data"),
         Command::Custom => info!("Should run custom"),
     };
