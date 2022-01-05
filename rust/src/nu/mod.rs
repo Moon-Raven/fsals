@@ -24,10 +24,18 @@ pub struct Configuration {
 }
 
 
-#[derive(Debug, serde::Serialize, Deserialize)]
-pub struct NuResult {
+#[derive(Debug, serde::Serialize)]
+pub struct NuPointResult {
     p: Par,
     nu: i32,
+}
+
+
+#[derive(Debug, serde::Serialize)]
+pub struct NuResult {
+    point_results: Vec<NuPointResult>,
+    limits: Limits,
+    parameters: (&'static str, &'static str),
 }
 
 
@@ -91,13 +99,13 @@ fn calculate_nu_single(
 }
 
 
-fn calculate_nu(conf: &Configuration) -> Vec <NuResult> {
+fn calculate_nu(conf: &Configuration) -> Vec <NuPointResult> {
     let grid_min = [conf.limits.p1_min, conf.limits.p2_min];
     let grid_max = [conf.limits.p1_max, conf.limits.p2_max];
     let grid = grid_space(grid_min..=grid_max, [5, 5]);
     let results = grid.map(|p| {
         let p = (p[0], p[1]);
-        NuResult {
+        NuPointResult {
             p: p,
             nu: calculate_nu_single(conf.w_min, conf.w_max, conf.steps, conf.system.f_complex, p)}
         }
@@ -107,7 +115,7 @@ fn calculate_nu(conf: &Configuration) -> Vec <NuResult> {
 
 
 pub fn store_results<I>(results: I, filename: &String)
-where I: IntoIterator<Item=NuResult> + Serialize
+where I: IntoIterator<Item=NuPointResult> + Serialize
 {
     let results = serde_json::to_string(&results).unwrap();
     info!("Storing results into {}", filename);

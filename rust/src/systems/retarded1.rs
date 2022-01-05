@@ -7,4 +7,8 @@ fn retarded1_complex(s: Comp, p: Par) -> Comp {
     s*s + 2.0*s*(-s*tau1).exp() + (-s*tau2).exp()
 }
 
-pub const RETARDED1: System = System {name: "retarded1", f_complex: retarded1_complex};
+pub const RETARDED1: System = System {
+    name: "retarded1",
+    f_complex: retarded1_complex,
+    parameters: (r"\tau_1", r"\tau_2")
+};
