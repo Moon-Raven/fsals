@@ -1,6 +1,7 @@
 use lazy_static::lazy_static;
 use crate::systems::retarded1;
 use crate::systems::distributed_delay1;
+use crate::systems::semi_infinite_rod;
 use super::NuConfiguration;
 use crate::types::Limits;
 use std::collections::HashMap;
@@ -30,6 +31,17 @@ lazy_static! {
                w_max: 1e5,
                steps: 10_000usize,
                limits: Limits { p1_min: 0.0, p1_max: 20.0, p2_min: 0.0, p2_max: 0.4 },
+               grid_step: 40usize,
+          });
+
+        configs.insert("semi_infinite_rod",
+          NuConfiguration {
+               name: "semi_infinite_rod",
+               system: semi_infinite_rod::SYSTEM,
+               w_min: 1e-3,
+               w_max: 1e5,
+               steps: 10_000usize,
+               limits: Limits { p1_min: 0.0, p1_max: 100.0, p2_min: 0.0, p2_max: 70_000.0 },
                grid_step: 40usize,
           });
 

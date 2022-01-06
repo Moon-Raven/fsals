@@ -1,5 +1,6 @@
 pub mod retarded1;
 pub mod distributed_delay1;
+pub mod semi_infinite_rod;
 
 use log::{debug, info, warn, error};
 use num::complex::Complex;
