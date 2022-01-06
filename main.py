@@ -12,7 +12,7 @@ import python.utils.log_helper
 logger = None
 
 
-def print_args(args):
+def log_args(args):
     logger.info('Running script with following parameters:')
     logger.info(f'  Command: {args.command}')
     logger.info(f'  Algorithm: {args.algorithm}')
@@ -63,7 +63,7 @@ def main():
     args = parse_cli_arguments()
     python.utils.log_helper.init_logging(args.loglevel)
     logger = logging.getLogger(__name__)
-    print_args(args)
+    log_args(args)
 
     if args.command == 'custom':
         python.custom.main_custom.main(args)
@@ -79,6 +79,7 @@ def main():
     end = time.monotonic()
     elapsed = end - start
     logger.info(f'Python script completed in {elapsed} seconds')
+
 
 if __name__ == '__main__':
     main()
