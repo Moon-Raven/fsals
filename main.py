@@ -1,5 +1,6 @@
 import argparse
 import logging
+import time
 
 import python.custom.main_custom
 import python.data.main_data
@@ -8,8 +9,10 @@ import python.nu.main_nu
 import python.utils.log_helper
 
 
+logger = None
+
+
 def print_args(args):
-    logger = logging.getLogger(__name__)
     logger.info('Running script with following parameters:')
     logger.info(f'  Command: {args.command}')
     logger.info(f'  Algorithm: {args.algorithm}')
@@ -54,8 +57,12 @@ def parse_cli_arguments():
 
 
 def main():
+    global logger
+
+    start = time.monotonic()
     args = parse_cli_arguments()
     python.utils.log_helper.init_logging(args.loglevel)
+    logger = logging.getLogger(__name__)
     print_args(args)
 
     if args.command == 'custom':
@@ -69,6 +76,9 @@ def main():
     else:
         raise argparse.ArgumentError(f'Unknown command: {args.command}')
 
+    end = time.monotonic()
+    elapsed = end - start
+    logger.info(f'Python script completed in {elapsed} seconds')
 
 if __name__ == '__main__':
     main()

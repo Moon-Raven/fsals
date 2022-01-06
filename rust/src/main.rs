@@ -10,6 +10,7 @@ use std::fmt;
 use std::fmt::Display;
 use std::{str::FromStr};
 use log::{debug, info, warn, error, LevelFilter};
+use std::time::{Duration, Instant};
 
 
 #[derive(Parser)]
@@ -97,8 +98,13 @@ fn print_args_verbose(args: &Args) {
 
 
 fn main() {
+    let start = Instant::now();
     let args = Args::parse();
-    simple_logger::SimpleLogger::new().with_level(args.loglevel).init().unwrap();
+    simple_logger::SimpleLogger::new()
+        .with_utc_timestamps()
+        .with_level(args.loglevel)
+        .init()
+        .unwrap();
 
     info!("Starting rust program");
     print_args_verbose(&args);
@@ -107,5 +113,7 @@ fn main() {
         Command::Data => info!("Should run data"),
         Command::Custom => info!("Should run custom"),
     };
-    info!("Rust program complete");
+    let end = Instant::now();
+    let elapsed = end - start;
+    info!("Rust program completed in {:?}", elapsed);
 }

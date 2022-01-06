@@ -12,6 +12,7 @@ use serde::{Deserialize, Serialize};
 use serde_json::Result;
 use std::fs;
 use std::path::{Path,PathBuf};
+use rayon::prelude::*;
 
 
 pub struct Configuration {
@@ -21,6 +22,7 @@ pub struct Configuration {
     w_max: f64,
     steps: usize,
     pub limits: Limits,
+    grid_step: usize,
 }
 
 
@@ -34,7 +36,7 @@ pub struct NuPointResult {
 #[derive(Debug, serde::Serialize)]
 pub struct NuResult {
     point_results: Vec<NuPointResult>,
-    limits: Limits,
+    limits: &'static Limits,
     parameters: (&'static str, &'static str),
 }
 
@@ -99,10 +101,12 @@ fn calculate_nu_single(
 }
 
 
-fn calculate_nu(conf: &Configuration) -> Vec <NuPointResult> {
+fn calculate_nu(conf: &'static Configuration) -> NuResult {
     let grid_min = [conf.limits.p1_min, conf.limits.p2_min];
     let grid_max = [conf.limits.p1_max, conf.limits.p2_max];
-    let grid = grid_space(grid_min..=grid_max, [5, 5]);
+    let steps = [conf.grid_step, conf.grid_step];
+    let grid: Vec<[f64; 2]> = grid_space(grid_min..=grid_max, steps).collect();
+    let grid = grid.into_par_iter();
     let results = grid.map(|p| {
         let p = (p[0], p[1]);
         NuPointResult {
@@ -110,12 +114,17 @@ fn calculate_nu(conf: &Configuration) -> Vec <NuPointResult> {
             nu: calculate_nu_single(conf.w_min, conf.w_max, conf.steps, conf.system.f_complex, p)}
         }
     );
-    results.collect()
+    let ret_val = NuResult {
+        point_results: results.collect(),
+        limits: &conf.limits,
+        parameters: conf.system.parameters,
+    };
+    ret_val
 }
 
 
 pub fn store_results<I>(results: I, filename: &String)
-where I: IntoIterator<Item=NuPointResult> + Serialize
+where I: Serialize
 {
     let results = serde_json::to_string(&results).unwrap();
     info!("Storing results into {}", filename);
