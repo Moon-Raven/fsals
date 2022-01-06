@@ -11,6 +11,7 @@ use serde::Serialize;
 use std::fs;
 use std::path::PathBuf;
 use rayon::prelude::*;
+use configurations::CONFIGURATONS;
 
 
 pub struct NuConfiguration {
@@ -39,23 +40,13 @@ pub struct NuResult {
 }
 
 
-/* Global collection of all nu configurations */
-lazy_static! {
-    pub static ref CONFIGURATONS: HashMap<&'static str, NuConfiguration> = {
-        let mut configs = HashMap::new();
-
-        configs.insert("retarded1", configurations::RETARDED1);
-
-        configs
-    };
-}
 
 
 fn get_bromwhich_contour(w_min: f64, w_max: f64, steps: usize) -> impl Iterator<Item=Comp> {
     let freq = log_space(w_min..=w_max, steps);
-    let imag_positive = freq.map(|w| Comp::new(0.0, w));
+    let imag_positive = freq.map(|w| Comp::new(1e-3, w));
     let freq = log_space(w_min..=w_max, steps);
-    let imag_negative = freq.map(|w| Comp::new(0.0, -w)).rev();
+    let imag_negative = freq.map(|w| Comp::new(1e-3, -w)).rev();
     let angles = lin_space(-PI/2.0..=PI/2.0, steps).rev();
     let semicircle = angles.map(move |theta| Comp::from_polar(w_max, theta));
 

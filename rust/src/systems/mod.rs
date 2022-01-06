@@ -1,4 +1,5 @@
 pub mod retarded1;
+pub mod distributed_delay1;
 
 use log::{debug, info, warn, error};
 use num::complex::Complex;
@@ -12,7 +13,8 @@ lazy_static! {
     pub static ref SYSTEMS: HashMap<&'static str, System> = {
         let mut systems = HashMap::new();
 
-        systems.insert("retarded1", retarded1::RETARDED1);
+        systems.insert("retarded1", retarded1::SYSTEM);
+        systems.insert("distributed_delay1", retarded1::SYSTEM);
 
         systems
     };

@@ -1,7 +1,7 @@
 use crate::types::{Comp, Par, System};
 
 
-fn retarded1_complex(s: Comp, p: Par) -> Comp {
+fn f_complex(s: Comp, p: Par) -> Comp {
     let tau1 = p.0;
     let tau2 = p.1;
 
@@ -9,8 +9,8 @@ fn retarded1_complex(s: Comp, p: Par) -> Comp {
 }
 
 
-pub const RETARDED1: System = System {
+pub const SYSTEM: System = System {
     name: "retarded1",
-    f_complex: retarded1_complex,
+    f_complex,
     parameters: (r"\tau_1", r"\tau_2")
 };
