@@ -40,13 +40,13 @@ pub struct NuResult {
 }
 
 
-
-
 fn get_bromwhich_contour(w_min: f64, w_max: f64, steps: usize) -> impl Iterator<Item=Comp> {
+    const SAFETY_OFFSET: f64 = 1e-3; // Nudge the contour a bit to the right
+
     let freq = log_space(w_min..=w_max, steps);
-    let imag_positive = freq.map(|w| Comp::new(1e-3, w));
+    let imag_positive = freq.map(|w| Comp::new(SAFETY_OFFSET, w));
     let freq = log_space(w_min..=w_max, steps);
-    let imag_negative = freq.map(|w| Comp::new(1e-3, -w)).rev();
+    let imag_negative = freq.map(|w| Comp::new(SAFETY_OFFSET, -w)).rev();
     let angles = lin_space(-PI/2.0..=PI/2.0, steps).rev();
     let semicircle = angles.map(move |theta| Comp::from_polar(w_max, theta));
 
@@ -92,6 +92,11 @@ fn calculate_nu_single(
     }
 
     let windings = -integral / (2.0*PI);
+
+    if windings.is_nan() {
+        panic!("NaN value detected");
+    }
+
     debug!("Windings (real): {}", windings);
     let windings = windings.round();
     debug!("Windings (rounded): {}", windings);
