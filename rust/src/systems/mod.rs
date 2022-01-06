@@ -7,7 +7,7 @@ use lazy_static::lazy_static;
 use crate::types::{Comp, Par, System};
 
 
-
+/* A global collection of all systems */
 lazy_static! {
     pub static ref SYSTEMS: HashMap<&'static str, System> = {
         let mut systems = HashMap::new();

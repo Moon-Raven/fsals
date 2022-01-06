@@ -9,8 +9,8 @@ use clap::{Parser, Subcommand};
 use std::fmt;
 use std::fmt::Display;
 use std::{str::FromStr};
-use log::{debug, info, warn, error, LevelFilter};
-use std::time::{Duration, Instant};
+use log::{info, LevelFilter};
+use std::time::Instant;
 
 
 #[derive(Parser)]
@@ -108,11 +108,13 @@ fn main() {
 
     info!("Starting rust program");
     print_args_verbose(&args);
+
     match args.command {
         Command::Nu => nu::run(&args),
         Command::Data => info!("Should run data"),
         Command::Custom => info!("Should run custom"),
     };
+
     let end = Instant::now();
     let elapsed = end - start;
     info!("Rust program completed in {:?}", elapsed);

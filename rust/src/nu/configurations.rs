@@ -1,9 +1,10 @@
 use lazy_static::lazy_static;
 use crate::systems::retarded1;
-use super::Configuration;
+use super::NuConfiguration;
 use crate::types::Limits;
 
-pub const RETARDED1: Configuration = Configuration {
+
+pub const RETARDED1: NuConfiguration = NuConfiguration {
      name: "retarded1",
      system: retarded1::RETARDED1,
      w_min: 1e-3,
