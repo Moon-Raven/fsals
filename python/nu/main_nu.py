@@ -4,6 +4,7 @@ import contextlib
 from types import SimpleNamespace
 import json
 from pathlib import Path
+from shutil import copyfile
 
 import matplotlib.pyplot as plt
 
@@ -88,8 +89,11 @@ def save_figure(args, fig):
     dir = Path(dirname)
     dir.mkdir(exist_ok=True, parents=True)
     timestamp = timestamps.get_timestamp_str()
-    figpath = f'{dirname}/{args.system}_{timestamp}.pdf'
-    fig.savefig(figpath)
+    figpath_timestamped = f'{dirname}/{args.system}_{timestamp}.pdf'
+    figpath = f'{dirname}/{args.system}.pdf'
+
+    fig.savefig(figpath_timestamped)
+    copyfile(figpath_timestamped, figpath)
 
 
 def main(args):
