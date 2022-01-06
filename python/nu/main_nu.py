@@ -21,12 +21,7 @@ def calculate_nu(args):
 
     result = None
     with contextlib.redirect_stdout(logging.getLogger(__name__)):
-        result = subprocess.run(
-            rust_args,
-            cwd='./rust',
-            stdout=None,
-            stderr=None,
-        )
+        result = subprocess.run(rust_args, cwd='./rust', stdout=None, stderr=None)
 
     if result.returncode != 0:
         raise Exception(f'Rust subsystem for nu exited with {result.returncode}')
