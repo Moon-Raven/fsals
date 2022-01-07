@@ -1,8 +1,6 @@
 mod configurations;
 
 use log::{debug, info};
-use crate::Args;
-use crate::types::{Comp, Par, System, Limits};
 use std::collections::HashMap;
 use lazy_static::lazy_static;
 use iter_num_tools::{log_space, lin_space, grid_space};
@@ -11,18 +9,10 @@ use serde::Serialize;
 use std::fs;
 use std::path::PathBuf;
 use rayon::prelude::*;
-use configurations::CONFIGURATONS;
 
-
-pub struct NuConfiguration {
-    name: &'static str,
-    system: System,
-    w_min: f64,
-    w_max: f64,
-    steps: usize,
-    pub limits: Limits,
-    grid_step: usize,
-}
+use crate::Args;
+use crate::types::{Comp, Par, System, Limits};
+use configurations::{NuConfiguration,CONFIGURATONS};
 
 
 #[derive(Debug, serde::Serialize)]

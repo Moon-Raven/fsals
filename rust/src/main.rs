@@ -2,6 +2,7 @@
 #![allow(unused_imports)]
 
 mod nu;
+mod data;
 mod systems;
 mod types;
 
@@ -111,7 +112,7 @@ fn main() {
 
     match args.command {
         Command::Nu => nu::run(&args),
-        Command::Data => info!("Should run data"),
+        Command::Data => data::run(&args),
         Command::Custom => info!("Should run custom"),
     };
 

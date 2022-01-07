@@ -11,8 +11,18 @@ use crate::systems::pde_complex_beta_sigma;
 use crate::systems::telegrapher_x_k;
 use crate::systems::telegrapher_alpha_gamma;
 
-use super::NuConfiguration;
-use crate::types::Limits;
+use crate::types::{Limits, System};
+
+
+pub struct NuConfiguration {
+    pub name: &'static str,
+    pub system: System,
+    pub w_min: f64,
+    pub w_max: f64,
+    pub steps: usize,
+    pub limits: Limits,
+    pub grid_step: usize,
+}
 
 
 /* Global collection of all nu configurations */
