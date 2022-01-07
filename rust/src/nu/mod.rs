@@ -12,7 +12,7 @@ use rayon::prelude::*;
 
 use crate::Args;
 use crate::types::{Comp, Par, System, Limits};
-use configurations::{NuConfiguration,CONFIGURATONS};
+pub use configurations::{ContourConfiguration,NuConfiguration,CONFIGURATONS};
 
 
 #[derive(Debug, serde::Serialize)]
@@ -30,15 +30,15 @@ pub struct NuResult {
 }
 
 
-fn get_bromwhich_contour(w_min: f64, w_max: f64, steps: usize) -> impl Iterator<Item=Comp> {
+fn get_bromwhich_contour(conf: &ContourConfiguration) -> impl Iterator<Item=Comp>  + '_ {
     const SAFETY_OFFSET: f64 = 1e-3; // Nudge the contour a bit to the right
 
-    let freq = log_space(w_min..=w_max, steps);
+    let freq = log_space(conf.w_min..=conf.w_max, conf.steps);
     let imag_positive = freq.map(|w| Comp::new(SAFETY_OFFSET, w));
-    let freq = log_space(w_min..=w_max, steps);
+    let freq = log_space(conf.w_min..=conf.w_max, conf.steps);
     let imag_negative = freq.map(|w| Comp::new(SAFETY_OFFSET, -w)).rev();
-    let angles = lin_space(-PI/2.0..=PI/2.0, steps).rev();
-    let semicircle = angles.map(move |theta| Comp::from_polar(w_max, theta));
+    let angles = lin_space(-PI/2.0..=PI/2.0, conf.steps).rev();
+    let semicircle = angles.map(move |theta| Comp::from_polar(conf.w_max, theta));
 
     let contour = imag_positive;
     let contour = contour.chain(semicircle);
@@ -48,15 +48,13 @@ fn get_bromwhich_contour(w_min: f64, w_max: f64, steps: usize) -> impl Iterator<
 }
 
 
-fn calculate_nu_single(
-    w_min: f64,
-    w_max: f64,
-    steps: usize,
+pub fn calculate_nu_single(
+    contour_conf: &ContourConfiguration,
     f: fn(Comp, Par) -> Comp,
     p: Par
 ) -> i32
 {
-    let contour = get_bromwhich_contour(w_min, w_max, steps);
+    let contour = get_bromwhich_contour(contour_conf);
     let image = contour.map(|s| f(s, p));
     let angles: Vec<f64> = image.map(|s| s.arg()).collect();
 
@@ -106,7 +104,7 @@ fn calculate_nu(conf: &'static NuConfiguration, _parallel: bool) -> NuResult {
         let p = (p[0], p[1]);
         NuPointResult {
             p: p,
-            nu: calculate_nu_single(conf.w_min, conf.w_max, conf.steps, conf.system.f_complex, p)}
+            nu: calculate_nu_single(&conf.contour_conf, conf.system.f_complex, p)}
         }
     );
     let ret_val = NuResult {

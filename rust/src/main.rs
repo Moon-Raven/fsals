@@ -5,6 +5,7 @@ mod nu;
 mod data;
 mod systems;
 mod types;
+mod utils;
 
 use clap::{Parser, Subcommand};
 use std::fmt;
@@ -12,6 +13,7 @@ use std::fmt::Display;
 use std::{str::FromStr};
 use log::{info, LevelFilter};
 use std::time::Instant;
+use test_env_log::test;
 
 
 #[derive(Parser)]

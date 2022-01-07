@@ -12,5 +12,7 @@ fn f_complex(s: Comp, p: Par) -> Comp {
 pub const SYSTEM: System = System {
     name: "pde_complex_tau_sigma",
     f_complex,
-    parameters: (r"\tau", r"\sigma")
+    parameters: (r"\tau", r"\sigma"),
+    line_denominator: Option::None,
+    region_denominator: Option::None,
 };

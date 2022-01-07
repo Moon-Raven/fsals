@@ -23,5 +23,7 @@ fn f_complex(s: Comp, p: Par) -> Comp {
 pub const SYSTEM: System = System {
     name: "telegrapher_alpha_gamma",
     f_complex,
-    parameters: (r"\alpha", r"\gamma")
+    parameters: (r"\alpha", r"\gamma"),
+    line_denominator: Option::None,
+    region_denominator: Option::None,
 };

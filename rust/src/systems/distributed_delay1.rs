@@ -12,5 +12,7 @@ fn f_complex(s: Comp, p: Par) -> Comp {
 pub const SYSTEM: System = System {
     name: "distributed_delay1",
     f_complex,
-    parameters: (r"\tau", r"k")
+    parameters: (r"\tau", r"k"),
+    line_denominator: Option::None,
+    region_denominator: Option::None,
 };

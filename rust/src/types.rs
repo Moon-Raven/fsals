@@ -5,6 +5,8 @@ use serde::Serialize;
 /* Convenience aliases */
 pub type Par = (f64, f64);
 pub type Comp = num::complex::Complex64;
+pub type LineDenomFunc = fn(w: f64, p: Par, angle: f64, th_min: f64, th_max: f64) -> f64;
+pub type RegionDenomFunc = fn(w: f64, p: Par, eps: f64) -> f64;
 
 
 /* Rectangular 2D limits */
@@ -22,4 +24,6 @@ pub struct System {
     pub name: &'static str,
     pub f_complex: fn(Comp, Par) -> Comp,
     pub parameters: (&'static str, &'static str),
+    pub line_denominator: Option<LineDenomFunc>,
+    pub region_denominator: Option<RegionDenomFunc>,
 }
