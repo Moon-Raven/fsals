@@ -13,7 +13,6 @@ use std::fmt::Display;
 use std::{str::FromStr};
 use log::{info, LevelFilter};
 use std::time::Instant;
-use test_env_log::test;
 
 
 #[derive(Parser)]
