@@ -29,6 +29,7 @@ pub struct LineConfiguration {
     pub ray_count: usize,
     pub contour_conf: ContourConfiguration,
     pub delta: Delta,
+    pub safeguard: f64,
 }
 
 
@@ -41,6 +42,7 @@ lazy_static! {
             system: retarded1::SYSTEM,
             limits: Limits { p1_min: 0.0, p1_max: 2.6, p2_min: 0.0, p2_max: 3.3 },
             ray_count: 8,
+            safeguard: 0.95,
             origins: vec![
                 (1e-2, 1e-2),
                 (1.75, 1.20),

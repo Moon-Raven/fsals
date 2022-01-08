@@ -28,10 +28,6 @@ struct RayFan {
 }
 
 
-type F1d = fn(s: Comp, theta: f64) -> Comp;
-type LineDenomFunc1d = fn(w: f64, theta_min: f64, theta_max: f64) -> Comp;
-
-
 fn spawn_angles(limits: &Limits, count: usize) -> Vec<f64> {
     let angles_lin = lin_space(-PI..PI, count);
     let p1_span = limits.p1_max - limits.p1_min;
@@ -74,17 +70,77 @@ fn delta_rel2abs(conf: &LineConfiguration, delta_rel: f64, angle: f64) -> f64 {
 }
 
 
-fn get_stability_segment_1D(
-    f_1D: F1d,
-    line_denom_1D: LineDenomFunc1d,
+fn check_jump_validity<F1, F2> (
+    f: F1,
+    line_denominator: F2,
+    theta0: f64,
+    delta_theta: f64,
+) -> bool
+where
+F1: Fn(Comp, f64) -> Comp,
+F2: Fn(f64, f64, f64) -> f64
+{
+    let theta_min = theta0;
+    let theta_max = theta0 + delta_theta;
+    let numerator = |w: f64| Comp::norm(f(Comp::new(0.0, w), theta0));
+    let denominator = |w: f64| line_denominator(w, theta_min, theta_max);
+    let fraction = |w: f64| numerator(w) / denominator(w);
+    let min = optimization::find_minimum(fraction);
+    let jump_valid = delta_theta < min;
+    jump_valid
+}
+
+
+fn find_max_delta_theta<F1, F2>(
+    f: F1,
+    line_denominator: F2,
+    theta0: f64,
+    delta: f64,
+    limit: f64
+) -> f64
+where
+F1: Fn(Comp, f64) -> Comp,
+F2: Fn(f64, f64, f64) -> f64
+{
+    let min_step = delta;
+    let condition = |delta_theta: f64| {
+        check_jump_validity(&f, &line_denominator, theta0, delta_theta)
+    };
+    optimization::get_maximum_condition(condition, min_step, limit)
+}
+
+
+fn get_stability_segment_1_d<F1, F2>(
+    f_1_d: F1,
+    line_denom_1_d: F2,
     theta0: f64,
     delta: f64,
     limit: f64,
     conf: &LineConfiguration,
 ) -> f64
+where
+    F1: Fn(Comp, f64) -> Comp,
+    F2: Fn(f64, f64, f64) -> f64
 {
+    let mut theta = theta0;
+    let mut delta_theta = f64::INFINITY;
 
-    0.0
+    while delta_theta > delta {
+        /* Find maximum offset allowed by Rouche's theorem */
+        delta_theta = find_max_delta_theta(&f_1_d, &line_denom_1_d, theta, delta, limit);
+
+        /* Reduce change for numerical errors caused by global optimization */
+        delta_theta = delta_theta * conf.safeguard;
+
+        /* Update maximum total offset thus far */
+        theta += delta_theta;
+        if theta > limit {
+            theta = limit;
+            break;
+        }
+    }
+
+    theta
 }
 
 
@@ -122,20 +178,16 @@ fn get_stability_segment(conf: &LineConfiguration, angle: f64, origin: Par) -> f
         (conf.system.f_complex)(s, p)
     };
 
-    //     Create a closure which converts the 2d denom into 1d denom
+    // Create a closure which converts the 2d denom into 1d denom
     let line_denom_2D = conf.system.line_denominator.expect("System must have line denom impl");
     let line_denom_1D  = |w: f64, th_min: f64, th_max: f64| {
         line_denom_2D(w, origin, angle, th_min, th_max)
     };
 
     let limit = get_max_theta(&conf.limits, origin, angle, delta);
+    let theta0 = 0.0;
 
-    //     While delta_theta > delta
-    //       find max delta theta:
-    //         Create a closure which checks if a delta theta is valid
-    //         Find maximum value which satisfies the condition (why is minimal in python?)
-    //       if contions are met, terminate
-    9.0
+    get_stability_segment_1_d(f_1D, line_denom_1D, theta0, delta, limit, conf)
 }
 
 
