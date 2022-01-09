@@ -2,6 +2,7 @@ mod configurations;
 
 use log::{debug, info};
 use iter_num_tools::lin_space;
+use serde::Serialize;
 use std::f64::consts::PI;
 use std::f64;
 use std::iter::Cloned;
@@ -12,16 +13,19 @@ use crate::nu;
 use crate::utils::{geometry, optimization};
 use configurations::{Delta, LineConfiguration, CONFIGURATONS};
 use cgmath::Vector2;
+use rayon::prelude::*;
 
 
-struct Ray {
+#[derive(Serialize)]
+pub struct Ray {
     origin: Par,
     angle: f64,
     length: f64,
 }
 
 
-struct RayFan {
+#[derive(Serialize)]
+pub struct RayFan {
     origin: Par,
     rays: Vec<Ray>,
     nu: i32,
@@ -160,6 +164,7 @@ fn get_max_theta(limits: &Limits, origin: Par, angle: f64, delta: f64) -> f64 {
 
 
 fn get_stability_segment(conf: &LineConfiguration, angle: f64, origin: Par) -> f64 {
+    info!("Getting stability segment for origin {:?}, angle {:?}", origin, angle);
     if !geometry::is_point_in_limits(origin, &conf.limits){
         panic!("Origin not in given limits");
     }
@@ -171,7 +176,7 @@ fn get_stability_segment(conf: &LineConfiguration, angle: f64, origin: Par) -> f
 
     // Create a closure which converts the 2d function to 1d function
     let directional_vec = (f64::cos(angle), f64::sin(angle));
-    let f_1D = |s: Comp, theta: f64 | -> Comp {
+    let f_1_d = |s: Comp, theta: f64 | -> Comp {
         let p0 = origin.0 + theta*directional_vec.0;
         let p1 = origin.1 + theta*directional_vec.1;
         let p = (p0, p1);
@@ -179,42 +184,69 @@ fn get_stability_segment(conf: &LineConfiguration, angle: f64, origin: Par) -> f
     };
 
     // Create a closure which converts the 2d denom into 1d denom
-    let line_denom_2D = conf.system.line_denominator.expect("System must have line denom impl");
-    let line_denom_1D  = |w: f64, th_min: f64, th_max: f64| {
-        line_denom_2D(w, origin, angle, th_min, th_max)
+    let line_denom_2_d = conf.system.line_denominator
+        .expect("System must have line denom impl");
+
+    let line_denom_1_d  = |w: f64, th_min: f64, th_max: f64| {
+        line_denom_2_d(w, origin, angle, th_min, th_max)
     };
 
     let limit = get_max_theta(&conf.limits, origin, angle, delta);
     let theta0 = 0.0;
 
-    get_stability_segment_1_d(f_1D, line_denom_1D, theta0, delta, limit, conf)
+    get_stability_segment_1_d(f_1_d, line_denom_1_d, theta0, delta, limit, conf)
 }
 
 
 fn get_rayfan(conf: &LineConfiguration, origin: Par) -> RayFan {
+    info!("Calculating line algo for rayfan {:?}", origin);
     let angles = spawn_angles(&conf.limits, conf.ray_count);
 
     let nu = nu::calculate_nu_single(&conf.contour_conf, conf.system.f_complex, origin);
 
-    let stability_segments = angles.clone().into_iter().map({
-        |angle| get_stability_segment(conf, angle, origin)});
-    let rays = angles.into_iter().zip(stability_segments).map(|(angle, stability_segment)| {
-        Ray {origin: origin, angle: angle, length: stability_segment}
-    });
+    let stability_segments = angles
+        .clone()
+        .into_par_iter()
+        .map(|angle| get_stability_segment(conf, angle, origin));
+
+    let rays = angles
+        .into_par_iter()
+        .zip(stability_segments)
+        .map(|(angle, stability_segment)|{
+            Ray {origin: origin, angle: angle, length: stability_segment}}
+    );
 
     RayFan { nu, rays: rays.collect(), origin: origin }
 }
 
 
-pub fn run_line(args: &Args) -> bool {
+#[derive(Serialize)]
+pub struct LineResult {
+    pub rayfans: Vec<RayFan>,
+    pub limits: &'static Limits,
+    pub parameters: (&'static str, &'static str),
+}
+
+
+pub fn run_line(args: &Args) -> LineResult {
     let config_name_option = &args.system;
     let config_name = config_name_option
         .as_ref()
         .expect("data requires system to be specified");
 
     let config = CONFIGURATONS.get(config_name.as_str()).expect("Unknown system");
-    let results = config.origins.clone().into_iter().map(|origin| get_rayfan(config, origin));
 
-    // let results: Vec<()> = results.collect();
-    true
+    let rayfans = config
+        .origins
+        .clone()
+        .into_par_iter()
+        .map(|origin| get_rayfan(config, origin));
+
+    let results = LineResult {
+        rayfans: rayfans.collect(),
+        limits: &config.limits,
+        parameters: config.system.parameters,
+    };
+
+    results
 }

@@ -41,7 +41,7 @@ lazy_static! {
             name: "retarded1",
             system: retarded1::SYSTEM,
             limits: Limits { p1_min: 0.0, p1_max: 2.6, p2_min: 0.0, p2_max: 3.3 },
-            ray_count: 8,
+            ray_count: 320,
             safeguard: 0.95,
             origins: vec![
                 (1e-2, 1e-2),
@@ -55,7 +55,7 @@ lazy_static! {
                 w_max: 1e5,
                 steps: 10_000usize,
                 },
-            delta: Delta::Abs(1e-2),
+            delta: Delta::Abs(1e-3),
         });
 
 

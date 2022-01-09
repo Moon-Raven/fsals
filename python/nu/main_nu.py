@@ -3,13 +3,11 @@ import subprocess
 import contextlib
 from types import SimpleNamespace
 import json
-from pathlib import Path
-from shutil import copyfile
 
 import matplotlib.pyplot as plt
 
 import python.utils.rust_adapter as rust_utils
-import python.utils.timestamps as timestamps
+import python.utils.storage as storage
 
 
 logger = logging.getLogger(__name__)
@@ -79,19 +77,7 @@ def create_figure(args):
     return fig
 
 
-def save_figure(args, fig):
-    dirname = 'output/nu/figures'
-    dir = Path(dirname)
-    dir.mkdir(exist_ok=True, parents=True)
-    timestamp = timestamps.get_timestamp_str()
-    figpath_timestamped = f'{dirname}/{args.system}_{timestamp}.pdf'
-    figpath = f'{dirname}/{args.system}.pdf'
-
-    fig.savefig(figpath_timestamped)
-    copyfile(figpath_timestamped, figpath)
-
-
 def main(args):
     calculate_nu(args)
     fig = create_figure(args)
-    save_figure(args, fig)
+    storage.save_figure(args, fig, 'nu', 'figures')

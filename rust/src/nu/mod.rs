@@ -5,13 +5,13 @@ use std::collections::HashMap;
 use lazy_static::lazy_static;
 use iter_num_tools::{log_space, lin_space, grid_space};
 use std::f64::consts::PI;
-use serde::Serialize;
-use std::fs;
 use std::path::PathBuf;
 use rayon::prelude::*;
+use std::fs;
 
 use crate::Args;
 use crate::types::{Comp, Par, System, Limits};
+use crate::utils::storage;
 pub use configurations::{ContourConfiguration,NuConfiguration,CONFIGURATONS};
 
 
@@ -117,14 +117,6 @@ fn calculate_nu(conf: &'static NuConfiguration, _parallel: bool) -> NuResult {
 }
 
 
-pub fn store_results<I>(results: I, filename: &String)
-where I: Serialize
-{
-    let results = serde_json::to_string(&results).unwrap();
-    info!("Storing results into {}", filename);
-    fs::write(filename, results).expect("Unable to store nu results");
-}
-
 
 fn get_nu_path(config_name: &String) -> String {
     let root = "../";
@@ -149,5 +141,5 @@ pub fn run(args: &Args) {
 
     /* Store results in file */
     let filename = get_nu_path(config_name);
-    store_results(results, &filename);
+    storage::store_results(results, &filename);
 }
