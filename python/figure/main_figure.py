@@ -9,13 +9,7 @@ import numpy as np
 
 import python.utils.geometry as geometry
 import python.utils.storage as storage
-import python.utils.comparison_methods.gu2005 as gu2005
 from python.figure.configurations import CONFIGURATIONS
-
-
-EXAMPLE1_SCALING = 1.1
-SINGLE_COLUMN_WIDTH = 8.85553
-DOUBLE_COLUMN_WIDTH = 18.3436
 
 
 logger = logging.getLogger(__name__)
@@ -105,7 +99,7 @@ def create_figure(args):
     # Fetch figure
     tight = False
     constrained = True
-    width, height = SINGLE_COLUMN_WIDTH, SINGLE_COLUMN_WIDTH * EXAMPLE1_SCALING
+    width, height = cfg.width, cfg.height
     fig, ax = new_figure(width, height, tight, constrained)
 
     # Configure axes
@@ -118,36 +112,39 @@ def create_figure(args):
     configure_ticks(ax, cfg)
 
     linewidth = 1
-    origins = True
     colors = {0: 'g', 2: 'darkred', 4: 'cornflowerblue', 6: 'orange', 8: 'mediumpurple'}
     nus = set()
 
-    for rayfan, ratio in zip(data.rayfans, cfg.ratios):
+    if cfg.ratios == None:
+        ratios = [1] * len(data.rayfans)
+    else:
+        ratios = cfg.ratios
+
+    for rayfan, ratio in zip(data.rayfans, ratios):
         nu = rayfan.nu
         nus.add(nu)
         color = colors[nu]
         logging.debug(f'Taking color {color} for nu {nu}')
-        add_rayfan_to_ax(ax, rayfan, color, linewidth, ratio, origins)
+        add_rayfan_to_ax(ax, rayfan, color, linewidth, ratio, cfg.draw_origins)
 
     # Prepare regular legend labels
     nus = sorted(list(nus))
-    legend_elements = [
+    legend_handles = [
         Line2D([0], [0], color=colors[nu], label=f'$NU_f$ = {nu}') for nu in nus]
 
     # Add origin label, if necessary
-    if origins:
+    if cfg.draw_origins:
         origin_handle = Line2D([0], [0], color='black', linestyle='None',
             markersize=4, marker='X', label='Starting points'),
-        legend_elements.insert(0, *origin_handle)
+        legend_handles.insert(0, *origin_handle)
 
-    # legend_elements = [
-    #     # Line2D([0], [0], color='black', linestyle='--', label='SCS'),
-    #     ]
-    x = ax.legend(handles=legend_elements, loc='upper left', frameon=False,
-              bbox_to_anchor=cfg.bbox, mode='expand', ncol=cfg.ncol)
 
     # Call custom drawing actions for given system
-    cfg.custom_func(ax)
+    ax, legend_handles = cfg.custom_func(ax, legend_handles)
+
+    # Draw the legend
+    ax.legend(handles=legend_handles, loc='upper left', frameon=False,
+              bbox_to_anchor=cfg.bbox, mode='expand', ncol=cfg.ncol)
 
     return fig
 
