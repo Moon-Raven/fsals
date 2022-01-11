@@ -9,7 +9,7 @@ where I: Serialize
 {
     let results = serde_json::to_string(&results).unwrap();
     info!("Storing results into {}", filename);
-    fs::write(filename, results).expect("Unable to store nu results");
+    fs::write(filename, results).expect("Unable to store results");
 }
 
 

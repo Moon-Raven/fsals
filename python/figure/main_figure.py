@@ -88,8 +88,6 @@ def add_rayfan_to_ax(ax, rayfan, linecolor, linewidth, ratio, origins=False):
                 clip_on=False, markersize=ORIGIN_MARKERSIZE)
 
 
-
-
 def create_figure(args):
     data = read_data(args)
     cfg = CONFIGURATIONS[args.system]

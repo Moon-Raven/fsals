@@ -10,7 +10,7 @@ use std::iter::Cloned;
 use crate::Args;
 use crate::types::{Comp, Par, System, Limits};
 use crate::nu;
-use crate::utils::{geometry, optimization};
+use crate::utils::{storage, geometry, optimization};
 use configurations::{Delta, LineConfiguration, CONFIGURATONS};
 use cgmath::Vector2;
 use rayon::prelude::*;
@@ -228,7 +228,7 @@ pub struct LineResult {
 }
 
 
-pub fn run_line(args: &Args) -> LineResult {
+pub fn run_line(args: &Args) {
     let config_name_option = &args.system;
     let config_name = config_name_option
         .as_ref()
@@ -248,5 +248,22 @@ pub fn run_line(args: &Args) -> LineResult {
         parameters: config.system.parameters,
     };
 
-    results
+    /* Store results in file */
+    let config_name_option = &args.system;
+    let config_name = config_name_option
+        .as_ref()
+        .expect("data requires system to be specified");
+    let command = "data";
+    let extension = "data";
+
+    let algorithm_option = &args.algorithm;
+    let algorithm = algorithm_option.as_ref().expect("data requires algorithm to be set");
+
+    let filename = storage::get_filepath(
+        command,
+        &algorithm.to_string(),
+        extension,
+        config_name);
+
+    storage::store_results(results, &filename);
 }
