@@ -10,15 +10,12 @@ use crate::systems::retarded1;
 use crate::systems::semi_infinite_rod;
 use crate::systems::telegrapher_alpha_gamma;
 use crate::systems::telegrapher_x_k;
+use crate::utils::geometry::Delta;
 
 use crate::nu::ContourConfiguration;
 use crate::types::{Limits, Par, System};
 
 
-pub enum Delta {
-    Abs(f64),
-    Rel(f64),
-}
 
 
 pub struct LineConfiguration {

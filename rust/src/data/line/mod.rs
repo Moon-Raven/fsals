@@ -11,7 +11,8 @@ use crate::Args;
 use crate::types::{Comp, Par, System, Limits};
 use crate::nu;
 use crate::utils::{storage, geometry, optimization};
-use configurations::{Delta, LineConfiguration, CONFIGURATONS};
+use crate::utils::geometry::Delta;
+use configurations::{LineConfiguration, CONFIGURATONS};
 use cgmath::Vector2;
 use rayon::prelude::*;
 
@@ -54,24 +55,6 @@ fn spawn_angles(limits: &Limits, count: usize) -> Vec<f64> {
 }
 
 
-fn delta_rel2abs(conf: &LineConfiguration, delta_rel: f64, angle: f64) -> f64 {
-    let p1span = conf.limits.p1_max - conf.limits.p1_min;
-    let p2span = conf.limits.p2_max - conf.limits.p2_min;
-    let p1delta = p1span * delta_rel;
-    let p2delta = p2span * delta_rel;
-
-    let delta1 = match f64::cos(angle) != 0.0 {
-        true => f64::abs(p1delta / f64::cos(angle)),
-        false => f64::INFINITY,
-    };
-    let delta2 = match f64::cos(angle) != 0.0 {
-        true => f64::abs(p2delta / f64::cos(angle)),
-        false => f64::INFINITY,
-    };
-    let delta_abs = f64::min(delta1, delta2);
-
-    delta_abs
-}
 
 
 fn check_jump_validity<F1, F2> (
@@ -148,6 +131,26 @@ where
 }
 
 
+pub fn delta_rel2abs(limits: &Limits, delta_rel: f64, angle: f64) -> f64 {
+    let p1span = limits.p1_max - limits.p1_min;
+    let p2span = limits.p2_max - limits.p2_min;
+    let p1delta = p1span * delta_rel;
+    let p2delta = p2span * delta_rel;
+
+    let delta1 = match f64::cos(angle) != 0.0 {
+        true => f64::abs(p1delta / f64::cos(angle)),
+        false => f64::INFINITY,
+    };
+    let delta2 = match f64::cos(angle) != 0.0 {
+        true => f64::abs(p2delta / f64::cos(angle)),
+        false => f64::INFINITY,
+    };
+    let delta_abs = f64::min(delta1, delta2);
+
+    delta_abs
+}
+
+
 fn get_max_theta(limits: &Limits, origin: Par, angle: f64, delta: f64) -> f64 {
     let direction = Vector2::new(f64::cos(angle), f64::sin(angle));
 
@@ -171,7 +174,7 @@ fn get_stability_segment(conf: &LineConfiguration, angle: f64, origin: Par) -> f
 
     let delta = match conf.delta {
         Delta::Abs(abs) => abs,
-        Delta::Rel(rel) => delta_rel2abs(conf, rel, angle),
+        Delta::Rel(rel) => delta_rel2abs(&conf.limits, rel, angle),
     };
 
     // Create a closure which converts the 2d function to 1d function

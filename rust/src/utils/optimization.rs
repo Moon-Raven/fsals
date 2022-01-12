@@ -48,6 +48,7 @@ where F: Fn(f64) -> bool
         }
 
         if step < min_step {
+            debug!{"Minimum step breached; aborting"}
             break;
         }
     }

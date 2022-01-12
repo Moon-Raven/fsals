@@ -16,10 +16,17 @@ fn line_denominator(w: f64, _p: Par, _angle: f64, _th_min: f64, _th_max: f64) ->
 }
 
 
+fn region_denominator(w: f64, _origin: Par, _eps: f64) -> f64 {
+    let gradient_p1 = 2.0 * w.powi(2);
+    let gradient_p2 = w;
+    f64::sqrt(gradient_p1.powi(2) + gradient_p2.powi(2))
+}
+
+
 pub const SYSTEM: System = System {
     name: "retarded1",
     f_complex,
     parameters: (r"\tau_1", r"\tau_2"),
     line_denominator: Option::Some(line_denominator),
-    region_denominator: Option::None,
+    region_denominator: Option::Some(region_denominator),
 };

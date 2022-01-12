@@ -1,4 +1,11 @@
 use crate::types::{Par, Limits};
+use crate::utils::geometry;
+
+
+pub enum Delta {
+    Abs(f64),
+    Rel(f64),
+}
 
 
 pub fn is_point_in_limits(point: Par, limits: &Limits) -> bool {
@@ -10,3 +17,4 @@ pub fn is_point_in_limits(point: Par, limits: &Limits) -> bool {
         true
     }
 }
+
