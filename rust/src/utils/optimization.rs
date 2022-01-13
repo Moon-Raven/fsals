@@ -61,7 +61,7 @@ where F: Fn(f64) -> bool
 lazy_static! {
     pub static ref W_LOGSPACED: Vec<f64> = {
         let w_min = 1e-3;
-        let w_max = 1e7;
+        let w_max = 1e10;
         let steps = 10_000;
         log_space(w_min..=w_max, steps).collect()
     };

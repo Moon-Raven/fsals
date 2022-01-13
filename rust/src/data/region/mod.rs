@@ -30,7 +30,7 @@ pub struct PRegion {
 
 impl PRegion {
     fn spawn_edge_points(&self, point_count: usize) -> Vec<Par> {
-        let angles = lin_space(0.0..PI, point_count);
+        let angles = lin_space(0.0..2.0*PI, point_count);
         let angles2 = angles.clone();
         let p1_offsets = angles.into_iter().map(|angle| self.radius * f64::cos(angle));
         let p2_offsets = angles2.into_iter().map(|angle| self.radius * f64::sin(angle));
@@ -40,7 +40,7 @@ impl PRegion {
     }
 
     fn is_point_inside(&self, p: Par) -> bool {
-        const SAFEGUARD: f64 = 0.9999;
+        const SAFEGUARD: f64 = 0.99;
         let x = f64::abs(self.origin.0 - p.0);
         let y = f64::abs(self.origin.1 - p.1);
         let distance = f64::sqrt(x.powi(2) + y.powi(2));
@@ -116,19 +116,25 @@ pub fn get_region(conf: &RegionConfiguration, origin: Par) -> Region {
 
     while let Some(p) = pending_points.pop_front() {
         if pregions.iter().map(|preg| preg.is_point_inside(p)).any(|b| b) {
+            debug!("Point {:?} is already inside one of the regions; skipping", p);
             continue;
         }
-
+        info!("Point {:?}; is valid; searching for pregion", p);
         let pregion = get_pregion(conf, p);
         if pregion.radius > delta { // Test with > and >=
             let new_points = pregion.spawn_edge_points(conf.spawn_count);
+            debug!("Spawned {} new points around {:?}", new_points.len(), p);
             let mut valid_points: VecDeque<Par> = new_points
                 .into_iter()
                 .filter(|p| {
-                    pregions.iter().map(|preg| preg.is_point_inside(*p)).all(|b| b)
+                    pregions.iter().map(|preg| !preg.is_point_inside(*p)).all(|b| b)
                 }).collect();
+            debug!("Adding {} new points to FIFO queue", valid_points.len());
             pending_points.append(&mut valid_points);
+        } else {
+            debug!("New pregion around {:?} is too small; won't add new points", p);
         }
+
         pregions.push(pregion);
     }
 
