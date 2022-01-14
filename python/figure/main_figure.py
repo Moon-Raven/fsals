@@ -227,15 +227,14 @@ def create_figure_region(args):
     return fig
 
 
-def create_figure(args):
+def main(args):
     if args.algorithm == 'line':
-        return create_figure_line(args)
+        fig = create_figure_line(args)
+        extension = 'pdf'
+        storage.save_figure(args, fig, args.command, args.algorithm, extension)
     elif args.algorithm == 'region':
-        return create_figure_region(args)
+        fig =  create_figure_region(args)
+        extension = 'png'
+        storage.save_figure(args, fig, args.command, args.algorithm, extension)
     else:
         raise Exception(f'Unknown algorithm: {args.algorithm}')
-
-
-def main(args):
-    fig = create_figure(args)
-    storage.save_figure(args, fig, args.command, args.algorithm)

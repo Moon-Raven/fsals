@@ -30,6 +30,7 @@ pub struct RegionConfiguration {
     pub delta: Delta,
     pub safeguard: f64,
     pub spawn_count: usize,
+    pub enforce_limits: bool,
 }
 
 
@@ -55,7 +56,8 @@ lazy_static! {
                 steps: 10_000usize,
                 },
             delta: Delta::Abs(1e-2),
-            spawn_count: 16,
+            spawn_count: 32,
+            enforce_limits: false,
         });
 
         // configs.insert("distributed_delay1", RegionConfiguration {

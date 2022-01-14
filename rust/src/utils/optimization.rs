@@ -7,7 +7,7 @@ use iter_num_tools::{log_space, lin_space};
 pub fn get_maximum_condition<F>(condition: F, min_step: f64, limit: f64) -> f64
 where F: Fn(f64) -> bool
 {
-    const CONSECUTIVE_SUCCESSES_THRESHOLD: u32 = 5;
+    const CONSECUTIVE_SUCCESSES_THRESHOLD: u32 = 3;
     let mut step = min_step * 1e3;
     let mut consecutive_successes: u32 = 0;
     let mut x: f64 = 0.0; // Variable we are optimizing
@@ -62,7 +62,7 @@ lazy_static! {
     pub static ref W_LOGSPACED: Vec<f64> = {
         let w_min = 1e-3;
         let w_max = 1e10;
-        let steps = 10_000;
+        let steps = 1_000;
         log_space(w_min..=w_max, steps).collect()
     };
 }
@@ -88,12 +88,14 @@ where F: Fn(f64) -> f64
     debug!("Found log minimum f({}) = {} at index {}", argmin, min, minind);
 
     /* Perform search on linspace */
-    let w_min = if minind == 0 {
-        0.0
+    let w_min =
+        if minind == 0 {
+            0.0
         } else {
             W_LOGSPACED[minind -1]
         };
-    let w_max = if minind == last_ind {
+    let w_max =
+        if minind == last_ind {
             panic!("Minimum seems to be out of bounds")
         } else {
             W_LOGSPACED[minind + 1]

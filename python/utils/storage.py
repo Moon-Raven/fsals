@@ -4,13 +4,16 @@ from shutil import copyfile
 import python.utils.timestamps as timestamps
 
 
-def save_figure(args, fig, command, subcommand):
+def save_figure(args, fig, command, subcommand, extension):
     dirname = f'output/{command}/{subcommand}'
     dir = Path(dirname)
     dir.mkdir(exist_ok=True, parents=True)
     timestamp = timestamps.get_timestamp_str()
-    figpath_timestamped = f'{dirname}/{args.system}_{timestamp}.pdf'
-    figpath = f'{dirname}/{args.system}.pdf'
+    figpath_timestamped = f'{dirname}/{args.system}_{timestamp}.{extension}'
+    figpath = f'{dirname}/{args.system}.{extension}'
 
-    fig.savefig(figpath_timestamped)
+    if extension == 'png':
+        fig.savefig(figpath_timestamped, pad_inches=0.0, dpi=1000)
+    else:
+        fig.savefig(figpath_timestamped)
     copyfile(figpath_timestamped, figpath)

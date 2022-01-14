@@ -8,7 +8,7 @@ use std::collections::VecDeque;
 
 use crate::nu;
 use crate::types::{Comp, Limits, Par, System};
-use crate::utils::{optimization, storage};
+use crate::utils::{geometry, optimization, storage};
 use crate::Args;
 use configurations::{Delta, RegionConfiguration, CONFIGURATONS};
 use std::fs;
@@ -88,51 +88,58 @@ fn delta_rel2abs(delta: f64, limits: &Limits) -> f64 {
 }
 
 
-fn get_pregion(conf: &RegionConfiguration, origin: Par) -> PRegion {
-    let delta = match conf.delta {
-        Delta::Abs(abs) => abs,
-        Delta::Rel(rel) => delta_rel2abs(rel, &conf.limits),
-    };
+fn get_pregion(
+    conf: &RegionConfiguration,
+    origin: Par,
+    enforce_limits: bool,
+    delta_abs: f64) -> PRegion
+{
     let condition = |eps| check_jump_validity(conf, origin, eps);
-    let limit = get_limiting_eps(origin, &conf.limits);
-    info!("Finding pregion for origin {:?}; delta={}, limit={}", origin, delta, limit);
-    let radius = optimization::get_maximum_condition(condition, delta, limit);
+    let limit = match enforce_limits {
+        true => get_limiting_eps(origin, &conf.limits),
+        false => f64::INFINITY,
+    };
+    info!("Finding pregion for origin {:?}; delta={}, limit={}", origin, delta_abs, limit);
+    let radius = optimization::get_maximum_condition(condition, delta_abs, limit);
 
     PRegion { origin, radius }
 }
 
 
+pub fn absolutize_delta(delta: &Delta, limits: &Limits) -> f64 {
+    match delta {
+        Delta::Abs(abs) => *abs,
+        Delta::Rel(rel) => delta_rel2abs(*rel, limits),
+    }
+}
+
+
 pub fn get_region(conf: &RegionConfiguration, origin: Par) -> Region {
-    let delta = match conf.delta {
-        Delta::Abs(abs) => abs,
-        Delta::Rel(rel) => delta_rel2abs(rel, &conf.limits),
-    };
+    const VEC_PREALLOCATION_SIZE: usize = 10_000;
+    let delta = absolutize_delta(&conf.delta, &conf.limits);
     let nu = nu::calculate_nu_single(&conf.contour_conf, conf.system.f_complex, origin);
-    let mut pending_points: VecDeque<Par> = VecDeque::new();
+    let mut pending_points: VecDeque<Par> = VecDeque::with_capacity(VEC_PREALLOCATION_SIZE);
     pending_points.push_back(origin);
-    let mut pregions: Vec<PRegion> = vec![];
+    let mut pregions: Vec<PRegion> = Vec::with_capacity(VEC_PREALLOCATION_SIZE);
 
     info!("Searching for region around {:?} with nu {}", origin, nu);
 
     while let Some(p) = pending_points.pop_front() {
+
         if pregions.iter().map(|preg| preg.is_point_inside(p)).any(|b| b) {
-            debug!("Point {:?} is already inside one of the regions; skipping", p);
             continue;
         }
-        info!("Point {:?}; is valid; searching for pregion", p);
-        let pregion = get_pregion(conf, p);
+
+        let pregion = get_pregion(conf, p, conf.enforce_limits, delta);
         if pregion.radius > delta { // Test with > and >=
             let new_points = pregion.spawn_edge_points(conf.spawn_count);
-            debug!("Spawned {} new points around {:?}", new_points.len(), p);
             let mut valid_points: VecDeque<Par> = new_points
                 .into_iter()
-                .filter(|p| {
-                    pregions.iter().map(|preg| !preg.is_point_inside(*p)).all(|b| b)
-                }).collect();
-            debug!("Adding {} new points to FIFO queue", valid_points.len());
+                .filter(|p| {pregions.iter().map(|preg| !preg.is_point_inside(*p)).all(|b| b)})
+                .filter(|p| geometry::is_point_in_limits(*p, &conf.limits))
+                .collect();
+
             pending_points.append(&mut valid_points);
-        } else {
-            debug!("New pregion around {:?} is too small; won't add new points", p);
         }
 
         pregions.push(pregion);

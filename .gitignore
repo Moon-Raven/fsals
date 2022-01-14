@@ -155,4 +155,4 @@ cython_debug/
 log/
 output/
 run.sh
-questions.txt
+notes/
