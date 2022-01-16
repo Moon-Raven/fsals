@@ -61,12 +61,17 @@ fn check_jump_validity<I> (
     conf: &RegionConfiguration,
     origin: Par,
     eps: f64,
-    numerator: &I) -> bool
+    numerator_preallocated: &I) -> bool
 where
     for<'a> &'a I: IntoIterator<Item = &'a f64>
 {
+    let numerator = |w| (conf.system.f_complex)(Comp::new(0.0, w), origin).norm();
     let denominator = |w| (conf.system.region_denominator.unwrap())(w, origin, eps);
-    let min = optimization::find_minimum_preallocated_numerator(denominator, numerator);
+    let fraction = |w| numerator(w) / denominator(w);
+    let min = optimization::find_minimum_preallocated_numerator(
+        fraction,
+        denominator,
+        numerator_preallocated);
 
     eps < min
 }
@@ -94,16 +99,15 @@ fn delta_rel2abs(delta: f64, limits: &Limits) -> f64 {
 }
 
 
-fn get_pregion<I>(
+fn get_pregion(
     conf: &RegionConfiguration,
     origin: Par,
     enforce_limits: bool,
     delta_abs: f64,
-    numerator: &I) -> PRegion
-where
-    for<'a> &'a I: IntoIterator<Item = &'a f64>
+) -> PRegion
 {
-    let condition = |eps| check_jump_validity(conf, origin, eps, numerator);
+    let numerator: Vec<f64> = precalculate_numerator(conf, origin);
+    let condition = |eps| check_jump_validity(conf, origin, eps, &numerator);
     let limit = match enforce_limits {
         true => get_limiting_eps(origin, &conf.limits),
         false => f64::INFINITY,
@@ -136,7 +140,6 @@ pub fn get_region(conf: &RegionConfiguration, origin: Par) -> Region {
     let mut pending_points: VecDeque<Par> = VecDeque::with_capacity(VEC_PREALLOCATION_SIZE);
     pending_points.push_back(origin);
     let mut pregions: Vec<PRegion> = Vec::with_capacity(VEC_PREALLOCATION_SIZE);
-    let numerator: Vec<f64> = precalculate_numerator(conf, origin);
 
     info!("Searching for region around {:?} with nu {}", origin, nu);
 
@@ -146,7 +149,7 @@ pub fn get_region(conf: &RegionConfiguration, origin: Par) -> Region {
             continue;
         }
 
-        let pregion = get_pregion(conf, p, conf.enforce_limits, delta, &numerator);
+        let pregion = get_pregion(conf, p, conf.enforce_limits, delta);
         if pregion.radius > delta { // Test with > and >=
             let new_points = pregion.spawn_edge_points(conf.spawn_count);
             let mut valid_points: VecDeque<Par> = new_points

@@ -4,6 +4,8 @@ use log::{debug, info};
 use iter_num_tools::{log_space, lin_space};
 use rayon::join;
 
+use crate::types;
+
 
 pub fn get_maximum_condition<F>(condition: F, min_step: f64, limit: f64) -> f64
 where F: Fn(f64) -> bool
@@ -92,13 +94,19 @@ where
 }
 
 
-pub fn find_minimum_preallocated_numerator<F, I>(denominator: F, numerator: &I) -> f64
-where   F: Fn(f64) -> f64,
-        for<'a> &'a I: IntoIterator<Item = &'a f64>
+pub fn find_minimum_preallocated_numerator<F1, F2, I>(
+    total_func: F1,
+    denominator: F2,
+    numerator_preallocated: &I,
+) -> f64
+where
+    F1: Fn(f64) -> f64,
+    F2: Fn(f64) -> f64,
+    for<'a> &'a I: IntoIterator<Item = &'a f64>
 {
     let w_size = W_LOGSPACED.len();
     let last_ind: usize = w_size - 1;
-    let total_iter = components2iterator(&denominator, numerator, W_LOGSPACED.iter().copied());
+    let total_iter = components2iterator(&denominator, numerator_preallocated, W_LOGSPACED.iter().copied());
 
     /* Perform search on logspace */
     let minind = total_iter
@@ -123,7 +131,8 @@ where   F: Fn(f64) -> f64,
     debug!("Starting linsearch on [{}, {}]", w_min, w_max);
 
     let w_axis = lin_space(w_min..=w_max, w_size);
-    let min = components2iterator(&denominator, numerator, w_axis) // Fix pls
+    let min = lin_space(w_min..=w_max, w_size)
+        .map(|w| total_func(w))
         .min_by(|a, b| a.partial_cmp(b).expect("Invalid value found"))
         .expect("Error while searching for lin min");
 
