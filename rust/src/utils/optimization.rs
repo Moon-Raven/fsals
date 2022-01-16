@@ -2,6 +2,8 @@ use lazy_static::lazy_static;
 use log::{debug, info};
 
 use iter_num_tools::{log_space, lin_space};
+use itertools_num::linspace;
+use rayon::join;
 
 
 pub fn get_maximum_condition<F>(condition: F, min_step: f64, limit: f64) -> f64
@@ -65,6 +67,72 @@ lazy_static! {
         let steps = 1_000;
         log_space(w_min..=w_max, steps).collect()
     };
+}
+
+
+pub fn precalculate_logspace<F>(f: F) -> Vec<f64>
+where F: Fn(f64) -> f64
+{
+    W_LOGSPACED.iter().map(|w| f(*w)).collect()
+}
+
+
+pub fn components2iterator<'a, F, I1, I2>(
+    denominator: &'a F,
+    numerator: &'a I1,
+    w_axis: I2
+) -> impl Iterator<Item=f64> + 'a
+where
+    F: Fn(f64) -> f64,
+    for<'c> &'c I1: IntoIterator<Item = &'c f64>,
+    I2: Iterator<Item = &'a f64> + 'a,
+{
+    let denominator_iter = w_axis.into_iter().map(move |w: &f64| denominator(*w));
+    let joint_iter = numerator.into_iter().zip(denominator_iter);
+    joint_iter.map(|(num, denom)| num / denom)
+}
+
+
+pub fn find_minimum_preallocated_numerator<F, I>(denominator: F, numerator: &I) -> f64
+where   F: Fn(f64) -> f64,
+        for<'a> &'a I: IntoIterator<Item = &'a f64>
+{
+    let w_size = W_LOGSPACED.len();
+    let last_ind: usize = w_size - 1;
+    let total_iter = components2iterator(&denominator, numerator, W_LOGSPACED.iter());
+
+    /* Perform search on logspace */
+    let minind = total_iter
+        .enumerate()
+        .min_by(|(_, a), (_, b)| a.partial_cmp(b).expect("Invalid value found"))
+        .map(|(index, _)| index)
+        .expect("Error while searching for log min");
+
+    let argmin = W_LOGSPACED[minind];
+
+    /* Perform search on linspace */
+    let w_min =
+        if minind == 0 {
+            0.0
+        } else {
+            W_LOGSPACED[minind -1]
+        };
+    let w_max =
+        if minind == last_ind {
+            panic!("Minimum seems to be out of bounds")
+        } else {
+            W_LOGSPACED[minind + 1]
+        };
+    debug!("Starting linsearch on [{}, {}]", w_min, w_max);
+
+    let w_axis = lin_space(w_min..=w_max, w_size);
+    let min = components2iterator(&denominator, numerator, w_axis) // Fix pls
+        .min_by(|a, b| a.partial_cmp(b).expect("Invalid value found"))
+        .expect("Error while searching for lin min");
+
+    debug!("Found lin minimum f(?) = {}", min);
+
+    min
 }
 
 

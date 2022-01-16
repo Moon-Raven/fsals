@@ -8,6 +8,7 @@ use std::collections::VecDeque;
 
 use crate::nu;
 use crate::types::{Comp, Limits, Par, System};
+use crate::utils::optimization::precalculate_logspace;
 use crate::utils::{geometry, optimization, storage};
 use crate::Args;
 use configurations::{Delta, RegionConfiguration, CONFIGURATONS};
@@ -56,11 +57,16 @@ pub struct Region {
 }
 
 
-fn check_jump_validity(conf: &RegionConfiguration, origin: Par, eps: f64) -> bool {
-    let numerator = |w| (conf.system.f_complex)(Comp::new(0.0, w), origin).norm();
+fn check_jump_validity<I> (
+    conf: &RegionConfiguration,
+    origin: Par,
+    eps: f64,
+    numerator: &I) -> bool
+where
+    for<'a> &'a I: IntoIterator<Item = &'a f64>
+{
     let denominator = |w| (conf.system.region_denominator.unwrap())(w, origin, eps);
-    let fraction = |w| numerator(w) / denominator(w);
-    let min = optimization::find_minimum(fraction);
+    let min = optimization::find_minimum_preallocated_numerator(denominator, numerator);
 
     eps < min
 }
@@ -88,13 +94,16 @@ fn delta_rel2abs(delta: f64, limits: &Limits) -> f64 {
 }
 
 
-fn get_pregion(
+fn get_pregion<I>(
     conf: &RegionConfiguration,
     origin: Par,
     enforce_limits: bool,
-    delta_abs: f64) -> PRegion
+    delta_abs: f64,
+    numerator: &I) -> PRegion
+where
+    for<'a> &'a I: IntoIterator<Item = &'a f64>
 {
-    let condition = |eps| check_jump_validity(conf, origin, eps);
+    let condition = |eps| check_jump_validity(conf, origin, eps, numerator);
     let limit = match enforce_limits {
         true => get_limiting_eps(origin, &conf.limits),
         false => f64::INFINITY,
@@ -114,6 +123,12 @@ pub fn absolutize_delta(delta: &Delta, limits: &Limits) -> f64 {
 }
 
 
+pub fn precalculate_numerator(conf: &RegionConfiguration, origin: Par) -> Vec<f64> {
+    let numerator = |w| (conf.system.f_complex)(Comp::new(0.0, w), origin).norm();
+    optimization::precalculate_logspace(numerator)
+}
+
+
 pub fn get_region(conf: &RegionConfiguration, origin: Par) -> Region {
     const VEC_PREALLOCATION_SIZE: usize = 10_000;
     let delta = absolutize_delta(&conf.delta, &conf.limits);
@@ -121,6 +136,7 @@ pub fn get_region(conf: &RegionConfiguration, origin: Par) -> Region {
     let mut pending_points: VecDeque<Par> = VecDeque::with_capacity(VEC_PREALLOCATION_SIZE);
     pending_points.push_back(origin);
     let mut pregions: Vec<PRegion> = Vec::with_capacity(VEC_PREALLOCATION_SIZE);
+    let numerator: Vec<f64> = precalculate_numerator(conf, origin);
 
     info!("Searching for region around {:?} with nu {}", origin, nu);
 
@@ -130,7 +146,7 @@ pub fn get_region(conf: &RegionConfiguration, origin: Par) -> Region {
             continue;
         }
 
-        let pregion = get_pregion(conf, p, conf.enforce_limits, delta);
+        let pregion = get_pregion(conf, p, conf.enforce_limits, delta, &numerator);
         if pregion.radius > delta { // Test with > and >=
             let new_points = pregion.spawn_edge_points(conf.spawn_count);
             let mut valid_points: VecDeque<Par> = new_points
