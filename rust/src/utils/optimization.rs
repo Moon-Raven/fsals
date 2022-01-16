@@ -2,7 +2,6 @@ use lazy_static::lazy_static;
 use log::{debug, info};
 
 use iter_num_tools::{log_space, lin_space};
-use itertools_num::linspace;
 use rayon::join;
 
 
@@ -85,9 +84,9 @@ pub fn components2iterator<'a, F, I1, I2>(
 where
     F: Fn(f64) -> f64,
     for<'c> &'c I1: IntoIterator<Item = &'c f64>,
-    I2: Iterator<Item = &'a f64> + 'a,
+    I2: Iterator<Item = f64> + 'a,
 {
-    let denominator_iter = w_axis.into_iter().map(move |w: &f64| denominator(*w));
+    let denominator_iter = w_axis.map(move |w| denominator(w));
     let joint_iter = numerator.into_iter().zip(denominator_iter);
     joint_iter.map(|(num, denom)| num / denom)
 }
@@ -99,7 +98,7 @@ where   F: Fn(f64) -> f64,
 {
     let w_size = W_LOGSPACED.len();
     let last_ind: usize = w_size - 1;
-    let total_iter = components2iterator(&denominator, numerator, W_LOGSPACED.iter());
+    let total_iter = components2iterator(&denominator, numerator, W_LOGSPACED.iter().copied());
 
     /* Perform search on logspace */
     let minind = total_iter
@@ -107,8 +106,6 @@ where   F: Fn(f64) -> f64,
         .min_by(|(_, a), (_, b)| a.partial_cmp(b).expect("Invalid value found"))
         .map(|(index, _)| index)
         .expect("Error while searching for log min");
-
-    let argmin = W_LOGSPACED[minind];
 
     /* Perform search on linspace */
     let w_min =
