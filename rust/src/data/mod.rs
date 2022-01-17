@@ -14,7 +14,7 @@ pub fn run(args: &Args) {
     let algorithm_option = &args.algorithm;
     let algorithm = algorithm_option.as_ref().expect("data requires algorithm to be set");
 
-    let results = match algorithm {
+    match algorithm {
          Algorithm::Line => line::run_line(args),
          Algorithm::Region => region::run_region(args),
     };

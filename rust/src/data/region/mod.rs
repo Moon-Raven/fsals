@@ -8,7 +8,7 @@ use std::collections::VecDeque;
 
 use crate::nu;
 use crate::types::{Comp, Limits, Par, System};
-use crate::utils::optimization::precalculate_logspace;
+use crate::utils::optimization::MinimizationProblem;
 use crate::utils::{geometry, optimization, storage};
 use crate::Args;
 use configurations::{Delta, RegionConfiguration, CONFIGURATONS};
@@ -61,17 +61,21 @@ fn check_jump_validity<I> (
     conf: &RegionConfiguration,
     origin: Par,
     eps: f64,
-    numerator_preallocated: &I) -> bool
+    precalculated_numerator: &I) -> bool
 where
     for<'a> &'a I: IntoIterator<Item = &'a f64>
 {
     let numerator = |w| (conf.system.f_complex)(Comp::new(0.0, w), origin).norm();
     let denominator = |w| (conf.system.region_denominator.unwrap())(w, origin, eps);
     let fraction = |w| numerator(w) / denominator(w);
-    let min = optimization::find_minimum_preallocated_numerator(
-        fraction,
-        denominator,
-        numerator_preallocated);
+
+    let minimization_problem = MinimizationProblem {
+        precalculated_numerator: &precalculated_numerator,
+        fraction_function: &fraction,
+        denominator_function: &denominator,
+    };
+
+    let min = optimization::find_minimum_preallocated_numerator(&minimization_problem);
 
     eps < min
 }

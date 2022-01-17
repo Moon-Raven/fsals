@@ -78,26 +78,36 @@ where F: Fn(f64) -> f64
 }
 
 
-pub fn components2iterator<'a, F, I1, I2>(
-    denominator: &'a F,
-    numerator: &'a I1,
-    w_axis: I2
-) -> impl Iterator<Item=f64> + 'a
+pub struct MinimizationProblem<'b, I, F1, F2>
 where
-    F: Fn(f64) -> f64,
-    for<'c> &'c I1: IntoIterator<Item = &'c f64>,
-    I2: Iterator<Item = f64> + 'a,
+    F1: Fn(f64) -> f64,
+    F2: Fn(f64) -> f64,
+    for<'a> &'a I: IntoIterator<Item = &'a f64>
 {
-    let denominator_iter = w_axis.map(move |w| denominator(w));
-    let joint_iter = numerator.into_iter().zip(denominator_iter);
-    joint_iter.map(|(num, denom)| num / denom)
+    pub precalculated_numerator: &'b I,
+    pub denominator_function: &'b F1,
+    pub fraction_function: &'b F2,
+}
+
+impl<'b, I, F1, F2> MinimizationProblem<'b, I, F1, F2>
+where
+    F1: Fn(f64) -> f64,
+    F2: Fn(f64) -> f64,
+    for<'a> &'a I: IntoIterator<Item = &'a f64>
+{
+    pub fn spawn_log_iterator<I2>(&'b self, w_axis: I2) -> impl Iterator<Item=f64> + 'b
+    where
+        I2: Iterator<Item = f64> + 'b
+    {
+        let denominator_iter = w_axis.map(move |w| (self.denominator_function)(w));
+        let joint_iter = self.precalculated_numerator.into_iter().zip(denominator_iter);
+        joint_iter.map(|(num, denom)| num / denom)
+    }
 }
 
 
 pub fn find_minimum_preallocated_numerator<F1, F2, I>(
-    total_func: F1,
-    denominator: F2,
-    numerator_preallocated: &I,
+    problem: &MinimizationProblem<I, F1, F2>,
 ) -> f64
 where
     F1: Fn(f64) -> f64,
@@ -106,10 +116,10 @@ where
 {
     let w_size = W_LOGSPACED.len();
     let last_ind: usize = w_size - 1;
-    let total_iter = components2iterator(&denominator, numerator_preallocated, W_LOGSPACED.iter().copied());
+    let fraction_iterator = problem.spawn_log_iterator(W_LOGSPACED.iter().copied());
 
     /* Perform search on logspace */
-    let minind = total_iter
+    let minind = fraction_iterator
         .enumerate()
         .min_by(|(_, a), (_, b)| a.partial_cmp(b).expect("Invalid value found"))
         .map(|(index, _)| index)
@@ -122,6 +132,7 @@ where
         } else {
             W_LOGSPACED[minind -1]
         };
+
     let w_max =
         if minind == last_ind {
             panic!("Minimum seems to be out of bounds")
@@ -130,9 +141,8 @@ where
         };
     debug!("Starting linsearch on [{}, {}]", w_min, w_max);
 
-    let w_axis = lin_space(w_min..=w_max, w_size);
     let min = lin_space(w_min..=w_max, w_size)
-        .map(|w| total_func(w))
+        .map(|w| (problem.fraction_function)(w))
         .min_by(|a, b| a.partial_cmp(b).expect("Invalid value found"))
         .expect("Error while searching for lin min");
 
