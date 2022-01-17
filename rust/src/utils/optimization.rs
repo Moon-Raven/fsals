@@ -163,7 +163,7 @@ pub fn find_minimum<F>(f: F) -> f64
 where F: Fn(f64) -> f64
 {
     let w_size = W_LOGSPACED.len();
-    let last_ind: usize = w_size - 1;
+    let last_index: usize = w_size - 1;
 
     /* Perform search on logspace */
     let minind = W_LOGSPACED
@@ -179,18 +179,7 @@ where F: Fn(f64) -> f64
     debug!("Found log minimum f({}) = {} at index {}", argmin, min, minind);
 
     /* Perform search on linspace */
-    let w_min =
-        if minind == 0 {
-            0.0
-        } else {
-            W_LOGSPACED[minind -1]
-        };
-    let w_max =
-        if minind == last_ind {
-            panic!("Minimum seems to be out of bounds")
-        } else {
-            W_LOGSPACED[minind + 1]
-        };
+    let (w_min, w_max) = get_linsearch_interval(minind, last_index);
     debug!("Starting linsearch on [{}, {}]", w_min, w_max);
 
     let min = lin_space(w_min..=w_max, w_size)
@@ -271,7 +260,7 @@ mod tests {
     fn test_find_minimum_right() {
         let limit = 1e10;
         let f = |x: f64| limit - x;
-        let min = find_minimum(f);
+        let _min = find_minimum(f);
         /* Should be unreachable */
     }
 }

@@ -170,7 +170,7 @@ def add_pregion_to_ax(ax, pregion, color, fill=True):
 def add_polygon(ax, poly_boundary, style_string='g', fill=True):
     """Draw polygon to given axes."""
     if fill:
-        ax.fill(poly_boundary[0,:], poly_boundary[1,:], style_string)
+        ax.fill(poly_boundary[0,:], poly_boundary[1,:], style_string, rasterized=True)
     else:
         ax.plot(poly_boundary[0,:], poly_boundary[1,:], style_string)
 
@@ -186,6 +186,7 @@ def create_figure_region(args):
     constrained = True
     width, height = cfg.width, cfg.height
     fig, ax = new_figure(width, height, tight, constrained)
+    ax.set_rasterized(True)
 
     # Configure axes
     ax.set_xlim(data.limits.p1_min, data.limits.p1_max)

@@ -55,7 +55,7 @@ lazy_static! {
                 w_max: 1e5,
                 steps: 10_000usize,
                 },
-            delta: Delta::Abs(1e-2),
+            delta: Delta::Abs(0.005),
             spawn_count: 32,
             enforce_limits: false,
         });
