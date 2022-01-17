@@ -1,10 +1,12 @@
 mod configurations;
 
+use std::sync::{Arc, Mutex};
 use iter_num_tools::lin_space;
 use std::f64::consts::PI;
 use log::{debug, info};
 use serde::Serialize;
 use std::collections::VecDeque;
+use std::{fs, slice};
 
 use crate::nu;
 use crate::types::{Comp, Limits, Par, System};
@@ -12,7 +14,6 @@ use crate::utils::optimization::MinimizationProblem;
 use crate::utils::{geometry, optimization, storage};
 use crate::Args;
 use configurations::{Delta, RegionConfiguration, CONFIGURATONS};
-use std::fs;
 
 
 #[derive(Serialize, Debug)]
@@ -156,37 +157,74 @@ where
 }
 
 
+pub fn get_region_parallel(
+    conf: &RegionConfiguration,
+    origins: &[Par],
+    pregions: &Arc<Mutex<Vec<PRegion>>>,
+    delta: f64)
+{
+    let len = origins.len();
+    if len > 1 {
+        let (lo, hi) = origins.split_at(len / 2);
+        rayon::join(|| get_region_parallel(conf, lo, pregions, delta),
+                    || get_region_parallel(conf, hi, pregions, delta));
+    }
+    else {
+        let origin = origins[0];
+
+        /* Check if the point is obsolete */
+        {
+            let pregions_unlocked = pregions.lock().unwrap();
+            if pregions_unlocked.iter().map(|preg| preg.is_point_inside(origin)).any(|b| b) {
+                return;
+            }
+        }
+
+        /* Find new PRegion around the point */
+        let pregion = get_pregion(conf, origin, conf.enforce_limits, delta);
+
+        let new_points = {
+            let mut pregions_unlocked = pregions.lock().unwrap();
+
+            /* If necessary, spawn new points on edge of the newly obtained PRegion */
+            if pregion.radius > delta {
+                let new_points: Vec<Par> = spawn_valid_points(
+                    &pregion,
+                    &conf,
+                    &*pregions_unlocked)
+                    .collect();
+                pregions_unlocked.push(pregion);
+                Some(new_points)
+            }
+            else {None}
+        };
+
+        if let Some(new_points) = new_points {
+            if new_points.len() == 1 {
+                get_region_parallel(conf, &new_points, pregions, delta);
+            }
+            else if new_points.len() > 1 {
+                let (lo, hi) = new_points.split_at(new_points.len() / 2);
+                rayon::join(|| get_region_parallel(conf, lo, pregions, delta),
+                            || get_region_parallel(conf, hi, pregions, delta));
+            }
+       }
+    }
+}
+
+
 pub fn get_region(conf: &RegionConfiguration, origin: Par) -> Region {
     const VEC_PREALLOCATION_SIZE: usize = 10_000;
 
     let delta = absolutize_delta(&conf.delta, &conf.limits);
     let nu = nu::calculate_nu_single(&conf.contour_conf, conf.system.f_complex, origin);
-
-    let mut pending_points: VecDeque<Par> = VecDeque::with_capacity(VEC_PREALLOCATION_SIZE);
-    pending_points.push_back(origin);
-    let mut pregions: Vec<PRegion> = Vec::with_capacity(VEC_PREALLOCATION_SIZE);
+    let mut pregions = Arc::new(Mutex::new(Vec::with_capacity(VEC_PREALLOCATION_SIZE)));
 
     info!("Searching for region around {:?} with nu {}", origin, nu);
-
-    while let Some(p) = pending_points.pop_front() {
-
-        /* Check if the point is obsolete */
-        if pregions.iter().map(|preg| preg.is_point_inside(p)).any(|b| b) {
-            continue;
-        }
-
-        /* Find new PRegion around the point */
-        let pregion = get_pregion(conf, p, conf.enforce_limits, delta);
-
-        /* If necessary, spawn new points on edge of the newly obtained PRegion1 */
-        if pregion.radius > delta {
-            pending_points.append(&mut spawn_valid_points(&pregion, &conf, &pregions).collect());
-        }
-
-        pregions.push(pregion);
-    }
-
+    get_region_parallel(conf, slice::from_ref(&origin), &mut pregions, delta);
+    let pregions = Arc::try_unwrap(pregions).unwrap().into_inner().unwrap();
     info!("Returning region around {:?} with {:?} pregions", origin, pregions.len());
+
     Region { pregions, nu }
 }
 
