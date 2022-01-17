@@ -133,10 +133,31 @@ pub fn precalculate_numerator(conf: &RegionConfiguration, origin: Par) -> Vec<f6
 }
 
 
+pub fn spawn_valid_points<'a, I>(
+    pregion: &'a PRegion,
+    conf: &'a RegionConfiguration,
+    existing_pregs: &'a I,
+) -> impl Iterator<Item=Par> + 'a
+where
+    for<'b> &'b I: IntoIterator<Item=&'b PRegion>
+{
+    let new_points = pregion.spawn_edge_points(conf.spawn_count);
+    let valid_points = new_points
+        .into_iter()
+        .filter(move |p| {
+            (&existing_pregs).into_iter().map(|preg| !preg.is_point_inside(*p)).all(|b| b)})
+        .filter(move |p| geometry::is_point_in_limits(*p, &conf.limits));
+
+    valid_points
+}
+
+
 pub fn get_region(conf: &RegionConfiguration, origin: Par) -> Region {
     const VEC_PREALLOCATION_SIZE: usize = 10_000;
+
     let delta = absolutize_delta(&conf.delta, &conf.limits);
     let nu = nu::calculate_nu_single(&conf.contour_conf, conf.system.f_complex, origin);
+
     let mut pending_points: VecDeque<Par> = VecDeque::with_capacity(VEC_PREALLOCATION_SIZE);
     pending_points.push_back(origin);
     let mut pregions: Vec<PRegion> = Vec::with_capacity(VEC_PREALLOCATION_SIZE);
@@ -145,20 +166,17 @@ pub fn get_region(conf: &RegionConfiguration, origin: Par) -> Region {
 
     while let Some(p) = pending_points.pop_front() {
 
+        /* Check if the point is obsolete */
         if pregions.iter().map(|preg| preg.is_point_inside(p)).any(|b| b) {
             continue;
         }
 
+        /* Find new PRegion around the point */
         let pregion = get_pregion(conf, p, conf.enforce_limits, delta);
-        if pregion.radius > delta { // Test with > and >=
-            let new_points = pregion.spawn_edge_points(conf.spawn_count);
-            let mut valid_points: VecDeque<Par> = new_points
-                .into_iter()
-                .filter(|p| {pregions.iter().map(|preg| !preg.is_point_inside(*p)).all(|b| b)})
-                .filter(|p| geometry::is_point_in_limits(*p, &conf.limits))
-                .collect();
 
-            pending_points.append(&mut valid_points);
+        /* If necessary, spawn new points on edge of the newly obtained PRegion1 */
+        if pregion.radius > delta {
+            pending_points.append(&mut spawn_valid_points(&pregion, &conf, &pregions).collect());
         }
 
         pregions.push(pregion);
@@ -169,7 +187,20 @@ pub fn get_region(conf: &RegionConfiguration, origin: Par) -> Region {
 }
 
 
-pub fn run_region(args: &Args) {
+pub fn store_results(results: &RegionResult, config: &RegionConfiguration) {
+    let system_name = config.system.name;
+    let command = "data";
+    let extension = "data";
+
+    let algorithm_option = "region";
+
+    let filename = storage::get_filepath(command, algorithm_option, extension, system_name);
+
+    storage::store_results(results, &filename);
+}
+
+
+pub fn args2config(args: &Args) -> &'static RegionConfiguration {
     let config_name_option = &args.system;
     let config_name = config_name_option
         .as_ref()
@@ -178,6 +209,13 @@ pub fn run_region(args: &Args) {
     let config = CONFIGURATONS
         .get(config_name.as_str())
         .expect("Unknown system");
+
+    config
+}
+
+
+pub fn run_region(args: &Args) {
+    let config = args2config(args);
 
     let regions = config
         .origins
@@ -191,20 +229,5 @@ pub fn run_region(args: &Args) {
         parameters: config.system.parameters,
     };
 
-    /* Store results in file */
-    let config_name_option = &args.system;
-    let config_name = config_name_option
-        .as_ref()
-        .expect("data requires system to be specified");
-    let command = "data";
-    let extension = "data";
-
-    let algorithm_option = &args.algorithm;
-    let algorithm = algorithm_option
-        .as_ref()
-        .expect("data requires algorithm to be set");
-
-    let filename = storage::get_filepath(command, &algorithm.to_string(), extension, config_name);
-
-    storage::store_results(results, &filename);
+    store_results(&results, &config);
 }

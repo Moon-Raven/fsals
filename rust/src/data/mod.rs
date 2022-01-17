@@ -18,6 +18,4 @@ pub fn run(args: &Args) {
          Algorithm::Line => line::run_line(args),
          Algorithm::Region => region::run_region(args),
     };
-
-
 }
