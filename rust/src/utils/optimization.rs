@@ -89,6 +89,7 @@ where
     pub fraction_function: &'b F2,
 }
 
+
 impl<'b, I, F1, F2> MinimizationProblem<'b, I, F1, F2>
 where
     F1: Fn(f64) -> f64,
@@ -106,6 +107,24 @@ where
 }
 
 
+pub fn get_linsearch_interval(index_of_logmin: usize, last_index: usize) -> (f64, f64) {
+    let w_min =
+        if index_of_logmin == 0 {
+            0.0
+        } else {
+            W_LOGSPACED[index_of_logmin -1]
+        };
+
+    let w_max =
+        if index_of_logmin == last_index {
+            panic!("Minimum seems to be out of bounds")
+        } else {
+            W_LOGSPACED[index_of_logmin + 1]
+        };
+    (w_min, w_max)
+}
+
+
 pub fn find_minimum_preallocated_numerator<F1, F2, I>(
     problem: &MinimizationProblem<I, F1, F2>,
 ) -> f64
@@ -115,7 +134,7 @@ where
     for<'a> &'a I: IntoIterator<Item = &'a f64>
 {
     let w_size = W_LOGSPACED.len();
-    let last_ind: usize = w_size - 1;
+    let last_index: usize = w_size - 1;
     let fraction_iterator = problem.spawn_log_iterator(W_LOGSPACED.iter().copied());
 
     /* Perform search on logspace */
@@ -126,19 +145,7 @@ where
         .expect("Error while searching for log min");
 
     /* Perform search on linspace */
-    let w_min =
-        if minind == 0 {
-            0.0
-        } else {
-            W_LOGSPACED[minind -1]
-        };
-
-    let w_max =
-        if minind == last_ind {
-            panic!("Minimum seems to be out of bounds")
-        } else {
-            W_LOGSPACED[minind + 1]
-        };
+    let (w_min, w_max) = get_linsearch_interval(minind, last_index);
     debug!("Starting linsearch on [{}, {}]", w_min, w_max);
 
     let min = lin_space(w_min..=w_max, w_size)
