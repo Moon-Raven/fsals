@@ -159,56 +159,45 @@ where
 
 pub fn get_region_parallel(
     conf: &RegionConfiguration,
-    origins: &[Par],
+    origin: Par,
     pregions: &Arc<Mutex<Vec<PRegion>>>,
     delta: f64)
 {
-    let len = origins.len();
-    if len > 1 {
-        let (lo, hi) = origins.split_at(len / 2);
-        rayon::join(|| get_region_parallel(conf, lo, pregions, delta),
-                    || get_region_parallel(conf, hi, pregions, delta));
-    }
-    else {
-        let origin = origins[0];
-
-        /* Check if the point is obsolete */
-        {
-            let pregions_unlocked = pregions.lock().unwrap();
-            if pregions_unlocked.iter().map(|preg| preg.is_point_inside(origin)).any(|b| b) {
-                return;
-            }
+    /* Check if the point is obsolete */
+    {
+        let pregions_unlocked = pregions.lock().unwrap();
+        if pregions_unlocked.iter().map(|preg| preg.is_point_inside(origin)).any(|b| b) {
+            return;
         }
+    }
 
-        /* Find new PRegion around the point */
-        let pregion = get_pregion(conf, origin, conf.enforce_limits, delta);
+    /* Find new PRegion around the point */
+    let pregion = get_pregion(conf, origin, conf.enforce_limits, delta);
 
-        let new_points = {
-            let mut pregions_unlocked = pregions.lock().unwrap();
+    let new_points = {
+        let mut pregions_unlocked = pregions.lock().unwrap();
 
-            /* If necessary, spawn new points on edge of the newly obtained PRegion */
-            if pregion.radius > delta {
-                let new_points: Vec<Par> = spawn_valid_points(
-                    &pregion,
-                    &conf,
-                    &*pregions_unlocked)
-                    .collect();
-                pregions_unlocked.push(pregion);
-                Some(new_points)
-            }
-            else {None}
-        };
+        /* If necessary, spawn new points on edge of the newly obtained PRegion */
+        if pregion.radius > delta {
+            let new_points: Vec<Par> = spawn_valid_points(
+                &pregion,
+                &conf,
+                &*pregions_unlocked)
+                .collect();
+            pregions_unlocked.push(pregion);
+            Some(new_points)
+        }
+        else {None}
+    };
 
-        if let Some(new_points) = new_points {
-            if new_points.len() == 1 {
-                get_region_parallel(conf, &new_points, pregions, delta);
-            }
-            else if new_points.len() > 1 {
-                let (lo, hi) = new_points.split_at(new_points.len() / 2);
-                rayon::join(|| get_region_parallel(conf, lo, pregions, delta),
-                            || get_region_parallel(conf, hi, pregions, delta));
-            }
-       }
+    if let Some(new_points) = new_points {
+        if new_points.len() != 0 {
+            rayon::scope(|s| {
+                for point in new_points {
+                    s.spawn(move |_| get_region_parallel(conf, point, pregions, delta));
+                }
+            });
+        }
     }
 }
 
@@ -221,7 +210,7 @@ pub fn get_region(conf: &RegionConfiguration, origin: Par) -> Region {
     let mut pregions = Arc::new(Mutex::new(Vec::with_capacity(VEC_PREALLOCATION_SIZE)));
 
     info!("Searching for region around {:?} with nu {}", origin, nu);
-    get_region_parallel(conf, slice::from_ref(&origin), &mut pregions, delta);
+    get_region_parallel(conf, origin, &mut pregions, delta);
     let pregions = Arc::try_unwrap(pregions).unwrap().into_inner().unwrap();
     info!("Returning region around {:?} with {:?} pregions", origin, pregions.len());
 
