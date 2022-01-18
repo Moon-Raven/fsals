@@ -59,10 +59,12 @@ def configure_ticks(ax, cfg):
                              width=MAJOR_WIDTH, direction='in', right='on')
     ax.yaxis.set_tick_params(which='minor', size=MINOR_SIZE,
                              width=MINOR_WIDTH, direction='in', right='on')
-    ax.xaxis.set_major_locator(mpl.ticker.MultipleLocator(cfg.ticks.major_x))
-    ax.xaxis.set_minor_locator(mpl.ticker.MultipleLocator(cfg.ticks.minor_x))
-    ax.yaxis.set_major_locator(mpl.ticker.MultipleLocator(cfg.ticks.major_y))
-    ax.yaxis.set_minor_locator(mpl.ticker.MultipleLocator(cfg.ticks.minor_y))
+
+    if cfg.ticks:
+        ax.xaxis.set_major_locator(mpl.ticker.MultipleLocator(cfg.ticks.major_x))
+        ax.xaxis.set_minor_locator(mpl.ticker.MultipleLocator(cfg.ticks.minor_x))
+        ax.yaxis.set_major_locator(mpl.ticker.MultipleLocator(cfg.ticks.major_y))
+        ax.yaxis.set_minor_locator(mpl.ticker.MultipleLocator(cfg.ticks.minor_y))
 
 
 def add_ray_to_ax(ax, ray, linecolor, linewidth):

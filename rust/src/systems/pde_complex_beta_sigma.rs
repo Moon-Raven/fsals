@@ -106,7 +106,7 @@ fn region_denominator(w: f64, origin: Par, eps: f64) -> f64 {
 
     // vectors = np.vstack((derivative_beta, derivative_sigma))
     // result = np.linalg.norm(vectors, ord=p, axis=0)
-    // return result
+    0.0
 }
 
 

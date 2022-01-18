@@ -3,9 +3,10 @@ from matplotlib.lines import Line2D
 import python.utils.comparison_methods.gu2005 as gu2005
 
 
-EXAMPLE1_SCALING = 1.1
+SCALING_FACTOR = 1.1
 SINGLE_COLUMN_WIDTH = 8.85553
 DOUBLE_COLUMN_WIDTH = 18.3436
+STANDARD_HEIGHT = SINGLE_COLUMN_WIDTH * SCALING_FACTOR
 
 
 class TickConfiguration:
@@ -27,8 +28,8 @@ class FigureConfiguration:
                  'draw_origins']
 
     def __init__(
-        self, width, height, ticks, ncol, bbox, custom_func=default_custom_func,
-        draw_origins=True):
+        self, width, height, ncol, bbox, custom_func=default_custom_func,
+        draw_origins=True, ticks=None):
         self.width = width
         self.height = height
         self.ticks = ticks
@@ -42,19 +43,21 @@ class LineConfiguration(FigureConfiguration):
     __slots__ = ['ratios']
 
     def __init__(
-        self, width, height, ticks, ncol, bbox,
-        ratios=None, custom_func=default_custom_func, draw_origins=True):
+        self, width, height, ncol, bbox,
+        ratios=None, custom_func=default_custom_func, draw_origins=True, ticks=None):
 
-        super().__init__(width, height, ticks, ncol, bbox, custom_func, draw_origins)
+        super().__init__(width, height, ncol, bbox, custom_func, draw_origins,
+            ticks=ticks)
         self.ratios = ratios
 
 
 class RegionConfiguration(FigureConfiguration):
     __slots__ = []
 
-    def __init__(self, width, height, ticks, ncol, bbox,
-        custom_func=default_custom_func, draw_origins=True):
-        super().__init__(width, height, ticks, ncol, bbox, custom_func, draw_origins)
+    def __init__(self, width, height, ncol, bbox,
+        custom_func=default_custom_func, draw_origins=True, ticks=None):
+        super().__init__(width, height, ncol, bbox, custom_func, draw_origins,
+            ticks=ticks)
 
 
 def retarded1_custom_func(ax, legend_handles):
@@ -68,7 +71,7 @@ def retarded1_custom_func(ax, legend_handles):
 LINE_CONFIGURATIONS = {
     'retarded1' : LineConfiguration(
         width=SINGLE_COLUMN_WIDTH,
-        height=SINGLE_COLUMN_WIDTH * EXAMPLE1_SCALING,
+        height=SINGLE_COLUMN_WIDTH * SCALING_FACTOR,
         ticks=TickConfiguration(1, 1, 0.25, 0.25),
         ncol=3,
         bbox=(0, -0.17, 1, 0.1),
@@ -88,18 +91,25 @@ LINE_CONFIGURATIONS = {
 REGION_CONFIGURATIONS = {
     'retarded1' : RegionConfiguration(
         width=SINGLE_COLUMN_WIDTH,
-        height=SINGLE_COLUMN_WIDTH * EXAMPLE1_SCALING,
+        height=SINGLE_COLUMN_WIDTH * SCALING_FACTOR,
         ticks=TickConfiguration(1, 1, 0.25, 0.25),
         ncol=3,
         bbox=(0, -0.17, 1, 0.1),
         custom_func=retarded1_custom_func,
     ),
 
-    # 'distributed_delay1' : LineConfiguration(
-    #     width=DOUBLE_COLUMN_WIDTH,
-    #     height=SINGLE_COLUMN_WIDTH, # 3 is the magic number
-    #     ticks=TickConfiguration(1, 1, 0.25, 0.25),
-    #     ncol=3,
-    #     bbox=(0, -0.17, 1, 0.1),
-    # ),
+    'distributed_delay1' : RegionConfiguration(
+        width=DOUBLE_COLUMN_WIDTH,
+        height=SINGLE_COLUMN_WIDTH, # 3 is the magic number
+        ticks=TickConfiguration(1, 1, 0.25, 0.25),
+        ncol=3,
+        bbox=(0, -0.17, 1, 0.1),
+    ),
+
+    'semi_infinite_rod' : RegionConfiguration(
+        width=SINGLE_COLUMN_WIDTH,
+        height=STANDARD_HEIGHT,
+        ncol=2,
+        bbox=(0, -0.17, 1, 0.1),
+    ),
 }

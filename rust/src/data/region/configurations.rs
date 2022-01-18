@@ -87,6 +87,25 @@ lazy_static! {
             enforce_limits: false,
         });
 
+        configs.insert("semi_infinite_rod", RegionConfiguration {
+            name: "semi_infinite_rod",
+            system: semi_infinite_rod::SYSTEM,
+            limits: Limits { p1_min: 0.0, p1_max: 100.0, p2_min: 0.0, p2_max: 7e4 },
+            safeguard: 0.99,
+            origins: vec![
+                (20.0, 1e4),
+                (60.0, 5e4),
+                ],
+            contour_conf: ContourConfiguration {
+                w_min: 1e-3,
+                w_max: 1e5,
+                steps: 1_000,
+                },
+            delta: Delta::Rel(0.01),
+            spawn_count: 32,
+            enforce_limits: false,
+        });
+
         configs
     };
 }

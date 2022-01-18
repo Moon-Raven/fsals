@@ -81,6 +81,30 @@ lazy_static! {
             delta: Delta::Abs(1e-4),
         });
 
+        configs.insert("semi_infinite_rod", LineConfiguration {
+            name: "semi_infinite_rod",
+            system: semi_infinite_rod::SYSTEM,
+            limits: Limits { p1_min: 0.0, p1_max: 100.0, p2_min: 0.0, p2_max: 7e4 },
+            ray_count: 160,
+            safeguard: 0.95,
+            origins: vec![
+                // Region 1
+                (1.0, 0.5e4),
+                (50.0, 0.5e4),
+                (90.0, 0.5e4),
+                (1.0, 4e4),
+                // Region 2
+                (50.0, 4e4),
+                (20.0, 6e4),
+                (90.0, 3e4),
+                ],
+            contour_conf: ContourConfiguration {
+                w_min: 1e-3,
+                w_max: 1e5,
+                steps: 1_000usize,
+                },
+            delta: Delta::Rel(0.01)
+        });
 
         configs
     };
