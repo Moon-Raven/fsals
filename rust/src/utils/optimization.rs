@@ -65,7 +65,7 @@ lazy_static! {
     pub static ref W_LOGSPACED: Vec<f64> = {
         let w_min = 1e-3;
         let w_max = 1e10;
-        let steps = 1_000;
+        let steps = 10_000;
         log_space(w_min..=w_max, steps).collect()
     };
 }
@@ -78,27 +78,31 @@ where F: Fn(f64) -> f64
 }
 
 
-pub struct MinimizationProblem<'b, I, F1, F2>
+pub struct MinimizationProblem<'b, I, I2, F1, F2>
 where
     F1: Fn(f64) -> f64,
     F2: Fn(f64) -> f64,
-    for<'a> &'a I: IntoIterator<Item = &'a f64>
+    for<'a> &'a I: IntoIterator<Item = &'a f64>,
+    for<'a> &'a I2: IntoIterator<Item = &'a f64>,
 {
     pub precalculated_numerator: &'b I,
     pub denominator_function: &'b F1,
     pub fraction_function: &'b F2,
+    pub logspace: &'b I2,
+    pub linspace_steps: usize,
 }
 
 
-impl<'b, I, F1, F2> MinimizationProblem<'b, I, F1, F2>
+impl<'b, I, I2, F1, F2> MinimizationProblem<'b, I, I2, F1, F2>
 where
     F1: Fn(f64) -> f64,
     F2: Fn(f64) -> f64,
-    for<'a> &'a I: IntoIterator<Item = &'a f64>
+    for<'a> &'a I: IntoIterator<Item = &'a f64>,
+    for<'a> &'a I2: IntoIterator<Item = &'a f64>,
 {
-    pub fn spawn_log_iterator<I2>(&'b self, w_axis: I2) -> impl Iterator<Item=f64> + 'b
+    pub fn spawn_log_iterator<I3>(&'b self, w_axis: I3) -> impl Iterator<Item=f64> + 'b
     where
-        I2: Iterator<Item = f64> + 'b
+        I3: Iterator<Item = f64> + 'b
     {
         let denominator_iter = w_axis.map(move |w| (self.denominator_function)(w));
         let joint_iter = self.precalculated_numerator.into_iter().zip(denominator_iter);
@@ -125,17 +129,18 @@ pub fn get_linsearch_interval(index_of_logmin: usize, last_index: usize) -> (f64
 }
 
 
-pub fn find_minimum_preallocated_numerator<F1, F2, I>(
-    problem: &MinimizationProblem<I, F1, F2>,
+pub fn find_minimum_preallocated_numerator<F1, F2, I, I2>(
+    problem: &MinimizationProblem<I, I2, F1, F2>,
 ) -> f64
 where
     F1: Fn(f64) -> f64,
     F2: Fn(f64) -> f64,
-    for<'a> &'a I: IntoIterator<Item = &'a f64>
+    for<'a> &'a I: IntoIterator<Item = &'a f64>,
+    for<'a> &'a I2: IntoIterator<Item = &'a f64>,
 {
     let w_size = W_LOGSPACED.len();
     let last_index: usize = w_size - 1;
-    let fraction_iterator = problem.spawn_log_iterator(W_LOGSPACED.iter().copied());
+    let fraction_iterator = problem.spawn_log_iterator((&problem.logspace).into_iter().copied());
 
     /* Perform search on logspace */
     let minind = fraction_iterator
@@ -148,7 +153,7 @@ where
     let (w_min, w_max) = get_linsearch_interval(minind, last_index);
     debug!("Starting linsearch on [{}, {}]", w_min, w_max);
 
-    let min = lin_space(w_min..=w_max, w_size)
+    let min = lin_space(w_min..=w_max, problem.linspace_steps)
         .map(|w| (problem.fraction_function)(w))
         .min_by(|a, b| a.partial_cmp(b).expect("Invalid value found"))
         .expect("Error while searching for lin min");

@@ -31,6 +31,15 @@ pub struct RegionConfiguration {
     pub safeguard: f64,
     pub spawn_count: usize,
     pub enforce_limits: bool,
+    pub logspace_config: SpaceConfig,
+    pub linspace_steps: usize,
+}
+
+
+pub struct SpaceConfig {
+    pub w_min: f64,
+    pub w_max: f64,
+    pub steps: usize,
 }
 
 
@@ -55,9 +64,15 @@ lazy_static! {
                 w_max: 1e5,
                 steps: 10_000usize,
                 },
-            delta: Delta::Abs(0.005),
+            delta: Delta::Abs(1e-3),
             spawn_count: 32,
             enforce_limits: false,
+            logspace_config: SpaceConfig {
+                w_min: 1e-3,
+                w_max: 1e10,
+                steps: 10_000,
+            },
+            linspace_steps: 10_000,
         });
 
         // configs.insert("distributed_delay1", RegionConfiguration {

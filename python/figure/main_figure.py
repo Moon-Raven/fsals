@@ -161,10 +161,10 @@ def get_pregion_boundary(pregion, N=1000, p=2):
     return shifted_boundary
 
 
-def add_pregion_to_ax(ax, pregion, color, fill=True):
+def add_pregion_to_ax(ax, pregion, color):
     """Draw pregion object to given axes."""
-    region_boundary = get_pregion_boundary(pregion)
-    add_polygon(ax, region_boundary, color, fill)
+    ax.add_artist(
+        plt.Circle(pregion.origin, pregion.radius, color=color, rasterized=True))
 
 
 def add_polygon(ax, poly_boundary, style_string='g', fill=True):

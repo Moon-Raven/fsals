@@ -1,7 +1,7 @@
 mod configurations;
 
 use std::sync::{Arc, Mutex};
-use iter_num_tools::lin_space;
+use iter_num_tools::{lin_space, log_space};
 use std::f64::consts::PI;
 use log::{debug, info};
 use serde::Serialize;
@@ -58,13 +58,15 @@ pub struct Region {
 }
 
 
-fn check_jump_validity<I> (
+fn check_jump_validity<I, I2> (
     conf: &RegionConfiguration,
     origin: Par,
     eps: f64,
-    precalculated_numerator: &I) -> bool
+    precalculated_numerator: &I,
+    preallocated_logspace: &I2) -> bool
 where
-    for<'a> &'a I: IntoIterator<Item = &'a f64>
+    for<'a> &'a I: IntoIterator<Item = &'a f64>,
+    for<'b> &'b I2: IntoIterator<Item=&'b f64>
 {
     let numerator = |w| (conf.system.f_complex)(Comp::new(0.0, w), origin).norm();
     let denominator = |w| (conf.system.region_denominator.unwrap())(w, origin, eps);
@@ -74,6 +76,8 @@ where
         precalculated_numerator: &precalculated_numerator,
         fraction_function: &fraction,
         denominator_function: &denominator,
+        logspace: &preallocated_logspace,
+        linspace_steps: conf.linspace_steps,
     };
 
     let min = optimization::find_minimum_preallocated_numerator(&minimization_problem);
@@ -104,21 +108,24 @@ fn delta_rel2abs(delta: f64, limits: &Limits) -> f64 {
 }
 
 
-fn get_pregion(
+fn get_pregion<I>(
     conf: &RegionConfiguration,
     origin: Par,
     enforce_limits: bool,
     delta_abs: f64,
+    preallocated_logspace: &I,
 ) -> PRegion
+where
+    for<'b> &'b I: IntoIterator<Item=&'b f64>
 {
-    let numerator: Vec<f64> = precalculate_numerator(conf, origin);
-    let condition = |eps| check_jump_validity(conf, origin, eps, &numerator);
+    let numerator: Vec<f64> = precalculate_numerator(conf, origin, preallocated_logspace);
+    let condition = |eps| check_jump_validity(conf, origin, eps, &numerator, preallocated_logspace);
     let limit = match enforce_limits {
         true => get_limiting_eps(origin, &conf.limits),
         false => f64::INFINITY,
     };
     info!("Finding pregion for origin {:?}; delta={}, limit={}", origin, delta_abs, limit);
-    let radius = optimization::get_maximum_condition(condition, delta_abs, limit);
+    let radius = conf.safeguard * optimization::get_maximum_condition(condition, delta_abs, limit);
 
     PRegion { origin, radius }
 }
@@ -132,9 +139,15 @@ pub fn absolutize_delta(delta: &Delta, limits: &Limits) -> f64 {
 }
 
 
-pub fn precalculate_numerator(conf: &RegionConfiguration, origin: Par) -> Vec<f64> {
+pub fn precalculate_numerator<I>(
+    conf: &RegionConfiguration,
+    origin: Par,
+    preallocated_logspace: &I) -> Vec<f64>
+where
+    for<'b> &'b I: IntoIterator<Item=&'b f64>
+{
     let numerator = |w| (conf.system.f_complex)(Comp::new(0.0, w), origin).norm();
-    optimization::precalculate_logspace(numerator)
+    preallocated_logspace.into_iter().map(|w| numerator(*w)).collect()
 }
 
 
@@ -157,11 +170,15 @@ where
 }
 
 
-pub fn get_region_parallel(
+pub fn get_region_parallel<I>(
     conf: &RegionConfiguration,
     origin: Par,
     pregions: &Arc<Mutex<Vec<PRegion>>>,
-    delta: f64)
+    delta: f64,
+    preallocated_logspace: &I,
+)
+where
+    for<'b> &'b I: IntoIterator<Item=&'b f64>
 {
     /* Check if the point is obsolete */
     {
@@ -172,7 +189,7 @@ pub fn get_region_parallel(
     }
 
     /* Find new PRegion around the point */
-    let pregion = get_pregion(conf, origin, conf.enforce_limits, delta);
+    let pregion = get_pregion(conf, origin, conf.enforce_limits, delta, preallocated_logspace);
 
     let new_points = {
         let mut pregions_unlocked = pregions.lock().unwrap();
@@ -194,7 +211,8 @@ pub fn get_region_parallel(
         if new_points.len() != 0 {
             rayon::scope(|s| {
                 for point in new_points {
-                    s.spawn(move |_| get_region_parallel(conf, point, pregions, delta));
+                    s.spawn(move |_|
+                        get_region_parallel(conf, point, pregions, delta, preallocated_logspace));
                 }
             });
         }
@@ -207,10 +225,13 @@ pub fn get_region(conf: &RegionConfiguration, origin: Par) -> Region {
 
     let delta = absolutize_delta(&conf.delta, &conf.limits);
     let nu = nu::calculate_nu_single(&conf.contour_conf, conf.system.f_complex, origin);
-    let mut pregions = Arc::new(Mutex::new(Vec::with_capacity(VEC_PREALLOCATION_SIZE)));
+    let mut pregions: Arc<Mutex<Vec<PRegion>>> =
+        Arc::new(Mutex::new(Vec::with_capacity(VEC_PREALLOCATION_SIZE)));
+    let logrange = conf.logspace_config.w_min..=conf.logspace_config.w_max;
+    let preallocated_logspace: Vec<f64> = log_space(logrange, conf.logspace_config.steps).collect();
 
     info!("Searching for region around {:?} with nu {}", origin, nu);
-    get_region_parallel(conf, origin, &mut pregions, delta);
+    get_region_parallel(conf, origin, &mut pregions, delta, &preallocated_logspace);
     let pregions = Arc::try_unwrap(pregions).unwrap().into_inner().unwrap();
     info!("Returning region around {:?} with {:?} pregions", origin, pregions.len());
 
