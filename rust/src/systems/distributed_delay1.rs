@@ -20,10 +20,25 @@ fn line_denominator(w: f64, p: Par, angle: f64, _th_min: f64, th_max: f64) -> f6
 }
 
 
+fn region_denominator(w: f64, origin: Par, eps: f64) -> f64 {
+    let p1min = origin.0 - eps;
+    let p1max = origin.0 + eps;
+    let p2min = origin.1 - eps;
+    let p2max = origin.1 + eps;
+
+    let exp_term = (-p1min * p2min).exp();
+
+    let gradient_p1 = exp_term * f64::sqrt(w.powi(2) + p2max.powi(2));
+    let gradient_p2 = w + p1max * exp_term;
+
+    f64::sqrt(gradient_p1.powi(2) + gradient_p2.powi(2))
+}
+
+
 pub const SYSTEM: System = System {
     name: "distributed_delay1",
     f_complex,
     parameters: (r"\tau", r"k"),
     line_denominator: Option::Some(line_denominator),
-    region_denominator: Option::None,
+    region_denominator: Option::Some(region_denominator),
 };
