@@ -27,6 +27,7 @@ pub struct LineConfiguration {
     pub contour_conf: ContourConfiguration,
     pub delta: Delta,
     pub safeguard: f64,
+    pub w_steps_linear: usize,
 }
 
 
@@ -53,6 +54,7 @@ lazy_static! {
                 steps: 10_000usize,
                 },
             delta: Delta::Abs(1e-3),
+            w_steps_linear: 1_000,
         });
 
         configs.insert("distributed_delay1", LineConfiguration {
@@ -79,6 +81,7 @@ lazy_static! {
                 steps: 1_000usize,
                 },
             delta: Delta::Abs(1e-4),
+            w_steps_linear: 1_000,
         });
 
         configs.insert("semi_infinite_rod", LineConfiguration {
@@ -86,7 +89,7 @@ lazy_static! {
             system: semi_infinite_rod::SYSTEM,
             limits: Limits { p1_min: 0.0, p1_max: 100.0, p2_min: 0.0, p2_max: 7e4 },
             ray_count: 160,
-            safeguard: 0.95,
+            safeguard: 0.80,
             origins: vec![
                 // Region 1
                 (1.0, 0.5e4),
@@ -103,7 +106,8 @@ lazy_static! {
                 w_max: 1e5,
                 steps: 1_000usize,
                 },
-            delta: Delta::Rel(0.01)
+            delta: Delta::Abs(0.8),
+            w_steps_linear: 5_000,
         });
 
         configs

@@ -62,6 +62,7 @@ fn check_jump_validity<F1, F2> (
     line_denominator: F2,
     theta0: f64,
     delta_theta: f64,
+    w_steps_linear: usize,
 ) -> bool
 where
 F1: Fn(Comp, f64) -> Comp,
@@ -72,7 +73,7 @@ F2: Fn(f64, f64, f64) -> f64
     let numerator = |w: f64| Comp::norm(f(Comp::new(0.0, w), theta0));
     let denominator = |w: f64| line_denominator(w, theta_min, theta_max);
     let fraction = |w: f64| numerator(w) / denominator(w);
-    let min = optimization::find_minimum(fraction);
+    let min = optimization::find_minimum_custom_w_steps(fraction, w_steps_linear);
     let jump_valid = delta_theta < min;
     jump_valid
 }
@@ -83,7 +84,8 @@ fn find_max_delta_theta<F1, F2>(
     line_denominator: F2,
     theta0: f64,
     delta: f64,
-    limit: f64
+    limit: f64,
+    w_steps_linear: usize,
 ) -> f64
 where
 F1: Fn(Comp, f64) -> Comp,
@@ -91,7 +93,7 @@ F2: Fn(f64, f64, f64) -> f64
 {
     let min_step = delta;
     let condition = |delta_theta: f64| {
-        check_jump_validity(&f, &line_denominator, theta0, delta_theta)
+        check_jump_validity(&f, &line_denominator, theta0, delta_theta, w_steps_linear)
     };
     optimization::get_maximum_condition(condition, min_step, limit)
 }
@@ -114,7 +116,13 @@ where
 
     while delta_theta > delta {
         /* Find maximum offset allowed by Rouche's theorem */
-        delta_theta = find_max_delta_theta(&f_1_d, &line_denom_1_d, theta, delta, limit);
+        delta_theta = find_max_delta_theta(
+            &f_1_d,
+            &line_denom_1_d,
+            theta,
+            delta,
+            limit,
+            conf.w_steps_linear);
 
         /* Reduce change for numerical errors caused by global optimization */
         delta_theta = delta_theta * conf.safeguard;

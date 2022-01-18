@@ -193,6 +193,40 @@ where F: Fn(f64) -> f64
 }
 
 
+pub fn find_minimum_custom_w_steps<F>(f: F, w_steps_linear: usize) -> f64
+where F: Fn(f64) -> f64
+{
+    let w_size = W_LOGSPACED.len();
+    let last_index: usize = w_size - 1;
+
+    /* Perform search on logspace */
+    let minind = W_LOGSPACED
+        .iter()
+        .map(|w| f(*w))
+        .enumerate()
+        .min_by(|(_, a), (_, b)| a.partial_cmp(b).expect("Invalid value found"))
+        .map(|(index, _)| index)
+        .expect("Error while searching for log min");
+
+    let argmin = W_LOGSPACED[minind];
+    let min = f(argmin);
+    debug!("Found log minimum f({}) = {} at index {}", argmin, min, minind);
+
+    /* Perform search on linspace */
+    let (w_min, w_max) = get_linsearch_interval(minind, last_index);
+    debug!("Starting linsearch on [{}, {}]", w_min, w_max);
+
+    let min = lin_space(w_min..=w_max, w_steps_linear)
+        .map(|w| f(w))
+        .min_by(|a, b| a.partial_cmp(b).expect("Invalid value found"))
+        .expect("Error while searching for lin min");
+
+    debug!("Found lin minimum f(?) = {}", min);
+
+    min
+}
+
+
 #[cfg(test)]
 mod tests {
     use log::LevelFilter;

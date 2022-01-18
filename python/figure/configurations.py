@@ -86,6 +86,13 @@ LINE_CONFIGURATIONS = {
         ncol=3,
         bbox=(0, -0.17, 1, 0.1),
     ),
+
+    'semi_infinite_rod' : LineConfiguration(
+        width=SINGLE_COLUMN_WIDTH,
+        height=STANDARD_HEIGHT,
+        ncol=3,
+        bbox=(0, -0.17, 1, 0.1),
+    ),
 }
 
 REGION_CONFIGURATIONS = {
@@ -109,7 +116,7 @@ REGION_CONFIGURATIONS = {
     'semi_infinite_rod' : RegionConfiguration(
         width=SINGLE_COLUMN_WIDTH,
         height=STANDARD_HEIGHT,
-        ncol=2,
+        ncol=3,
         bbox=(0, -0.17, 1, 0.1),
     ),
 }
