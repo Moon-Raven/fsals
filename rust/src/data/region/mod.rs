@@ -246,7 +246,12 @@ pub fn args2config(args: &Args) -> &'static RegionConfiguration {
 
 
 pub fn run_region(args: &Args) {
+    const MEGABYTE: usize = 1024 * 1024;
+    const STACK_SIZE: usize = MEGABYTE * 128;
+    rayon::ThreadPoolBuilder::new().stack_size(STACK_SIZE).build_global().unwrap();
+
     let config = args2config(args);
+
 
     let regions = config
         .origins
