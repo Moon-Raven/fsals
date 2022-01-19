@@ -110,6 +110,30 @@ lazy_static! {
             w_steps_linear: 5_000,
         });
 
+        configs.insert("pde_complex_k_sigma", LineConfiguration {
+            name: "pde_complex_k_sigma",
+            system: pde_complex_k_sigma::SYSTEM,
+            limits: Limits { p1_min: 0.0, p1_max: 20.0, p2_min: 0.0, p2_max: 20.0 },
+            ray_count: 160,
+            safeguard: 0.90,
+            origins: vec![
+                // Region 1
+                (0.5, 0.5),
+                (4.0, 4.0),
+                (2.0, 10.0),
+                (10.0, 2.0),
+                // Region 2
+                (6.0, 6.0),
+                ],
+            contour_conf: ContourConfiguration {
+                w_min: 1e-3,
+                w_max: 1e5,
+                steps: 1_000usize,
+                },
+            delta: Delta::Abs(1e-2),
+            w_steps_linear: 100, //1000
+        });
+
         configs
     };
 }

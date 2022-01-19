@@ -5,7 +5,7 @@ fn f_complex(s: Comp, p: Par) -> Comp {
     let tau = p.0;
     let k = p.1;
 
-    s*s + s*k + 1.0 - (-tau*(s+k)).exp()
+    s.powi(2) + s*k + 1.0 - (-tau*(s+k)).exp()
 }
 
 

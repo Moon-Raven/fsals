@@ -227,7 +227,9 @@ fn get_rayfan(conf: &LineConfiguration, origin: Par) -> RayFan {
             Ray {origin: origin, angle: angle, length: stability_segment}}
     );
 
-    RayFan { nu, rays: rays.collect(), origin: origin }
+    let rayfan = RayFan { nu, rays: rays.collect(), origin: origin };
+    info!("Returning rayfan with {} rays", rayfan.rays.len());
+    rayfan
 }
 
 
@@ -259,6 +261,8 @@ pub fn run_line(args: &Args) {
         parameters: config.system.parameters,
     };
 
+    panic!("hello2");
+
     /* Store results in file */
     let config_name_option = &args.system;
     let config_name = config_name_option
@@ -276,5 +280,6 @@ pub fn run_line(args: &Args) {
         extension,
         config_name);
 
+    info!("Storing results into {}", filename);
     storage::store_results(results, &filename);
 }

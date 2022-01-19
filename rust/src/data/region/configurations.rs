@@ -82,7 +82,7 @@ lazy_static! {
                 w_max: 1e5,
                 steps: 1_000,
                 },
-            delta: Delta::Abs(1e-3), // 1e-4 in python
+            delta: Delta::Rel(0.001), // 1e-4 in python
             spawn_count: 32,
             enforce_limits: false,
         });
