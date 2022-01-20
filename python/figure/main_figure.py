@@ -14,6 +14,10 @@ from python.figure.configurations import LINE_CONFIGURATIONS, REGION_CONFIGURATI
 
 logger = logging.getLogger(__name__)
 
+ORIGIN_MARKERSTYLE = 'X'
+ORIGIN_MARKERCOLOR = 'black'
+ORIGIN_MARKERSIZE = 4
+
 
 def set_general_parameters():
     mpl.rcParams['font.family'] = 'serif'
@@ -76,9 +80,6 @@ def add_ray_to_ax(ax, ray, linecolor, linewidth):
 
 
 def add_rayfan_to_ax(ax, rayfan, linecolor, linewidth, ratio, origins=False):
-    ORIGIN_MARKERSTYLE = 'X'
-    ORIGIN_MARKERCOLOR = 'black'
-    ORIGIN_MARKERSIZE = 4
 
     for ray in rayfan.rays[0::ratio]:
         add_ray_to_ax(ax, ray, linecolor, linewidth)
@@ -169,6 +170,11 @@ def add_pregion_to_ax(ax, pregion, color, fill=True):
     add_polygon(ax, region_boundary, color, fill)
 
 
+def add_origin_to_ax(ax, origin):
+    ax.plot(origin[0], origin[1], ORIGIN_MARKERSTYLE, color=ORIGIN_MARKERCOLOR,
+            clip_on=False, markersize=ORIGIN_MARKERSIZE)
+
+
 def add_polygon(ax, poly_boundary, style_string='g', fill=True):
     """Draw polygon to given axes."""
     if fill:
@@ -205,6 +211,10 @@ def create_figure_region(args):
     for region in data.regions:
         nus.add(region.nu)
         color = colors[region.nu]
+
+        if cfg.draw_origins:
+            add_origin_to_ax(ax, region.pregions[0].origin)
+
         for pregion in region.pregions:
             add_pregion_to_ax(ax, pregion, color)
 

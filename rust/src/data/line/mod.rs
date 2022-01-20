@@ -1,7 +1,7 @@
 mod configurations;
 
 use log::{debug, info};
-use iter_num_tools::lin_space;
+use iter_num_tools;
 use serde::Serialize;
 use std::f64::consts::PI;
 use std::f64;
@@ -10,6 +10,7 @@ use std::iter::Cloned;
 use crate::Args;
 use crate::types::{Comp, Par, System, Limits};
 use crate::nu;
+use crate::utils::optimization::MinimizationProblem;
 use crate::utils::{storage, geometry, optimization};
 use crate::utils::geometry::Delta;
 use configurations::{LineConfiguration, CONFIGURATONS};
@@ -34,7 +35,7 @@ pub struct RayFan {
 
 
 fn spawn_angles(limits: &Limits, count: usize) -> Vec<f64> {
-    let angles_lin = lin_space(-PI..PI, count);
+    let angles_lin = iter_num_tools::lin_space(-PI..PI, count);
     let p1_span = limits.p1_max - limits.p1_min;
     let p2_span = limits.p2_max - limits.p2_min;
     let ratio = p1_span / p2_span;
@@ -45,7 +46,7 @@ fn spawn_angles(limits: &Limits, count: usize) -> Vec<f64> {
     /* Prepare modifiers based on angle quadrants */
     let modifiers = is_right.map(|b| match b {true => 0.0, false => PI});
 
-    let angles_lin = lin_space(-PI..PI, count);
+    let angles_lin = iter_num_tools::lin_space(-PI..PI, count);
     let zipped = angles_lin.zip(modifiers);
 
     let angles_scaled = zipped.map(move |(angle, modifier)|
@@ -63,6 +64,7 @@ fn check_jump_validity<F1, F2> (
     theta0: f64,
     delta_theta: f64,
     w_steps_linear: usize,
+    log_space: &[f64],
 ) -> bool
 where
 F1: Fn(Comp, f64) -> Comp,
@@ -73,7 +75,15 @@ F2: Fn(f64, f64, f64) -> f64
     let numerator = |w: f64| Comp::norm(f(Comp::new(0.0, w), theta0));
     let denominator = |w: f64| line_denominator(w, theta_min, theta_max);
     let fraction = |w: f64| numerator(w) / denominator(w);
-    let min = optimization::find_minimum_custom_w_steps(fraction, w_steps_linear);
+    let precalculated_numerator: Vec<f64> = log_space.iter().map(|w| numerator(*w)).collect();
+    let minimization_problem = MinimizationProblem {
+        log_space: log_space,
+        lin_steps: w_steps_linear,
+        precalculated_numerator: &precalculated_numerator,
+        denominator_function: &denominator,
+        fraction_function: &fraction,
+    };
+    let min = optimization::find_minimum_fraction(&minimization_problem);
     let jump_valid = delta_theta < min;
     jump_valid
 }
@@ -86,6 +96,7 @@ fn find_max_delta_theta<F1, F2>(
     delta: f64,
     limit: f64,
     w_steps_linear: usize,
+    log_space: &[f64],
 ) -> f64
 where
 F1: Fn(Comp, f64) -> Comp,
@@ -93,7 +104,7 @@ F2: Fn(f64, f64, f64) -> f64
 {
     let min_step = delta;
     let condition = |delta_theta: f64| {
-        check_jump_validity(&f, &line_denominator, theta0, delta_theta, w_steps_linear)
+        check_jump_validity(&f, &line_denominator, theta0, delta_theta, w_steps_linear, log_space)
     };
     optimization::get_maximum_condition(condition, min_step, limit)
 }
@@ -106,6 +117,7 @@ fn get_stability_segment_1_d<F1, F2>(
     delta: f64,
     limit: f64,
     conf: &LineConfiguration,
+    log_space: &[f64],
 ) -> f64
 where
     F1: Fn(Comp, f64) -> Comp,
@@ -122,7 +134,9 @@ where
             theta,
             delta,
             limit,
-            conf.w_steps_linear);
+            conf.w_steps_linear,
+            log_space,
+        );
 
         /* Reduce change for numerical errors caused by global optimization */
         delta_theta = delta_theta * conf.safeguard;
@@ -174,7 +188,13 @@ fn get_max_theta(limits: &Limits, origin: Par, angle: f64, delta: f64) -> f64 {
 }
 
 
-fn get_stability_segment(conf: &LineConfiguration, angle: f64, origin: Par) -> f64 {
+fn get_stability_segment(
+    conf: &LineConfiguration,
+    angle: f64,
+    origin: Par,
+    log_space: &[f64]
+) -> f64
+{
     info!("Getting stability segment for origin {:?}, angle {:?}", origin, angle);
     if !geometry::is_point_in_limits(origin, &conf.limits){
         panic!("Origin not in given limits");
@@ -205,11 +225,11 @@ fn get_stability_segment(conf: &LineConfiguration, angle: f64, origin: Par) -> f
     let limit = get_max_theta(&conf.limits, origin, angle, delta);
     let theta0 = 0.0;
 
-    get_stability_segment_1_d(f_1_d, line_denom_1_d, theta0, delta, limit, conf)
+    get_stability_segment_1_d(f_1_d, line_denom_1_d, theta0, delta, limit, conf, log_space)
 }
 
 
-fn get_rayfan(conf: &LineConfiguration, origin: Par) -> RayFan {
+fn get_rayfan(conf: &LineConfiguration, origin: Par, log_space: &[f64]) -> RayFan {
     info!("Calculating line algo for rayfan {:?}", origin);
     let angles = spawn_angles(&conf.limits, conf.ray_count);
 
@@ -218,7 +238,7 @@ fn get_rayfan(conf: &LineConfiguration, origin: Par) -> RayFan {
     let stability_segments = angles
         .clone()
         .into_par_iter()
-        .map(|angle| get_stability_segment(conf, angle, origin));
+        .map(|angle| get_stability_segment(conf, angle, origin, log_space));
 
     let rays = angles
         .into_par_iter()
@@ -249,11 +269,13 @@ pub fn run_line(args: &Args) {
 
     let config = CONFIGURATONS.get(config_name.as_str()).expect("Unknown system");
 
+    let w_log_space = config.get_log_space();
+
     let rayfans = config
         .origins
         .clone()
         .into_par_iter()
-        .map(|origin| get_rayfan(config, origin));
+        .map(|origin| get_rayfan(config, origin, &w_log_space));
 
     let results = LineResult {
         rayfans: rayfans.collect(),
@@ -261,7 +283,6 @@ pub fn run_line(args: &Args) {
         parameters: config.system.parameters,
     };
 
-    panic!("hello2");
 
     /* Store results in file */
     let config_name_option = &args.system;

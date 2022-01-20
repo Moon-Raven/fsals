@@ -2,7 +2,6 @@ use lazy_static::lazy_static;
 use log::{debug, info};
 
 use iter_num_tools::{log_space, lin_space};
-use rayon::join;
 
 use crate::types;
 
@@ -61,94 +60,68 @@ where F: Fn(f64) -> bool
 }
 
 
-lazy_static! {
-    pub static ref W_LOGSPACED: Vec<f64> = {
-        let w_min = 1e-3;
-        let w_max = 1e10;
-        let steps = 1_000;
-        log_space(w_min..=w_max, steps).collect()
-    };
-}
-
-
-pub fn precalculate_logspace<F>(f: F) -> Vec<f64>
-where F: Fn(f64) -> f64
-{
-    W_LOGSPACED.iter().map(|w| f(*w)).collect()
-}
-
-
-pub struct MinimizationProblem<'b, I, F1, F2>
+pub struct MinimizationProblem<'b, F1, F2>
 where
     F1: Fn(f64) -> f64,
     F2: Fn(f64) -> f64,
-    for<'a> &'a I: IntoIterator<Item = &'a f64>
 {
-    pub precalculated_numerator: &'b I,
+    pub log_space: &'b[f64],
+    pub lin_steps: usize,
+    pub precalculated_numerator: &'b[f64],
     pub denominator_function: &'b F1,
     pub fraction_function: &'b F2,
 }
 
 
-impl<'b, I, F1, F2> MinimizationProblem<'b, I, F1, F2>
-where
-    F1: Fn(f64) -> f64,
-    F2: Fn(f64) -> f64,
-    for<'a> &'a I: IntoIterator<Item = &'a f64>
+
+pub fn get_linsearch_interval(
+    index_of_logmin: usize,
+    log_space: &[f64],
+) -> (f64, f64)
 {
-    pub fn spawn_log_iterator<I2>(&'b self, w_axis: I2) -> impl Iterator<Item=f64> + 'b
-    where
-        I2: Iterator<Item = f64> + 'b
-    {
-        let denominator_iter = w_axis.map(move |w| (self.denominator_function)(w));
-        let joint_iter = self.precalculated_numerator.into_iter().zip(denominator_iter);
-        joint_iter.map(|(num, denom)| num / denom)
-    }
-}
-
-
-pub fn get_linsearch_interval(index_of_logmin: usize, last_index: usize) -> (f64, f64) {
+    let last_index = log_space.len() - 1;
     let w_min =
         if index_of_logmin == 0 {
             0.0
         } else {
-            W_LOGSPACED[index_of_logmin -1]
+            log_space[index_of_logmin -1]
         };
 
     let w_max =
         if index_of_logmin == last_index {
             panic!("Minimum seems to be out of bounds")
         } else {
-            W_LOGSPACED[index_of_logmin + 1]
+            log_space[index_of_logmin + 1]
         };
     (w_min, w_max)
 }
 
 
-pub fn find_minimum_preallocated_numerator<F1, F2, I>(
-    problem: &MinimizationProblem<I, F1, F2>,
-) -> f64
-where
+pub fn find_minimum_fraction<F1, F2>(problem: &MinimizationProblem<F1, F2>) -> f64 where
     F1: Fn(f64) -> f64,
     F2: Fn(f64) -> f64,
-    for<'a> &'a I: IntoIterator<Item = &'a f64>
 {
-    let w_size = W_LOGSPACED.len();
-    let last_index: usize = w_size - 1;
-    let fraction_iterator = problem.spawn_log_iterator(W_LOGSPACED.iter().copied());
+    let log_denominator_iterator = problem.log_space
+        .iter()
+        .map(|w| (problem.denominator_function)(*w));
+
+    let log_fraction_iterator = problem.precalculated_numerator
+        .iter()
+        .zip(log_denominator_iterator)
+        .map(|(num, denom)| num / denom);
 
     /* Perform search on logspace */
-    let minind = fraction_iterator
+    let minind = log_fraction_iterator
         .enumerate()
         .min_by(|(_, a), (_, b)| a.partial_cmp(b).expect("Invalid value found"))
         .map(|(index, _)| index)
         .expect("Error while searching for log min");
 
-    /* Perform search on linspace */
-    let (w_min, w_max) = get_linsearch_interval(minind, last_index);
+    // /* Perform search on linspace */
+    let (w_min, w_max) = get_linsearch_interval(minind, problem.log_space);
     debug!("Starting linsearch on [{}, {}]", w_min, w_max);
 
-    let min = lin_space(w_min..=w_max, w_size)
+    let min = iter_num_tools::lin_space(w_min..=w_max, problem.lin_steps)
         .map(|w| (problem.fraction_function)(w))
         .min_by(|a, b| a.partial_cmp(b).expect("Invalid value found"))
         .expect("Error while searching for lin min");
@@ -158,80 +131,11 @@ where
     min
 }
 
-
-pub fn find_minimum<F>(f: F) -> f64
-where F: Fn(f64) -> f64
-{
-    let w_size = W_LOGSPACED.len();
-    let last_index: usize = w_size - 1;
-
-    /* Perform search on logspace */
-    let minind = W_LOGSPACED
-        .iter()
-        .map(|w| f(*w))
-        .enumerate()
-        .min_by(|(_, a), (_, b)| a.partial_cmp(b).expect("Invalid value found"))
-        .map(|(index, _)| index)
-        .expect("Error while searching for log min");
-
-    let argmin = W_LOGSPACED[minind];
-    let min = f(argmin);
-    debug!("Found log minimum f({}) = {} at index {}", argmin, min, minind);
-
-    /* Perform search on linspace */
-    let (w_min, w_max) = get_linsearch_interval(minind, last_index);
-    debug!("Starting linsearch on [{}, {}]", w_min, w_max);
-
-    let min = lin_space(w_min..=w_max, w_size)
-        .map(|w| f(w))
-        .min_by(|a, b| a.partial_cmp(b).expect("Invalid value found"))
-        .expect("Error while searching for lin min");
-
-    debug!("Found lin minimum f(?) = {}", min);
-
-    min
-}
-
-
-pub fn find_minimum_custom_w_steps<F>(f: F, w_steps_linear: usize) -> f64
-where F: Fn(f64) -> f64
-{
-    let w_size = W_LOGSPACED.len();
-    let last_index: usize = w_size - 1;
-
-    /* Perform search on logspace */
-    let minind = W_LOGSPACED
-        .iter()
-        .map(|w| f(*w))
-        .enumerate()
-        .min_by(|(_, a), (_, b)| a.partial_cmp(b).expect("Invalid value found"))
-        .map(|(index, _)| index)
-        .expect("Error while searching for log min");
-
-    let argmin = W_LOGSPACED[minind];
-    let min = f(argmin);
-    debug!("Found log minimum f({}) = {} at index {}", argmin, min, minind);
-
-    /* Perform search on linspace */
-    let (w_min, w_max) = get_linsearch_interval(minind, last_index);
-    debug!("Starting linsearch on [{}, {}]", w_min, w_max);
-
-    let min = lin_space(w_min..=w_max, w_steps_linear)
-        .map(|w| f(w))
-        .min_by(|a, b| a.partial_cmp(b).expect("Invalid value found"))
-        .expect("Error while searching for lin min");
-
-    debug!("Found lin minimum f(?) = {}", min);
-
-    min
-}
-
-
 #[cfg(test)]
 mod tests {
     use log::LevelFilter;
 
-    use super::{get_maximum_condition, find_minimum};
+    use super::*;
 
     fn assert_floats_eq(x: f64, y:f64, assertion_eps: f64) {
         let diff = f64::abs(x - y);
@@ -267,34 +171,30 @@ mod tests {
 
 
     #[test]
-    fn test_find_minimum_regular() {
-        let target_x = 5.0;
-        let target_y = 2.0;
-        let f = |x: f64| (x-target_x).powi(2) + target_y;
-        let min = find_minimum(f);
-        let assertion_eps = 1e-3;
-        println!("Expected {}, got {}", target_y, min);
-        assert_floats_eq(min, target_y, assertion_eps);
-    }
+    fn test_find_minimum() {
+        /* Numerator is (x-x_offset)^3, denominator is (x-x_offset) */
+        let w_min = 1e-3;
+        let w_max = 1e5;
+        let x_offset = 2.0;
+        let steps = 10;
+        let log_steps = steps;
+        let lin_steps = steps;
+        let log_space: Vec<f64> = iter_num_tools::log_space(w_min..=w_max, log_steps).collect();
+        let precalculated_numerator: Vec<f64> = log_space.iter().map(|w| (w-x_offset).powi(3).abs()).collect();
+        let denominator_function = |w: f64| (w-x_offset).abs();
+        let fraction_function = |w: f64| (w-x_offset).powi(2);
 
+        let problem = MinimizationProblem {
+            log_space: &log_space,
+            lin_steps: lin_steps,
+            precalculated_numerator : &precalculated_numerator,
+            denominator_function: &denominator_function,
+            fraction_function: &fraction_function,
+        };
 
-    #[test]
-    fn test_find_minimum_left() {
-        let f = |x: f64| x;
-        let min = find_minimum(f);
-        let assertion_eps = 1e-3;
-        let expected = 0.0f64;
-        println!("Expected {}, got {}", expected, min);
-        assert_floats_eq(min, expected , assertion_eps);
-    }
-
-
-    #[test]
-    #[should_panic]
-    fn test_find_minimum_right() {
-        let limit = 1e10;
-        let f = |x: f64| limit - x;
-        let _min = find_minimum(f);
-        /* Should be unreachable */
-    }
-}
+        let obtained = find_minimum_fraction(&problem);
+        let expected = 0.0;
+        let eps = 1e-1;
+        println!("obtained vs expected: {} vs {}", obtained, expected);
+        assert_floats_eq(obtained, expected, eps);
+    }}

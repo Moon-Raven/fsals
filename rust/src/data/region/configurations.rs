@@ -31,6 +31,18 @@ pub struct RegionConfiguration {
     pub safeguard: f64,
     pub spawn_count: usize,
     pub enforce_limits: bool,
+    pub lin_steps: usize,
+    pub log_space_minw: f64,
+    pub log_space_maxw: f64,
+    pub log_space_steps: usize,
+}
+
+
+impl RegionConfiguration {
+    pub fn get_log_space(&self) -> Vec<f64> {
+        iter_num_tools::log_space(self.log_space_minw..=self.log_space_maxw, self.log_space_steps)
+            .collect()
+    }
 }
 
 
@@ -42,7 +54,7 @@ lazy_static! {
             name: "retarded1",
             system: retarded1::SYSTEM,
             limits: Limits { p1_min: 0.0, p1_max: 2.6, p2_min: 0.0, p2_max: 3.3 },
-            safeguard: 0.95,
+            safeguard: 0.7,
             origins: vec![
                 (0.25, 1.00),
                 (1.75, 1.20),
@@ -55,56 +67,60 @@ lazy_static! {
                 w_max: 1e5,
                 steps: 10_000,
                 },
-            delta: Delta::Abs(0.005),
+            delta: Delta::Abs(1e-3),
             spawn_count: 32,
             enforce_limits: false,
+            lin_steps: 10_000,
+            log_space_minw: 1e-3,
+            log_space_maxw: 1e5,
+            log_space_steps: 10_000,
         });
 
-        configs.insert("distributed_delay1", RegionConfiguration {
-            name: "distributed_delay1",
-            system: distributed_delay1::SYSTEM,
-            limits: Limits { p1_min: 0.0, p1_max: 20.5, p2_min: 0.0, p2_max: 1.3 },
-            safeguard: 0.90, // 0.75 in python
-            origins: vec![
-                (0.05, 1.0),
-                (4.9, 0.1),
-                (8.0, 0.04),
-                (11.3, 0.08),
-                (14.5, 0.04),
-                (17.5, 0.08),
-                (12.0, 0.013),
-                (18.0, 0.018),
-                (19.9, 0.047),
-                (16.19, 0.007),
-                ],
-            contour_conf: ContourConfiguration {
-                w_min: 1e-3,
-                w_max: 1e5,
-                steps: 1_000,
-                },
-            delta: Delta::Rel(0.001), // 1e-4 in python
-            spawn_count: 32,
-            enforce_limits: false,
-        });
+        // configs.insert("distributed_delay1", RegionConfiguration {
+        //     name: "distributed_delay1",
+        //     system: distributed_delay1::SYSTEM,
+        //     limits: Limits { p1_min: 0.0, p1_max: 20.5, p2_min: 0.0, p2_max: 1.3 },
+        //     safeguard: 0.90, // 0.75 in python
+        //     origins: vec![
+        //         (0.05, 1.0),
+        //         (4.9, 0.1),
+        //         (8.0, 0.04),
+        //         (11.3, 0.08),
+        //         (14.5, 0.04),
+        //         (17.5, 0.08),
+        //         (12.0, 0.013),
+        //         (18.0, 0.018),
+        //         (19.9, 0.047),
+        //         (16.19, 0.007),
+        //         ],
+        //     contour_conf: ContourConfiguration {
+        //         w_min: 1e-3,
+        //         w_max: 1e5,
+        //         steps: 1_000,
+        //         },
+        //     delta: Delta::Rel(0.001), // 1e-4 in python
+        //     spawn_count: 32,
+        //     enforce_limits: false,
+        // });
 
-        configs.insert("semi_infinite_rod", RegionConfiguration {
-            name: "semi_infinite_rod",
-            system: semi_infinite_rod::SYSTEM,
-            limits: Limits { p1_min: 0.0, p1_max: 100.0, p2_min: 0.0, p2_max: 7e4 },
-            safeguard: 0.99,
-            origins: vec![
-                (20.0, 1e4),
-                (60.0, 5e4),
-                ],
-            contour_conf: ContourConfiguration {
-                w_min: 1e-3,
-                w_max: 1e5,
-                steps: 1_000,
-                },
-            delta: Delta::Rel(0.01),
-            spawn_count: 32,
-            enforce_limits: false,
-        });
+        // configs.insert("semi_infinite_rod", RegionConfiguration {
+        //     name: "semi_infinite_rod",
+        //     system: semi_infinite_rod::SYSTEM,
+        //     limits: Limits { p1_min: 0.0, p1_max: 100.0, p2_min: 0.0, p2_max: 7e4 },
+        //     safeguard: 0.99,
+        //     origins: vec![
+        //         (20.0, 1e4),
+        //         (60.0, 5e4),
+        //         ],
+        //     contour_conf: ContourConfiguration {
+        //         w_min: 1e-3,
+        //         w_max: 1e5,
+        //         steps: 1_000,
+        //         },
+        //     delta: Delta::Rel(0.01),
+        //     spawn_count: 32,
+        //     enforce_limits: false,
+        // });
 
         configs
     };
