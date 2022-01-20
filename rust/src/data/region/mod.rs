@@ -13,6 +13,7 @@ use crate::types::{Comp, Limits, Par, System};
 use crate::utils::optimization::MinimizationProblem;
 use crate::utils::{geometry, optimization, storage};
 use crate::Args;
+use rayon::prelude::*;
 use configurations::{Delta, RegionConfiguration, CONFIGURATONS};
 
 
@@ -55,6 +56,7 @@ impl PRegion {
 pub struct Region {
     pub pregions: Vec<PRegion>,
     pub nu: i32,
+    pub origin: Par,
 }
 
 
@@ -175,6 +177,12 @@ pub fn get_region_parallel(
     /* Check if the point is obsolete */
     {
         let pregions_unlocked = pregions.lock().unwrap();
+
+        /* Check if it has been enough */
+        const THRESHOLD: usize = 5_000;
+        if pregions_unlocked.len() > THRESHOLD { return }
+
+        /* Check if the point is obsolete */
         if pregions_unlocked.iter().map(|preg| preg.is_point_inside(origin)).any(|b| b) {
             return;
         }
@@ -201,9 +209,9 @@ pub fn get_region_parallel(
 
     if let Some(new_points) = new_points {
         if new_points.len() != 0 {
-            rayon::scope(|s| {
+            rayon::scope_fifo(|s| {
                 for point in new_points {
-                    s.spawn(move |_| get_region_parallel(conf, point, pregions, delta, log_space));
+                    s.spawn_fifo(move |_| get_region_parallel(conf, point, pregions, delta, log_space));
                 }
             });
         }
@@ -224,7 +232,7 @@ pub fn get_region(conf: &RegionConfiguration, origin: Par) -> Region {
     let pregions = Arc::try_unwrap(pregions).unwrap().into_inner().unwrap();
     info!("Returning region around {:?} with {:?} pregions", origin, pregions.len());
 
-    Region { pregions, nu }
+    Region { pregions, nu, origin}
 }
 
 

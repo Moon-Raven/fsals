@@ -213,7 +213,7 @@ def create_figure_region(args):
         color = colors[region.nu]
 
         if cfg.draw_origins:
-            add_origin_to_ax(ax, region.pregions[0].origin)
+            add_origin_to_ax(ax, region.origin)
 
         for pregion in region.pregions:
             add_pregion_to_ax(ax, pregion, color)

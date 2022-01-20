@@ -13,6 +13,8 @@ use std::fmt::Display;
 use std::{str::FromStr};
 use log::{info, LevelFilter};
 use std::time::Instant;
+use std::panic;
+use std::process;
 
 
 #[derive(Parser)]
@@ -100,6 +102,13 @@ fn print_args_verbose(args: &Args) {
 
 
 fn main() {
+    let orig_hook = panic::take_hook();
+    panic::set_hook(Box::new(move |panic_info| {
+        // invoke the default handler and exit the process
+        orig_hook(panic_info);
+        process::exit(1);
+    }));
+
     let start = Instant::now();
     let args = Args::parse();
     simple_logger::SimpleLogger::new()

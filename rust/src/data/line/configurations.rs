@@ -71,32 +71,35 @@ lazy_static! {
             log_space_steps: 1000,
         });
 
-        // configs.insert("distributed_delay1", LineConfiguration {
-        //     name: "distributed_delay1",
-        //     system: distributed_delay1::SYSTEM,
-        //     limits: Limits { p1_min: 0.0, p1_max: 20.5, p2_min: 0.0, p2_max: 1.3 },
-        //     ray_count: 160,
-        //     safeguard: 0.95, // 0.75 in python
-        //     origins: vec![
-        //         (0.05, 1.0),
-        //         (4.9, 0.1),
-        //         (8.0, 0.04),
-        //         (11.3, 0.08),
-        //         (14.5, 0.04),
-        //         (17.5, 0.08),
-        //         (12.0, 0.013),
-        //         (18.0, 0.018),
-        //         (19.9, 0.047),
-        //         (16.19, 0.007),
-        //         ],
-        //     contour_conf: ContourConfiguration {
-        //         w_min: 1e-3,
-        //         w_max: 1e5,
-        //         steps: 1_000usize,
-        //         },
-        //     delta: Delta::Abs(1e-4),
-        //     w_steps_linear: 1_000,
-        // });
+        configs.insert("distributed_delay1", LineConfiguration {
+            name: "distributed_delay1",
+            system: distributed_delay1::SYSTEM,
+            limits: Limits { p1_min: 0.0, p1_max: 20.5, p2_min: 0.0, p2_max: 1.3 },
+            ray_count: 160,
+            safeguard: 0.95, // 0.75 in python
+            origins: vec![
+                (0.05, 1.0),
+                (4.9, 0.1),
+                (8.0, 0.04),
+                (11.3, 0.08),
+                (14.5, 0.04),
+                (17.5, 0.08),
+                (12.0, 0.013),
+                (18.0, 0.018),
+                (19.9, 0.047),
+                (16.19, 0.007),
+                ],
+            contour_conf: ContourConfiguration {
+                w_min: 1e-3,
+                w_max: 1e5,
+                steps: 1_000,
+                },
+            delta: Delta::Abs(1e-4),
+            w_steps_linear: 1_000,
+            log_space_minw: 1e-3,
+            log_space_maxw: 1e5,
+            log_space_steps: 1000,
+        });
 
         // configs.insert("semi_infinite_rod", LineConfiguration {
         //     name: "semi_infinite_rod",
