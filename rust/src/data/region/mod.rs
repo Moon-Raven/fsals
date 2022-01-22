@@ -13,7 +13,7 @@ use crate::types::{Comp, Limits, Par, System};
 use crate::utils::optimization::MinimizationProblem;
 use crate::utils::{geometry, optimization, storage};
 use crate::Args;
-use rayon::prelude::*;
+use rayon::{prelude::*, ScopeFifo};
 use configurations::{Delta, RegionConfiguration, CONFIGURATONS};
 
 
@@ -166,12 +166,13 @@ where
 }
 
 
-pub fn get_region_parallel(
-    conf: &RegionConfiguration,
+pub fn get_region_parallel<'a>(
+    scope: &ScopeFifo<'a>,
+    conf: &'a RegionConfiguration,
     origin: Par,
-    pregions: &Arc<Mutex<Vec<PRegion>>>,
+    pregions: &'a Arc<Mutex<Vec<PRegion>>>,
     delta: f64,
-    log_space: &[f64],
+    log_space: &'a [f64],
 )
 {
     /* Check if the point is obsolete */
@@ -179,7 +180,7 @@ pub fn get_region_parallel(
         let pregions_unlocked = pregions.lock().unwrap();
 
         /* Check if it has been enough */
-        const THRESHOLD: usize = 5_000;
+        const THRESHOLD: usize = 9999999;
         if pregions_unlocked.len() > THRESHOLD { return }
 
         /* Check if the point is obsolete */
@@ -209,11 +210,9 @@ pub fn get_region_parallel(
 
     if let Some(new_points) = new_points {
         if new_points.len() != 0 {
-            rayon::scope_fifo(|s| {
-                for point in new_points {
-                    s.spawn_fifo(move |_| get_region_parallel(conf, point, pregions, delta, log_space));
-                }
-            });
+            for point in new_points {
+                scope.spawn_fifo(move |s| get_region_parallel(s, conf, point, pregions, delta, log_space));
+            }
         }
     }
 }
@@ -228,7 +227,9 @@ pub fn get_region(conf: &RegionConfiguration, origin: Par) -> Region {
     let w_log_space: Vec<f64> = conf.get_log_space();
 
     info!("Searching for region around {:?} with nu {}", origin, nu);
-    get_region_parallel(conf, origin, &mut pregions, delta, &w_log_space);
+    rayon::scope_fifo(|s| {
+        get_region_parallel(s, conf, origin, &mut pregions, delta, &w_log_space);
+    });
     let pregions = Arc::try_unwrap(pregions).unwrap().into_inner().unwrap();
     info!("Returning region around {:?} with {:?} pregions", origin, pregions.len());
 
@@ -274,7 +275,7 @@ pub fn run_region(args: &Args) {
     let regions = config
         .origins
         .clone()
-        .into_iter()
+        .into_par_iter()
         .map(|origin| get_region(config, origin));
 
     let results = RegionResult {
