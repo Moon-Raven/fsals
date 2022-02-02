@@ -76,16 +76,17 @@ F2: Fn(f64, f64, f64) -> f64
     let denominator = |w: f64| line_denominator(w, theta_min, theta_max);
     let fraction = |w: f64| numerator(w) / denominator(w);
     let precalculated_numerator: Vec<f64> = log_space.iter().map(|w| numerator(*w)).collect();
-    let minimization_problem = MinimizationProblem {
-        log_space: log_space,
-        lin_steps: w_steps_linear,
-        precalculated_numerator: &precalculated_numerator,
-        denominator_function: &denominator,
-        fraction_function: &fraction,
-    };
-    let min = optimization::find_minimum_fraction(&minimization_problem);
-    let jump_valid = delta_theta < min;
-    jump_valid
+    // let minimization_problem = MinimizationProblem {
+    //     log_space: log_space,
+    //     lin_steps: w_steps_linear,
+    //     precalculated_numerator: &precalculated_numerator,
+    //     denominator_function: &denominator,
+    //     fraction_function: &fraction,
+    // };
+    // let min = optimization::find_minimum_fraction(&minimization_problem);
+    // let jump_valid = delta_theta < min;
+    // jump_valid
+    true
 }
 
 

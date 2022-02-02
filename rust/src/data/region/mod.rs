@@ -15,6 +15,7 @@ use crate::utils::{geometry, optimization, storage};
 use crate::Args;
 use rayon::{prelude::*, ScopeFifo};
 use configurations::{Delta, RegionConfiguration, CONFIGURATONS};
+use crate::systems::distributed_delay1;
 
 
 #[derive(Serialize, Debug)]
@@ -68,19 +69,20 @@ fn check_jump_validity (
     log_space: &[f64],
 ) -> bool
 {
-    let numerator = |w| (conf.system.f_complex)(Comp::new(0.0, w), origin).norm();
-    let denominator = |w| (conf.system.region_denominator.unwrap())(w, origin, eps);
-    let fraction = |w| numerator(w) / denominator(w);
-
     let minimization_problem = MinimizationProblem {
         log_space: log_space,
         lin_steps: conf.lin_steps,
-        precalculated_numerator: &precalculated_numerator,
-        fraction_function: &fraction,
-        denominator_function: &denominator,
+        logspace_fraction_iterator: distributed_delay1::region_logspace_fraction(
+                precalculated_numerator,
+                log_space,
+                origin,
+                eps),
+        linspace_fraction_generator: Box::new(move |w_linspace| {
+            distributed_delay1::region_linspace_fraction(w_linspace, origin, eps)
+        }),
     };
 
-    let min = optimization::find_minimum_fraction(&minimization_problem);
+    let min = optimization::find_minimum_fraction(minimization_problem);
 
     eps < min
 }
