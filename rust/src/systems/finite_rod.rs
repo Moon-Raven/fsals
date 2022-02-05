@@ -31,4 +31,6 @@ pub const SYSTEM: System = System {
     parameters: (r"\tau", r"k"),
     line_denominator: Option::None,
     region_denominator: Option::None,
+    region_fraction_precalculated_numerator: Option::None,
+    region_fraction: Option::None,
 };

@@ -116,4 +116,6 @@ pub const SYSTEM: System = System {
     parameters: (r"\beta", r"\sigma"),
     line_denominator: Option::Some(line_denominator),
     region_denominator: Option::Some(region_denominator),
+    region_fraction_precalculated_numerator: Option::None,
+    region_fraction: Option::None,
 };

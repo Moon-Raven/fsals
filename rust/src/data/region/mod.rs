@@ -72,14 +72,14 @@ fn check_jump_validity (
     let minimization_problem = MinimizationProblem {
         log_space: log_space,
         lin_steps: conf.lin_steps,
-        logspace_fraction_iterator: distributed_delay1::region_logspace_fraction(
+        logspace_fraction_iterator: (conf.system.region_fraction_precalculated_numerator.unwrap())(
                 precalculated_numerator,
                 log_space,
                 origin,
                 eps),
-        linspace_fraction_generator: Box::new(move |w_linspace| {
-            distributed_delay1::region_linspace_fraction(w_linspace, origin, eps)
-        }),
+        linspace_fraction_generator: {
+            Box::new(move |w_linspace| conf.system.region_fraction.unwrap()(w_linspace, origin, eps))
+        },
     };
 
     let min = optimization::find_minimum_fraction(minimization_problem);

@@ -98,7 +98,7 @@ lazy_static! {
                 w_max: 1e5,
                 steps: 1_000,
                 },
-            delta: Delta::Abs(0.01), // 1e-3 in python
+            delta: Delta::Abs(0.001), // 1e-3 in python
             spawn_count: 32,
             enforce_limits: false,
             lin_steps: 10_000,      // 10_000 in python

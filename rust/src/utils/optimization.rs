@@ -67,7 +67,7 @@ pub struct MinimizationProblem<'b>
     pub log_space: &'b[f64],
     pub lin_steps: usize,
     pub logspace_fraction_iterator: Box<dyn Iterator<Item=f64> + 'b>,
-    pub linspace_fraction_generator: Box<dyn Fn(&[f64]) -> Box<dyn Iterator<Item=f64> + '_>>,
+    pub linspace_fraction_generator: Box<dyn Fn(&[f64]) -> Box<dyn Iterator<Item=f64> + '_> + 'b>,
 }
 
 
