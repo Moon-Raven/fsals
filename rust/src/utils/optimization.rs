@@ -61,8 +61,20 @@ where F: Fn(f64) -> bool
     x
 }
 
+pub struct MinimizationProblemSlow<'b, F1, F2>
+where
+    F1: Fn(f64) -> f64,
+    F2: Fn(f64) -> f64,
+{
+    pub log_space: &'b[f64],
+    pub lin_steps: usize,
+    pub precalculated_numerator: &'b[f64],
+    pub denominator_function: &'b F1,
+    pub fraction_function: &'b F2,
+}
 
-pub struct MinimizationProblem<'b>
+
+pub struct MinimizationProblemFast<'b>
 {
     pub log_space: &'b[f64],
     pub lin_steps: usize,
@@ -94,7 +106,42 @@ pub fn get_linsearch_interval(
 }
 
 
-pub fn find_minimum_fraction<'b>(problem: MinimizationProblem<'b>) -> f64 {
+pub fn find_minimum_fraction_slow<F1, F2>(problem: &MinimizationProblemSlow<F1, F2>) -> f64 where
+    F1: Fn(f64) -> f64,
+    F2: Fn(f64) -> f64,
+{
+    let log_denominator_iterator = problem.log_space
+        .iter()
+        .map(|w| (problem.denominator_function)(*w));
+
+    let log_fraction_iterator = problem.precalculated_numerator
+        .iter()
+        .zip(log_denominator_iterator)
+        .map(|(num, denom)| num / denom);
+
+    /* Perform search on logspace */
+    let minind = log_fraction_iterator
+        .enumerate()
+        .min_by(|(_, a), (_, b)| a.partial_cmp(b).expect("Invalid value found"))
+        .map(|(index, _)| index)
+        .expect("Error while searching for log min");
+
+    // /* Perform search on linspace */
+    let (w_min, w_max) = get_linsearch_interval(minind, problem.log_space);
+    debug!("Starting linsearch on [{}, {}]", w_min, w_max);
+
+    let min = iter_num_tools::lin_space(w_min..=w_max, problem.lin_steps)
+        .map(|w| (problem.fraction_function)(w))
+        .min_by(|a, b| a.partial_cmp(b).expect("Invalid value found"))
+        .expect("Error while searching for lin min");
+
+    debug!("Found lin minimum f(?) = {}", min);
+
+    min
+}
+
+
+pub fn find_minimum_fraction_fast<'b>(problem: MinimizationProblemFast<'b>) -> f64 {
     /* Perform search on logspace */
     let minind = problem.logspace_fraction_iterator
         .enumerate()

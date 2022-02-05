@@ -35,6 +35,17 @@ pub fn region_fraction_precalculated_numerator<'a>(
 }
 
 
+fn line_denominator(w: f64, p: Par, angle: f64, _th_min: f64, th_max: f64) -> f64 {
+    let tau0 = p.0;
+    let k0 = p.1;
+    let c1 = f64::cos(angle);
+    let c2 = f64::sin(angle);
+    let term1 = f64::abs(c2 * w);
+    let term2 = f64::sqrt((tau0*c2 + k0*c1 + th_max).powi(2) + (c1*w).powi(2));
+    return term1 + term2
+}
+
+
 pub fn region_fraction<'a>(
     w_linspace: &'a [f64],
     origin: Par,
@@ -71,6 +82,6 @@ pub const SYSTEM: System = System {
     parameters: (r"\tau", r"k"),
     region_fraction_precalculated_numerator: Option::Some(region_fraction_precalculated_numerator),
     region_fraction: Option::Some(region_fraction),
-    line_denominator: Option::None,
+    line_denominator: Option::Some(line_denominator),
     region_denominator: Option::None,
 };

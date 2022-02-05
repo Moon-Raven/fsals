@@ -10,7 +10,7 @@ use std::iter::Cloned;
 use crate::Args;
 use crate::types::{Comp, Par, System, Limits};
 use crate::nu;
-use crate::utils::optimization::MinimizationProblem;
+use crate::utils::optimization::{MinimizationProblemFast, MinimizationProblemSlow};
 use crate::utils::{storage, geometry, optimization};
 use crate::utils::geometry::Delta;
 use configurations::{LineConfiguration, CONFIGURATONS};
@@ -64,34 +64,26 @@ fn check_jump_validity<F1, F2> (
     theta0: f64,
     delta_theta: f64,
     w_steps_linear: usize,
-    precalculated_numerator: &[f64],
     log_space: &[f64],
 ) -> bool
 where
 F1: Fn(Comp, f64) -> Comp,
 F2: Fn(f64, f64, f64) -> f64
 {
-    // let theta_min = theta0;
-    // let theta_max = theta0 + delta_theta;
-    // let numerator = |w: f64| Comp::norm(f(Comp::new(0.0, w), theta0));
-    // let denominator = |w: f64| line_denominator(w, theta_min, theta_max);
-    // let fraction = |w: f64| numerator(w) / denominator(w);
-
-    let minimization_problem = MinimizationProblem {
+    let theta_min = theta0;
+    let theta_max = theta0 + delta_theta;
+    let numerator = |w: f64| Comp::norm(f(Comp::new(0.0, w), theta0));
+    let denominator = |w: f64| line_denominator(w, theta_min, theta_max);
+    let fraction = |w: f64| numerator(w) / denominator(w);
+    let precalculated_numerator: Vec<f64> = log_space.iter().map(|w| numerator(*w)).collect();
+    let minimization_problem = MinimizationProblemSlow {
         log_space: log_space,
-        lin_steps: conf.lin_steps,
-        logspace_fraction_iterator: (conf.system.region_fraction_precalculated_numerator.unwrap())(
-                precalculated_numerator,
-                log_space,
-                origin,
-                eps),
-        linspace_fraction_generator: {
-            Box::new(move |w_linspace|
-                conf.system.region_fraction.unwrap()(w_linspace, origin, eps))
-        },
+        lin_steps: w_steps_linear,
+        precalculated_numerator: &precalculated_numerator,
+        denominator_function: &denominator,
+        fraction_function: &fraction,
     };
-    let min = optimization::find_minimum_fraction(minimization_problem);
-
+    let min = optimization::find_minimum_fraction_slow(&minimization_problem);
     let jump_valid = delta_theta < min;
     jump_valid
 }
@@ -107,24 +99,12 @@ fn find_max_delta_theta<F1, F2>(
     log_space: &[f64],
 ) -> f64
 where
-    F1: Fn(Comp, f64) -> Comp,
-    F2: Fn(f64, f64, f64) -> f64
+F1: Fn(Comp, f64) -> Comp,
+F2: Fn(f64, f64, f64) -> f64
 {
     let min_step = delta;
-    let precalculated_numerator: Vec<f64> = log_space
-        .iter()
-        .map(|w| f(Comp::new(0.0, *w), theta0).norm())
-        .collect();
-
     let condition = |delta_theta: f64| {
-        check_jump_validity(
-            &f,
-            &line_denominator,
-            theta0,
-            delta_theta,
-            w_steps_linear,
-            &precalculated_numerator,
-            log_space)
+        check_jump_validity(&f, &line_denominator, theta0, delta_theta, w_steps_linear, log_space)
     };
     optimization::get_maximum_condition(condition, min_step, limit)
 }
@@ -235,8 +215,7 @@ fn get_stability_segment(
     };
 
     // Create a closure which converts the 2d denom into 1d denom
-    let line_denom_2_d = conf.system.line_denominator
-        .expect("System must have line denom impl");
+    let line_denom_2_d = conf.system.line_denominator.expect("System must have line denom impl");
 
     let line_denom_1_d  = |w: f64, th_min: f64, th_max: f64| {
         line_denom_2_d(w, origin, angle, th_min, th_max)

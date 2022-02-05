@@ -9,6 +9,13 @@ fn f_complex(s: Comp, p: Par) -> Comp {
 }
 
 
+fn line_denominator(w: f64, _p: Par, _angle: f64, _th_min: f64, _th_max: f64) -> f64 {
+    let safeguard = 1e-10;
+
+    2.0*w.powi(2) + w + safeguard
+}
+
+
 pub fn region_fraction_precalculated_numerator<'a>(
     numerator: &'a [f64],
     w_logspace: &'a [f64],
@@ -51,6 +58,6 @@ pub const SYSTEM: System = System {
     parameters: (r"\tau_1", r"\tau_2"),
     region_fraction_precalculated_numerator: Option::Some(region_fraction_precalculated_numerator),
     region_fraction: Option::Some(region_fraction),
-    line_denominator: Option::None,
+    line_denominator: Option::Some(line_denominator),
     region_denominator: Option::None,
 };

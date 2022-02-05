@@ -10,7 +10,7 @@ use std::{fs, slice};
 
 use crate::nu;
 use crate::types::{Comp, Limits, Par, System};
-use crate::utils::optimization::MinimizationProblem;
+use crate::utils::optimization::MinimizationProblemFast;
 use crate::utils::{geometry, optimization, storage};
 use crate::Args;
 use rayon::{prelude::*, ScopeFifo};
@@ -69,7 +69,7 @@ fn check_jump_validity (
     log_space: &[f64],
 ) -> bool
 {
-    let minimization_problem = MinimizationProblem {
+    let minimization_problem = MinimizationProblemFast {
         log_space: log_space,
         lin_steps: conf.lin_steps,
         logspace_fraction_iterator: (conf.system.region_fraction_precalculated_numerator.unwrap())(
@@ -82,7 +82,7 @@ fn check_jump_validity (
         },
     };
 
-    let min = optimization::find_minimum_fraction(minimization_problem);
+    let min = optimization::find_minimum_fraction_fast(minimization_problem);
 
     eps < min
 }
