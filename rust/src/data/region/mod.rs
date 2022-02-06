@@ -1,6 +1,6 @@
 mod configurations;
 
-use std::sync::{Arc, Mutex};
+use std::sync::{Arc, Mutex, RwLock};
 use iter_num_tools::lin_space;
 use std::f64::consts::PI;
 use log::{debug, info};
@@ -172,14 +172,14 @@ pub fn get_region_parallel<'a>(
     scope: &ScopeFifo<'a>,
     conf: &'a RegionConfiguration,
     origin: Par,
-    pregions: &'a Arc<Mutex<Vec<PRegion>>>,
+    pregions: &'a Arc<RwLock<Vec<PRegion>>>,
     delta: f64,
     log_space: &'a [f64],
 )
 {
     /* Check if the point is obsolete */
     {
-        let pregions_unlocked = pregions.lock().unwrap();
+        let pregions_unlocked = pregions.read().unwrap();
 
         /* Check if it has been enough */
         const THRESHOLD: usize = 9999999;
@@ -195,7 +195,7 @@ pub fn get_region_parallel<'a>(
     let pregion = get_pregion(conf, origin, conf.enforce_limits, delta, log_space);
 
     let new_points = {
-        let mut pregions_unlocked = pregions.lock().unwrap();
+        let pregions_unlocked = pregions.read().unwrap();
 
         /* If necessary, spawn new points on edge of the newly obtained PRegion */
         if pregion.radius > delta {
@@ -204,11 +204,16 @@ pub fn get_region_parallel<'a>(
                 &conf,
                 &*pregions_unlocked)
                 .collect();
-            pregions_unlocked.push(pregion);
             Some(new_points)
         }
         else {None}
     };
+
+    /* Add obtained pregion to the Vec - this is the only access that requires write privileges */
+    {
+        let mut pregions_unlocked = pregions.write().unwrap();
+        pregions_unlocked.push(pregion);
+    }
 
     if let Some(new_points) = new_points {
         if new_points.len() != 0 {
@@ -225,7 +230,7 @@ pub fn get_region(conf: &RegionConfiguration, origin: Par) -> Region {
 
     let delta = absolutize_delta(&conf.delta, &conf.limits);
     let nu = nu::calculate_nu_single(&conf.contour_conf, conf.system.f_complex, origin);
-    let mut pregions = Arc::new(Mutex::new(Vec::with_capacity(VEC_PREALLOCATION_SIZE)));
+    let mut pregions = Arc::new(RwLock::new(Vec::with_capacity(VEC_PREALLOCATION_SIZE)));
     let w_log_space: Vec<f64> = conf.get_log_space();
 
     info!("Searching for region around {:?} with nu {}", origin, nu);
@@ -278,6 +283,7 @@ pub fn run_region(args: &Args) {
         .origins
         .clone()
         .into_par_iter()
+        // .into_iter()
         .map(|origin| get_region(config, origin));
 
     let results = RegionResult {

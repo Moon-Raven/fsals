@@ -18,23 +18,65 @@ fn f_complex(s: Comp, p: Par) -> Comp {
 }
 
 
+pub fn region_fraction_precalculated_numerator<'a>(
+    numerator: &'a [f64],
+    w_logspace: &'a [f64],
+    origin: Par,
+    eps: f64) -> Box<dyn Iterator<Item=f64> + 'a>
+{
+    let k_max = origin.1 + eps;
+    let k_powi = k_max.powi(2);
+    let helper = -X / (2.0 * SIGMA).sqrt();
+
+    let fraction_iter = numerator
+        .iter()
+        .zip(w_logspace.iter()).map(move |(num, w)| {
+            let a = (helper * w.sqrt()).exp();
+            let denom = a * (1.0 + k_powi * w.powi(2)).sqrt();
+            num / denom
+    });
+
+    Box::new(fraction_iter)
+}
+
+
 fn line_denominator(w: f64, p: Par, angle: f64, th_min: f64, th_max: f64) -> f64 {
-    // let tau = p.0;
-    // let k = p.1;
     let c1 = f64::cos(angle);
     let c2 = f64::sin(angle);
 
-    // let tau_start = p.0 + th_min * c1;
-    // let tau_end = p.0 + th_max * c1;
     let k_start = p.1 + th_min * c2;
     let k_end = p.1 + th_max * c2;
-    // let tau_max = f64::max(tau_start, tau_end);
     let k_max = f64::max(k_start, k_end);
 
     let term1 = (-X * f64::sqrt(w/(2.0*SIGMA))).exp();
     let term2 = f64::sqrt(c2.powi(2) + w.powi(2) * c1.powi(2)*k_max.powi(2));
 
     term1 * term2
+}
+
+
+pub fn region_fraction<'a>(
+    w_linspace: &'a [f64],
+    origin: Par,
+    eps: f64) -> Box<dyn Iterator<Item=f64> + 'a>
+{
+    let k_max = origin.1 + eps;
+    let k_powi = k_max.powi(2);
+    let helper = -X / (2.0 * SIGMA).sqrt();
+
+    let fraction_iter = w_linspace
+        .iter()
+        .map(move |w| {
+            let s = Comp::new(0.0, *w);
+            let tau = origin.0;
+            let k = origin.1;
+            let num = (s.powi(2) + s*k + 1.0 - (-tau*(s+k)).exp()).norm();
+            let a = (helper * w.sqrt()).exp();
+            let denom = a * (1.0 + k_powi * w.powi(2)).sqrt();
+            num / denom
+    });
+
+    Box::new(fraction_iter)
 }
 
 
@@ -56,6 +98,6 @@ pub const SYSTEM: System = System {
     parameters: (r"\tau", r"k"),
     line_denominator: Option::Some(line_denominator),
     region_denominator: Option::Some(region_denominator),
-    region_fraction_precalculated_numerator: Option::None,
-    region_fraction: Option::None,
+    region_fraction_precalculated_numerator: Option::Some(region_fraction_precalculated_numerator),
+    region_fraction: Option::Some(region_fraction),
 };

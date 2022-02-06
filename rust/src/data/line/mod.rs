@@ -72,6 +72,7 @@ F2: Fn(f64, f64, f64) -> f64
 {
     let theta_min = theta0;
     let theta_max = theta0 + delta_theta;
+    debug!("Checking jump validity with (th_min, th_max) = ({}, {})", theta_min, theta_max);
     let numerator = |w: f64| Comp::norm(f(Comp::new(0.0, w), theta0));
     let denominator = |w: f64| line_denominator(w, theta_min, theta_max);
     let fraction = |w: f64| numerator(w) / denominator(w);
@@ -123,10 +124,13 @@ where
     F1: Fn(Comp, f64) -> Comp,
     F2: Fn(f64, f64, f64) -> f64
 {
+    debug!("Finding stability segment for theta0={}", theta0);
     let mut theta = theta0;
     let mut delta_theta = f64::INFINITY;
 
     while delta_theta > delta {
+        debug!("Theta={}, delta_theta so far={}; continuing search...", theta, delta_theta);
+
         /* Find maximum offset allowed by Rouche's theorem */
         delta_theta = find_max_delta_theta(
             &f_1_d,
@@ -174,6 +178,7 @@ pub fn delta_rel2abs(limits: &Limits, delta_rel: f64, angle: f64) -> f64 {
 
 
 fn get_max_theta(limits: &Limits, origin: Par, angle: f64, delta: f64) -> f64 {
+    let safeguard = 0.9999;
     let direction = Vector2::new(f64::cos(angle), f64::sin(angle));
 
     let condition = |theta: f64| -> bool {
@@ -184,7 +189,7 @@ fn get_max_theta(limits: &Limits, origin: Par, angle: f64, delta: f64) -> f64 {
     };
     let min_step = delta;
     let limit = f64::INFINITY;
-    optimization::get_maximum_condition(condition, min_step, limit)
+    optimization::get_maximum_condition(condition, min_step, limit) * safeguard
 }
 
 
@@ -237,10 +242,12 @@ fn get_rayfan(conf: &LineConfiguration, origin: Par, log_space: &[f64]) -> RayFa
     let stability_segments = angles
         .clone()
         .into_par_iter()
+        // .into_iter()
         .map(|angle| get_stability_segment(conf, angle, origin, log_space));
 
     let rays = angles
         .into_par_iter()
+        // .into_iter()
         .zip(stability_segments)
         .map(|(angle, stability_segment)|{
             Ray {origin: origin, angle: angle, length: stability_segment}}
@@ -274,6 +281,7 @@ pub fn run_line(args: &Args) {
         .origins
         .clone()
         .into_par_iter()
+        // .into_iter()
         .map(|origin| get_rayfan(config, origin, &w_log_space));
 
     let results = LineResult {

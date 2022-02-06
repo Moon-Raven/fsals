@@ -100,6 +100,27 @@ LINE_CONFIGURATIONS = {
         ncol=3,
         bbox=(0, -0.17, 1, 0.1),
     ),
+
+    'pde_complex_beta_sigma' : LineConfiguration(
+        width=SINGLE_COLUMN_WIDTH,
+        height=STANDARD_HEIGHT,
+        ncol=3,
+        bbox=(0, -0.17, 1, 0.1),
+    ),
+
+    'pde_complex_tau_sigma' : LineConfiguration(
+        width=SINGLE_COLUMN_WIDTH,
+        height=STANDARD_HEIGHT,
+        ncol=3,
+        bbox=(0, -0.17, 1, 0.1),
+    ),
+
+    'telegrapher_x_k' : LineConfiguration(
+        width=SINGLE_COLUMN_WIDTH,
+        height=STANDARD_HEIGHT,
+        ncol=3,
+        bbox=(0, -0.17, 1, 0.1),
+    ),
 }
 
 REGION_CONFIGURATIONS = {
@@ -121,6 +142,27 @@ REGION_CONFIGURATIONS = {
     ),
 
     'semi_infinite_rod' : RegionConfiguration(
+        width=SINGLE_COLUMN_WIDTH,
+        height=STANDARD_HEIGHT,
+        ncol=3,
+        bbox=(0, -0.17, 1, 0.1),
+    ),
+
+    'pde_complex_k_sigma' : RegionConfiguration(
+        width=SINGLE_COLUMN_WIDTH,
+        height=STANDARD_HEIGHT,
+        ncol=3,
+        bbox=(0, -0.17, 1, 0.1),
+    ),
+
+    'pde_complex_beta_sigma' : RegionConfiguration(
+        width=SINGLE_COLUMN_WIDTH,
+        height=STANDARD_HEIGHT,
+        ncol=3,
+        bbox=(0, -0.17, 1, 0.1),
+    ),
+
+    'pde_complex_tau_sigma' : RegionConfiguration(
         width=SINGLE_COLUMN_WIDTH,
         height=STANDARD_HEIGHT,
         ncol=3,

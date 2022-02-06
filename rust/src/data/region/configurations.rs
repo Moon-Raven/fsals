@@ -107,24 +107,100 @@ lazy_static! {
             log_space_steps: 10_000, // 10_000 in python
         });
 
-        // configs.insert("semi_infinite_rod", RegionConfiguration {
-        //     name: "semi_infinite_rod",
-        //     system: semi_infinite_rod::SYSTEM,
-        //     limits: Limits { p1_min: 0.0, p1_max: 100.0, p2_min: 0.0, p2_max: 7e4 },
-        //     safeguard: 0.99,
-        //     origins: vec![
-        //         (20.0, 1e4),
-        //         (60.0, 5e4),
-        //         ],
-        //     contour_conf: ContourConfiguration {
-        //         w_min: 1e-3,
-        //         w_max: 1e5,
-        //         steps: 1_000,
-        //         },
-        //     delta: Delta::Rel(0.01),
-        //     spawn_count: 32,
-        //     enforce_limits: false,
-        // });
+        configs.insert("semi_infinite_rod", RegionConfiguration {
+            name: "semi_infinite_rod",
+            system: semi_infinite_rod::SYSTEM,
+            limits: Limits { p1_min: 0.0, p1_max: 100.0, p2_min: 0.0, p2_max: 7e4 },
+            safeguard: 0.99,
+            origins: vec![
+                (20.0, 1e4),
+                (60.0, 5e4),
+                ],
+            contour_conf: ContourConfiguration {
+                w_min: 1e-3,
+                w_max: 1e5,
+                steps: 1_000,
+                },
+            delta: Delta::Rel(0.01),
+            spawn_count: 32,
+            enforce_limits: false,
+            lin_steps: 100_000,      // 10_000 in python
+            log_space_minw: 1e-3,   // 1e-3 in python
+            log_space_maxw: 1e5,    // 1e7 in python
+            log_space_steps: 100_000, // 10_000 in python
+        });
+
+        configs.insert("pde_complex_k_sigma", RegionConfiguration {
+            name: "pde_complex_k_sigma",
+            system: pde_complex_k_sigma::SYSTEM,
+            limits: Limits { p1_min: 0.1, p1_max: 20.0, p2_min: 0.1, p2_max: 20.0 },
+            safeguard: 0.90,
+            origins: vec![
+                (4.0, 4.0),
+                (6.0, 6.0),
+                ],
+            contour_conf: ContourConfiguration {
+                w_min: 1e-3,
+                w_max: 1e5,
+                steps: 1_000,
+                },
+            delta: Delta::Abs(1e-2),
+            spawn_count: 32,
+            enforce_limits: false,
+            lin_steps: 1_000,      // 10_000 in python
+            log_space_minw: 1e-3,   // 1e-3 in python
+            log_space_maxw: 1e5,    // 1e7 in python
+            log_space_steps: 1_000, // 10_000 in python
+        });
+
+        configs.insert("pde_complex_beta_sigma", RegionConfiguration {
+            name: "pde_complex_beta_sigma",
+            system: pde_complex_beta_sigma::SYSTEM,
+            limits: Limits { p1_min: 0.0, p1_max: 2.0, p2_min: 0.0, p2_max: 2.0 },
+            safeguard: 0.90,
+            origins: vec![
+                (1.0, 1.0),
+                (1.80, 1.50),
+                ],
+            contour_conf: ContourConfiguration {
+                w_min: 1e-3,
+                w_max: 1e5,
+                steps: 1_000,
+                },
+            delta: Delta::Abs(1e-3),
+            spawn_count: 32,
+            enforce_limits: false,
+            lin_steps: 1_000,      // 10_000 in python
+            log_space_minw: 1e-3,   // 1e-3 in python
+            log_space_maxw: 1e5,    // 1e7 in python
+            log_space_steps: 1_000, // 10_000 in python
+        });
+
+        configs.insert("pde_complex_tau_sigma", RegionConfiguration {
+            name: "pde_complex_tau_sigma",
+            system: pde_complex_tau_sigma::SYSTEM,
+            limits: Limits { p1_min: 0.0, p1_max: 20.0, p2_min: 0.0, p2_max: 20.0 },
+            safeguard: 0.90,
+            origins: vec![
+                ( 1.0,  1.0),
+                (10.0, 10.0),
+                (18.0,  2.0),
+                (19.0,  0.15),
+                ],
+            contour_conf: ContourConfiguration {
+                w_min: 1e-3,
+                w_max: 1e5,
+                steps: 1_000,
+                },
+            delta: Delta::Abs(1e-3),
+            spawn_count: 32,
+            enforce_limits: false,
+            lin_steps: 1_000,
+            log_space_minw: 1e-3,
+            log_space_maxw: 1e5,
+            log_space_steps: 1_000,
+        });
+
 
         configs
     };

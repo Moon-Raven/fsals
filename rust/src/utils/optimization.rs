@@ -86,23 +86,24 @@ pub struct MinimizationProblemFast<'b>
 pub fn get_linsearch_interval(
     index_of_logmin: usize,
     log_space: &[f64],
-) -> (f64, f64)
+) -> Option<(f64, f64)>
 {
     let last_index = log_space.len() - 1;
     let w_min =
         if index_of_logmin == 0 {
-            0.0
+            log_space[0]
         } else {
             log_space[index_of_logmin -1]
         };
 
     let w_max =
         if index_of_logmin == last_index {
-            panic!("Minimum seems to be out of bounds")
+            debug!("Minimum seems to be out of bounds");
+            return Option::None;
         } else {
             log_space[index_of_logmin + 1]
         };
-    (w_min, w_max)
+    Some((w_min, w_max))
 }
 
 
@@ -127,7 +128,11 @@ pub fn find_minimum_fraction_slow<F1, F2>(problem: &MinimizationProblemSlow<F1, 
         .expect("Error while searching for log min");
 
     // /* Perform search on linspace */
-    let (w_min, w_max) = get_linsearch_interval(minind, problem.log_space);
+    let (w_min, w_max) = match get_linsearch_interval(minind, problem.log_space) {
+        Some(val) => val,
+        None => return 0.0,
+    };
+
     debug!("Starting linsearch on [{}, {}]", w_min, w_max);
 
     let min = iter_num_tools::lin_space(w_min..=w_max, problem.lin_steps)
@@ -150,7 +155,10 @@ pub fn find_minimum_fraction_fast<'b>(problem: MinimizationProblemFast<'b>) -> f
         .expect("Error while searching for log min");
 
     // /* Perform search on linspace */
-    let (w_min, w_max) = get_linsearch_interval(minind, problem.log_space);
+    let (w_min, w_max) = match get_linsearch_interval(minind, problem.log_space) {
+        Some(val) => val,
+        None => return 0.0,
+    };
     debug!("Starting linsearch on [{}, {}]", w_min, w_max);
 
     let w_linspace: Vec<f64> =

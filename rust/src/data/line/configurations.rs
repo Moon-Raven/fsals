@@ -101,55 +101,142 @@ lazy_static! {
             log_space_steps: 1000,
         });
 
-        // configs.insert("semi_infinite_rod", LineConfiguration {
-        //     name: "semi_infinite_rod",
-        //     system: semi_infinite_rod::SYSTEM,
-        //     limits: Limits { p1_min: 0.0, p1_max: 100.0, p2_min: 0.0, p2_max: 7e4 },
-        //     ray_count: 160,
-        //     safeguard: 0.80,
-        //     origins: vec![
-        //         // Region 1
-        //         (1.0, 0.5e4),
-        //         (50.0, 0.5e4),
-        //         (90.0, 0.5e4),
-        //         (1.0, 4e4),
-        //         // Region 2
-        //         (50.0, 4e4),
-        //         (20.0, 6e4),
-        //         (90.0, 3e4),
-        //         ],
-        //     contour_conf: ContourConfiguration {
-        //         w_min: 1e-3,
-        //         w_max: 1e5,
-        //         steps: 1_000usize,
-        //         },
-        //     delta: Delta::Abs(0.8),
-        //     w_steps_linear: 5_000,
-        // });
+        configs.insert("semi_infinite_rod", LineConfiguration {
+            name: "semi_infinite_rod",
+            system: semi_infinite_rod::SYSTEM,
+            limits: Limits { p1_min: 0.0, p1_max: 100.0, p2_min: 0.0, p2_max: 7e4 },
+            ray_count: 160,
+            safeguard: 0.80,
+            origins: vec![
+                // Region 1
+                (1.0, 0.5e4),
+                (50.0, 0.5e4),
+                (90.0, 0.5e4),
+                (1.0, 4e4),
+                // Region 2
+                (50.0, 4e4),
+                (20.0, 6e4),
+                (90.0, 3e4),
+                ],
+            contour_conf: ContourConfiguration {
+                w_min: 1e-3,
+                w_max: 1e5,
+                steps: 1_000usize,
+                },
+            delta: Delta::Abs(0.8),
+            w_steps_linear: 5_000,
+            log_space_minw: 1e-3,
+            log_space_maxw: 1e5,
+            log_space_steps: 1000,
+        });
 
-        // configs.insert("pde_complex_k_sigma", LineConfiguration {
-        //     name: "pde_complex_k_sigma",
-        //     system: pde_complex_k_sigma::SYSTEM,
-        //     limits: Limits { p1_min: 0.0, p1_max: 20.0, p2_min: 0.0, p2_max: 20.0 },
-        //     ray_count: 160,
-        //     safeguard: 0.90,
-        //     origins: vec![
-        //         // Region 1
-        //         (0.5, 0.5),
-        //         (4.0, 4.0),
-        //         (2.0, 10.0),
-        //         (10.0, 2.0),
-        //         // Region 2
-        //         (6.0, 6.0),
-        //         ],
-        //     contour_conf: ContourConfiguration {
-        //         w_min: 1e-3,
-        //         w_max: 1e5,
-        //         steps: 1_000usize,
-        //         },
-        //     delta: Delta::Abs(1e-2),
-        //     w_steps_linear: 100, //1000
-        // });
+        configs.insert("pde_complex_k_sigma", LineConfiguration {
+            name: "pde_complex_k_sigma",
+            system: pde_complex_k_sigma::SYSTEM,
+            limits: Limits { p1_min: 0.1, p1_max: 20.0, p2_min: 0.1, p2_max: 20.0 },
+            ray_count: 160,
+            safeguard: 0.90,
+            origins: vec![
+                // Region 1
+                (0.5, 0.5),
+                (4.0, 4.0),
+                (2.0, 10.0),
+                (10.0, 2.0),
+                // Region 2
+                (6.0, 6.0),
+                (16.0, 10.0),
+                (10.0, 16.0),
+                ],
+            contour_conf: ContourConfiguration {
+                w_min: 1e-3,
+                w_max: 1e5,
+                steps: 1_000usize,
+                },
+            delta: Delta::Abs(1e-3),
+            w_steps_linear: 1000,
+            log_space_minw: 1e-2,
+            log_space_maxw: 1e2,
+            log_space_steps: 1000,
+        });
+
+        configs.insert("pde_complex_beta_sigma", LineConfiguration {
+            name: "pde_complex_beta_sigma",
+            system: pde_complex_beta_sigma::SYSTEM,
+            limits: Limits { p1_min: 0.0, p1_max: 2.0, p2_min: 0.0, p2_max: 2.0 },
+            ray_count: 160,
+            safeguard: 0.90,
+            origins: vec![
+                // Region 1
+                (1.00, 1.00),
+                // Region 2
+                (1.80, 1.50),
+                ],
+            contour_conf: ContourConfiguration {
+                w_min: 1e-3,
+                w_max: 1e5,
+                steps: 1_000usize,
+                },
+            delta: Delta::Abs(1e-3),
+            w_steps_linear: 1_000,
+            log_space_minw: 1e-3,
+            log_space_maxw: 1e5,
+            log_space_steps: 1_000,
+        });
+
+        configs.insert("pde_complex_tau_sigma", LineConfiguration {
+            name: "pde_complex_tau_sigma",
+            system: pde_complex_tau_sigma::SYSTEM,
+            limits: Limits { p1_min: 0.0, p1_max: 20.0, p2_min: 0.0, p2_max: 20.0 },
+            ray_count: 160,
+            safeguard: 0.90,
+            origins: vec![
+                // Region 1
+                ( 1.0,  1.0),
+                ( 0.5, 12.0),
+                // Region 2
+                (10.0, 10.0),
+                // Region 3
+                (18.0,  2.0),
+                // Region 4
+                (19.0,  0.15),
+                ],
+            contour_conf: ContourConfiguration {
+                w_min: 1e-3,
+                w_max: 1e5,
+                steps: 1_000usize,
+                },
+            delta: Delta::Abs(1e-2),
+            w_steps_linear: 1_000,
+            log_space_minw: 1e-3,
+            log_space_maxw: 1e5,
+            log_space_steps: 1_000,
+        });
+
+        configs.insert("telegrapher_x_k", LineConfiguration {
+            name: "telegrapher_x_k",
+            system: telegrapher_x_k::SYSTEM,
+            limits: Limits { p1_min: 0.1, p1_max: 4.0, p2_min: 4.1, p2_max: 8.0 },
+            ray_count: 160,
+            safeguard: 0.90,
+            origins: vec![
+                // Region 1
+                (0.4, 7.0),
+                (0.2, 5.0),
+                // Region 2
+                (2.5, 6.0),
+                ],
+            contour_conf: ContourConfiguration {
+                w_min: 1e-3,
+                w_max: 1e5,
+                steps: 1_000usize,
+                },
+            delta: Delta::Abs(1e-4),
+            w_steps_linear: 1_000,
+            log_space_minw: 1e-3,
+            log_space_maxw: 1e5,
+            log_space_steps: 1_000,
+        });
+
 
         configs
     };

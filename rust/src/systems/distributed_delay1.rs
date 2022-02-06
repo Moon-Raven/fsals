@@ -8,6 +8,18 @@ fn f_complex(s: Comp, p: Par) -> Comp {
     s.powi(2) + s*k + 1.0 - (-tau*(s+k)).exp()
 }
 
+
+fn line_denominator(w: f64, p: Par, angle: f64, _th_min: f64, th_max: f64) -> f64 {
+    let tau0 = p.0;
+    let k0 = p.1;
+    let c1 = f64::cos(angle);
+    let c2 = f64::sin(angle);
+    let term1 = f64::abs(c2 * w);
+    let term2 = f64::sqrt((tau0*c2 + k0*c1 + th_max).powi(2) + (c1*w).powi(2));
+    term1 + term2
+}
+
+
 pub fn region_fraction_precalculated_numerator<'a>(
     numerator: &'a [f64],
     w_logspace: &'a [f64],
@@ -32,17 +44,6 @@ pub fn region_fraction_precalculated_numerator<'a>(
     });
 
     Box::new(fraction_iter)
-}
-
-
-fn line_denominator(w: f64, p: Par, angle: f64, _th_min: f64, th_max: f64) -> f64 {
-    let tau0 = p.0;
-    let k0 = p.1;
-    let c1 = f64::cos(angle);
-    let c2 = f64::sin(angle);
-    let term1 = f64::abs(c2 * w);
-    let term2 = f64::sqrt((tau0*c2 + k0*c1 + th_max).powi(2) + (c1*w).powi(2));
-    return term1 + term2
 }
 
 
