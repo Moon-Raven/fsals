@@ -80,4 +80,5 @@ def create_figure(args):
 def main(args):
     calculate_nu(args)
     fig = create_figure(args)
-    storage.save_figure(args, fig, 'nu', 'figures')
+    extension = 'pdf'
+    storage.save_figure(args, fig, 'nu', 'figures', extension)

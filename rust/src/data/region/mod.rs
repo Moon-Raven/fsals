@@ -1,5 +1,6 @@
 mod configurations;
 
+use std::borrow::BorrowMut;
 use std::sync::{Arc, Mutex, RwLock};
 use iter_num_tools::lin_space;
 use std::f64::consts::PI;
@@ -16,7 +17,6 @@ use crate::Args;
 use rayon::{prelude::*, ScopeFifo};
 use configurations::{Delta, RegionConfiguration, CONFIGURATONS};
 use crate::systems::distributed_delay1;
-
 
 #[derive(Serialize, Debug)]
 pub struct RegionResult {
@@ -61,6 +61,7 @@ pub struct Region {
 }
 
 
+
 fn check_jump_validity (
     conf: &RegionConfiguration,
     origin: Par,
@@ -83,6 +84,7 @@ fn check_jump_validity (
     };
 
     let min = optimization::find_minimum_fraction_fast(minimization_problem);
+
 
     eps < min
 }
@@ -137,7 +139,7 @@ fn get_pregion(
     info!("Finding pregion for origin {:?}; delta={}, limit={}", origin, delta_abs, limit);
     let radius = optimization::get_maximum_condition(condition, delta_abs, limit);
 
-    PRegion { origin, radius }
+    PRegion { origin, radius: radius * conf.safeguard }
 }
 
 
@@ -239,6 +241,7 @@ pub fn get_region(conf: &RegionConfiguration, origin: Par) -> Region {
     });
     let pregions = Arc::try_unwrap(pregions).unwrap().into_inner().unwrap();
     info!("Returning region around {:?} with {:?} pregions", origin, pregions.len());
+    info!("logspace = {:?}", w_log_space);
 
     Region { pregions, nu, origin}
 }
@@ -271,6 +274,7 @@ pub fn args2config(args: &Args) -> &'static RegionConfiguration {
 }
 
 
+
 pub fn run_region(args: &Args) {
     const MEGABYTE: usize = 1024 * 1024;
     const STACK_SIZE: usize = MEGABYTE * 128;
@@ -286,11 +290,14 @@ pub fn run_region(args: &Args) {
         // .into_iter()
         .map(|origin| get_region(config, origin));
 
+
     let results = RegionResult {
         regions: regions.collect(),
         limits: &config.limits,
         parameters: config.system.parameters,
     };
+
+    optimization::print_minmax_statistics();
 
     store_results(&results, &config);
 }

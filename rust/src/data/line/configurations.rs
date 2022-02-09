@@ -237,6 +237,59 @@ lazy_static! {
             log_space_steps: 1_000,
         });
 
+        configs.insert("telegrapher_alpha_gamma", LineConfiguration {
+            name: "telegrapher_alpha_gamma",
+            system: telegrapher_alpha_gamma::SYSTEM,
+            limits: Limits { p1_min: 0.2, p1_max: 0.9, p2_min: 0.2, p2_max: 0.9 },
+            ray_count: 160,
+            safeguard: 0.90,
+            origins: vec![
+                // Region 1
+                (0.40, 0.40),
+                // Region 2
+                (0.70, 0.70),
+                // Region 3
+                (0.86, 0.86),
+                // Region 4
+                (0.89, 0.89),
+                ],
+            contour_conf: ContourConfiguration {
+                w_min: 1e-3,
+                w_max: 1e5,
+                steps: 1_000usize,
+                },
+            delta: Delta::Abs(1e-4),
+            log_space_minw: 1e-3,
+            log_space_maxw: 1e7,
+            log_space_steps: 5000,
+            w_steps_linear: 5000,
+        });
+
+        configs.insert("finite_rod", LineConfiguration {
+            name: "finite_rod",
+            system: finite_rod::SYSTEM,
+            limits: Limits { p1_min: 0.0, p1_max: 100.0, p2_min: 0.0, p2_max: 7e4 },
+            ray_count: 160,
+            safeguard: 0.80,
+            origins: vec![
+                // Region 1
+                (17.0, 22_000.0),
+                (80.0,  5_000.0),
+                // Region 2
+                (40.0, 55_000.0),
+                (80.0, 30_000.0),
+                ],
+            contour_conf: ContourConfiguration {
+                w_min: 1e-3,
+                w_max: 1e3,
+                steps: 1_000usize,
+                },
+            delta: Delta::Abs(1.0),
+            log_space_minw: 1e-2,
+            log_space_maxw: 1e2,
+            log_space_steps: 10_000,
+            w_steps_linear: 10_000,
+        });
 
         configs
     };

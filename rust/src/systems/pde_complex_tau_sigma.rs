@@ -60,8 +60,8 @@ pub fn region_fraction<'a>(
     let fraction_iter = w_linspace
         .iter()
         .map(move |w| {
-            let w_sqrt = w.sqrt();
             let num = f_complex(Comp::new(0.0, *w), origin).norm();
+            let w_sqrt = w.sqrt();
             let x = (coeff1 * w_sqrt).exp();
             let denominator = K * x * w_sqrt * (w + coeff2).sqrt();
             num / denominator

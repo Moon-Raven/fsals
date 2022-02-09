@@ -121,6 +121,20 @@ LINE_CONFIGURATIONS = {
         ncol=3,
         bbox=(0, -0.17, 1, 0.1),
     ),
+
+    'telegrapher_alpha_gamma' : LineConfiguration(
+        width=SINGLE_COLUMN_WIDTH,
+        height=STANDARD_HEIGHT,
+        ncol=3,
+        bbox=(0, -0.17, 1, 0.1),
+    ),
+
+    'finite_rod' : LineConfiguration(
+        width=SINGLE_COLUMN_WIDTH,
+        height=STANDARD_HEIGHT,
+        ncol=3,
+        bbox=(0, -0.17, 1, 0.1),
+    ),
 }
 
 REGION_CONFIGURATIONS = {
@@ -163,6 +177,27 @@ REGION_CONFIGURATIONS = {
     ),
 
     'pde_complex_tau_sigma' : RegionConfiguration(
+        width=SINGLE_COLUMN_WIDTH,
+        height=STANDARD_HEIGHT,
+        ncol=3,
+        bbox=(0, -0.17, 1, 0.1),
+    ),
+
+    'telegrapher_x_k' : RegionConfiguration(
+        width=SINGLE_COLUMN_WIDTH,
+        height=STANDARD_HEIGHT,
+        ncol=3,
+        bbox=(0, -0.17, 1, 0.1),
+    ),
+
+     'telegrapher_alpha_gamma' : RegionConfiguration(
+        width=SINGLE_COLUMN_WIDTH,
+        height=STANDARD_HEIGHT,
+        ncol=3,
+        bbox=(0, -0.17, 1, 0.1),
+    ),
+
+     'finite_rod' : RegionConfiguration(
         width=SINGLE_COLUMN_WIDTH,
         height=STANDARD_HEIGHT,
         ncol=3,

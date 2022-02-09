@@ -2,19 +2,22 @@ use lazy_static::lazy_static;
 use log::{debug, info};
 
 use iter_num_tools::{log_space, lin_space};
+use rayon::iter::Update;
 use crate::types::Par;
 use crate::systems::distributed_delay1;
 
 use crate::types;
+use std::sync::Mutex;
 
 
 pub fn get_maximum_condition<F>(condition: F, min_step: f64, limit: f64) -> f64
 where F: Fn(f64) -> bool
 {
     const CONSECUTIVE_SUCCESSES_THRESHOLD: u32 = 3;
-    let mut step = min_step * 1e3;
+    let mut step = min_step;
     let mut consecutive_successes: u32 = 0;
     let mut x: f64 = 0.0; // Variable we are optimizing
+    let mut last_attempt_successful = true;
     debug!("Searching for min cond with: limit={}, min_step={}", limit, min_step);
 
     loop {
@@ -22,7 +25,7 @@ where F: Fn(f64) -> bool
         debug!("Trying {} = {} + {}", x_try, x, step);
 
         if x == x_try {
-            panic!("Floating point precition exceeded!");
+            panic!("Floating point precision exceeded!");
         }
 
         if x_try > limit {
@@ -40,7 +43,13 @@ where F: Fn(f64) -> bool
                 break;
             }
 
+            // Avoid a silly situation where we retry same value as last time
+            if !last_attempt_successful {
+                step /= 2.0;
+            }
+
             // If things have been going well for a while, increase steps
+            last_attempt_successful = true;
             consecutive_successes += 1;
             if consecutive_successes >= CONSECUTIVE_SUCCESSES_THRESHOLD {
                 step *= 2.0;
@@ -49,6 +58,7 @@ where F: Fn(f64) -> bool
             // Things didn't go well; decrease steps
             step /= 2.0;
             consecutive_successes = 0;
+            last_attempt_successful = false;
         }
 
         if step < min_step {
@@ -107,7 +117,32 @@ pub fn get_linsearch_interval(
 }
 
 
-pub fn find_minimum_fraction_slow<F1, F2>(problem: &MinimizationProblemSlow<F1, F2>) -> f64 where
+lazy_static!(
+    static ref min_w: Mutex<f64> = Mutex::new(f64::INFINITY);
+    static ref max_w: Mutex<f64> = Mutex::new(0.0);
+);
+
+
+pub fn update_statistics(w: f64) {
+    /* Update statistics used for optimization purposes */
+    {
+        let mut min_w_unlocked = min_w.lock().unwrap();
+        if w < *min_w_unlocked {
+            *min_w_unlocked = w;
+        }
+    }
+
+    {
+        let mut max_w_unlocked = max_w.lock().unwrap();
+        if w > *max_w_unlocked {
+            *max_w_unlocked = w;
+        }
+    }
+}
+
+
+pub fn find_minimum_fraction_slow<F1, F2>(problem: &MinimizationProblemSlow<F1, F2>) -> f64
+where
     F1: Fn(f64) -> f64,
     F2: Fn(f64) -> f64,
 {
@@ -140,9 +175,17 @@ pub fn find_minimum_fraction_slow<F1, F2>(problem: &MinimizationProblemSlow<F1, 
         .min_by(|a, b| a.partial_cmp(b).expect("Invalid value found"))
         .expect("Error while searching for lin min");
 
-    debug!("Found lin minimum f(?) = {}", min);
+        debug!("Found lin minimum f(?) = {}", min);
 
     min
+}
+
+
+pub fn print_minmax_statistics() {
+    let min = min_w.lock().unwrap();
+    let max = max_w.lock().unwrap();
+
+    info!("Roots for found for w in ({}, {})", min, max);
 }
 
 
@@ -154,7 +197,7 @@ pub fn find_minimum_fraction_fast<'b>(problem: MinimizationProblemFast<'b>) -> f
         .map(|(index, _)| index)
         .expect("Error while searching for log min");
 
-    // /* Perform search on linspace */
+    /* Perform search on linspace */
     let (w_min, w_max) = match get_linsearch_interval(minind, problem.log_space) {
         Some(val) => val,
         None => return 0.0,
