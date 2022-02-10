@@ -241,7 +241,6 @@ pub fn get_region(conf: &RegionConfiguration, origin: Par) -> Region {
     });
     let pregions = Arc::try_unwrap(pregions).unwrap().into_inner().unwrap();
     info!("Returning region around {:?} with {:?} pregions", origin, pregions.len());
-    info!("logspace = {:?}", w_log_space);
 
     Region { pregions, nu, origin}
 }
@@ -281,7 +280,6 @@ pub fn run_region(args: &Args) {
     rayon::ThreadPoolBuilder::new().stack_size(STACK_SIZE).build_global().unwrap();
 
     let config = args2config(args);
-
 
     let regions = config
         .origins

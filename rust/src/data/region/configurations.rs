@@ -54,7 +54,7 @@ lazy_static! {
             name: "retarded1",
             system: retarded1::SYSTEM,
             limits: Limits { p1_min: 0.0, p1_max: 2.6, p2_min: 0.0, p2_max: 3.3 },
-            safeguard: 1.0,
+            safeguard: 0.98,
             origins: vec![
                 (0.25, 1.00),
                 (1.75, 1.20),
@@ -240,13 +240,13 @@ lazy_static! {
                 w_max: 1e5,
                 steps: 1_000,
                 },
-            delta: Delta::Rel(0.01),
+            delta: Delta::Abs(10.0),
             spawn_count: 32,
             enforce_limits: false,
             log_space_minw: 1e-3,
             log_space_maxw: 1e5,
             log_space_steps: 10_000,
-            lin_steps: 1_000_000,
+            lin_steps: 10_000,
         });
 
         configs.insert("finite_rod", RegionConfiguration {

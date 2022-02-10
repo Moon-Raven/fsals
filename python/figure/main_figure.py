@@ -5,7 +5,10 @@ import json
 import matplotlib.pyplot as plt
 import matplotlib as mpl
 from matplotlib.lines import Line2D
+import matplotlib.image as mpimg
 import numpy as np
+from PIL import Image, ImageDraw
+from matplotlib.offsetbox import TextArea, DrawingArea, OffsetImage, AnnotationBbox
 
 import python.utils.geometry as geometry
 import python.utils.storage as storage
@@ -150,6 +153,88 @@ def create_figure_line(args):
     return fig
 
 
+def get_ax_ratio(fig, ax):
+    """Get heigth / width ratio of given axes"""
+    bbox = ax.get_window_extent().transformed(fig.dpi_scale_trans.inverted())
+    width_inch, height_inch = bbox.width, bbox.height
+    return height_inch / width_inch
+
+
+def get_nus(regions):
+    nus = set()
+    for region in regions:
+        nus.add(region.nu)
+    return nus
+
+
+def get_image_dimensions(desired_ratio):
+    width = 5000 # pixels
+    height = round(width * desired_ratio)
+    return width, height
+
+
+def get_drawable_canvas(width, height):
+    WHITE = (255, 255, 255)
+    img  = Image.new(mode = "RGB", size = (width, height), color=WHITE)
+    drawable = ImageDraw.Draw(img)
+    return img, drawable
+
+
+def add_origins_to_ax(ax, regions):
+    for region in regions:
+        add_origin_to_ax(ax, region.origin)
+
+
+def get_corners(pregion):
+    upper_left_p1 = pregion.origin[0] - pregion.radius
+    upper_left_p2 = pregion.origin[1] - pregion.radius
+    lower_right_p1 = pregion.origin[0] + pregion.radius
+    lower_right_p2 = pregion.origin[1] + pregion.radius
+
+    upper_left = np.array([upper_left_p1, upper_left_p2])
+    lower_right = np.array([lower_right_p1, lower_right_p2])
+
+    return upper_left, lower_right
+
+
+def corners2pixels(corners, spans, pixel_dimensions, mins):
+    upper, lower = corners
+
+    upper_ratios = (upper - mins) / spans
+    lower_ratios = (lower - mins) / spans
+
+    upper_pixels = np.rint(upper_ratios * pixel_dimensions).astype(int)
+    lower_pixels = np.rint(lower_ratios * pixel_dimensions).astype(int)
+
+    return upper_pixels, lower_pixels
+
+
+def add_regions_to_ax(fig, ax, data, colors):
+    ratio = get_ax_ratio(fig, ax)
+    width, height = get_image_dimensions(ratio)
+    pixel_dimensions = np.array([width, height])
+
+    image, canvas = get_drawable_canvas(width, height)
+    p1span = data.limits.p1_max - data.limits.p1_min
+    p2span = data.limits.p2_max - data.limits.p2_min
+    spans = np.array([p1span, p2span])
+    mins = np.array([data.limits.p1_min, data.limits.p2_min])
+
+    for region in data.regions:
+        color = mpl.colors.to_rgb(colors[region.nu])
+        color = tuple([round(c*255) for c in color])
+
+        for pregion in region.pregions:
+            corners = get_corners(pregion)
+            upper_np, lower_np = corners2pixels(corners, spans, pixel_dimensions, mins)
+            upper, lower = (upper_np[0], upper_np[1]), (lower_np[0], lower_np[1])
+            canvas.ellipse([upper, lower], fill=color)
+
+    box = [data.limits.p1_min, data.limits.p1_max, data.limits.p2_min, data.limits.p2_max]
+    ax.imshow(image, extent=box, aspect='auto', origin='lower')
+
+
+
 def get_pregion_boundary(pregion, N=1000, p=2):
     """Spawn an array of points on pregion's boundary."""
     x1 = np.linspace(-pregion.radius, pregion.radius, N)
@@ -186,6 +271,7 @@ def add_polygon(ax, poly_boundary, style_string='g', fill=True):
 def create_figure_region(args):
     data = read_data(args)
     cfg = REGION_CONFIGURATIONS[args.system]
+    colors = {0: 'g', 2: 'darkred', 4: 'cornflowerblue', 6: 'orange', 8: 'mediumpurple'}
 
     set_general_parameters()
 
@@ -201,22 +287,15 @@ def create_figure_region(args):
     ax.set_ylim(data.limits.p2_min, data.limits.p2_max)
     ax.set_xlabel(f'${data.parameters[0]}$')
     ax.set_ylabel(f'${data.parameters[1]}$')
-    ax.xaxis.labelpad = 0
-    ax.yaxis.labelpad = 0
+    ax.xaxis.labelpad, ax.yaxis.labelpad = 0, 0
+
     configure_ticks(ax, cfg)
 
-    colors = {0: 'g', 2: 'darkred', 4: 'cornflowerblue', 6: 'orange', 8: 'mediumpurple'}
-    nus = set()
+    add_regions_to_ax(fig, ax, data, colors)
+    nus = get_nus(data.regions)
 
-    for region in data.regions:
-        nus.add(region.nu)
-        color = colors[region.nu]
-
-        if cfg.draw_origins:
-            add_origin_to_ax(ax, region.origin)
-
-        for pregion in region.pregions:
-            add_pregion_to_ax(ax, pregion, color)
+    if cfg.draw_origins:
+        add_origins_to_ax(ax, data.regions)
 
     # Prepare regular legend labels
     nus = sorted(list(nus))
@@ -228,7 +307,6 @@ def create_figure_region(args):
         origin_handle = Line2D([0], [0], color='black', linestyle='None',
             markersize=4, marker='X', label='Starting points'),
         legend_handles.insert(0, *origin_handle)
-
 
     # Call custom drawing actions for given system
     ax, legend_handles = cfg.custom_func(ax, legend_handles)
