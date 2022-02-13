@@ -83,7 +83,7 @@ LINE_CONFIGURATIONS = {
         width=DOUBLE_COLUMN_WIDTH,
         height=SINGLE_COLUMN_WIDTH, # 3 is the magic number
         ticks=TickConfiguration(1, 1, 0.25, 0.25),
-        ncol=3,
+        ncol=6,
         bbox=(0, -0.17, 1, 0.1),
     ),
 

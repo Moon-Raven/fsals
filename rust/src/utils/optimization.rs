@@ -208,11 +208,15 @@ pub fn find_minimum_fraction_fast<'b>(problem: MinimizationProblemFast<'b>) -> f
         iter_num_tools::lin_space(w_min..=w_max, problem.lin_steps).collect();
     let linspace_iter = (problem.linspace_fraction_generator)(&w_linspace);
 
-    let min = linspace_iter
-        .min_by(|a, b| a.partial_cmp(b).expect("Invalid value found"))
+    let w_linspace: Vec<f64> =
+        iter_num_tools::lin_space(w_min..=w_max, problem.lin_steps).collect();
+
+    let (min, argmin) = linspace_iter.zip(w_linspace)
+        .min_by(|(a, _), (b, _)| a.partial_cmp(b).expect("Invalid value found"))
         .expect("Error while searching for lin min");
 
-    debug!("Found lin minimum f(?) = {}", min);
+    debug!("Found lin minimum f({}) = {}", argmin, min);
+    update_statistics(argmin);
 
     min
 }

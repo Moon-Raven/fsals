@@ -12,7 +12,7 @@ fn f_complex(s: Comp, p: Par) -> Comp {
 
     let root = Comp::sqrt(s / SIGMA);
     let term1 = LAMBDA * root;
-    let term2 = k * Comp::exp(-X * root) * Comp::exp(-s*tau);
+    let term2 = k * Comp::exp(-X * root - s*tau);
 
     term1 + term2
 }
@@ -70,7 +70,13 @@ pub fn region_fraction<'a>(
             let s = Comp::new(0.0, *w);
             let tau = origin.0;
             let k = origin.1;
-            let num = (s.powi(2) + s*k + 1.0 - (-tau*(s+k)).exp()).norm();
+
+            let root = Comp::sqrt(s / SIGMA);
+            let term1 = LAMBDA * root;
+            let term2 = k * Comp::exp(-X * root - s*tau);
+
+            let num = (term1 + term2).norm();
+
             let a = (helper * w.sqrt()).exp();
             let denom = a * (1.0 + k_powi * w.powi(2)).sqrt();
             num / denom
@@ -80,24 +86,12 @@ pub fn region_fraction<'a>(
 }
 
 
-fn region_denominator(w: f64, origin: Par, eps: f64) -> f64 {
-    let k_max = origin.1 + eps;
-
-    let exp_term = (-X * f64::sqrt(w/(2.0*SIGMA))).exp();
-
-    let gradient_tau= exp_term;
-    let gradient_k = exp_term * k_max * w;
-
-    f64::sqrt(gradient_tau.powi(2) + gradient_k.powi(2))
-}
-
-
 pub const SYSTEM: System = System {
     name: "semi_infinite_rod",
     f_complex,
     parameters: (r"\tau", r"k"),
     line_denominator: Option::Some(line_denominator),
-    region_denominator: Option::Some(region_denominator),
+    region_denominator: Option::None,
     region_fraction_precalculated_numerator: Option::Some(region_fraction_precalculated_numerator),
     region_fraction: Option::Some(region_fraction),
 };

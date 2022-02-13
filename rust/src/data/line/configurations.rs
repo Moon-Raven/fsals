@@ -167,9 +167,12 @@ lazy_static! {
             safeguard: 0.90,
             origins: vec![
                 // Region 1
-                (1.00, 1.00),
+                // (1.00, 1.00),
+                (0.50, 1.50),
+                (1.25, 0.25),
                 // Region 2
                 (1.80, 1.50),
+                (1.80, 0.30)
                 ],
             contour_conf: ContourConfiguration {
                 w_min: 1e-3,
@@ -223,7 +226,9 @@ lazy_static! {
                 (0.4, 7.0),
                 (0.2, 5.0),
                 // Region 2
-                (2.5, 6.0),
+                (3.0, 7.0),
+                (1.5, 5.0),
+                (3.5, 5.7),
                 ],
             contour_conf: ContourConfiguration {
                 w_min: 1e-3,
