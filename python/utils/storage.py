@@ -15,5 +15,5 @@ def save_figure(args, fig, command, subcommand, extension):
     if extension == 'png':
         fig.savefig(figpath_timestamped, pad_inches=0.0, dpi=1000)
     else:
-        fig.savefig(figpath_timestamped)
+        fig.savefig(figpath_timestamped, dpi=1000)
     copyfile(figpath_timestamped, figpath)

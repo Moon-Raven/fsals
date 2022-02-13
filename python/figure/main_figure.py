@@ -280,7 +280,6 @@ def create_figure_region(args):
     constrained = True
     width, height = cfg.width, cfg.height
     fig, ax = new_figure(width, height, tight, constrained)
-    ax.set_rasterized(True)
 
     # Configure axes
     ax.set_xlim(data.limits.p1_min, data.limits.p1_max)
@@ -325,7 +324,7 @@ def main(args):
         storage.save_figure(args, fig, args.command, args.algorithm, extension)
     elif args.algorithm == 'region':
         fig =  create_figure_region(args)
-        extension = 'png'
+        extension = 'pdf'
         storage.save_figure(args, fig, args.command, args.algorithm, extension)
     else:
         raise Exception(f'Unknown algorithm: {args.algorithm}')
