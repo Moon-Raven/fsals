@@ -3,10 +3,16 @@ from matplotlib.lines import Line2D
 import python.utils.comparison_methods.gu2005 as gu2005
 
 
-SCALING_FACTOR = 1.1
-SINGLE_COLUMN_WIDTH = 8.85553
-DOUBLE_COLUMN_WIDTH = 18.3436
-STANDARD_HEIGHT = SINGLE_COLUMN_WIDTH * SCALING_FACTOR
+# Deprecated - factor used to get height as slightly larger than width
+W2H_SCALING_FACTOR = 1.1
+
+# Commonly used figure widths, in inches
+COMMON_WIDTHS = {
+    'single_column': 3.486429134,
+    'double_column': 7.221889764,
+    'triple_subfigure': 2.38403,
+    'double_subfigure': 3.61217,
+}
 
 
 class TickConfiguration:
@@ -70,8 +76,8 @@ def retarded1_custom_func(ax, legend_handles):
 
 LINE_CONFIGURATIONS = {
     'retarded1' : LineConfiguration(
-        width=SINGLE_COLUMN_WIDTH,
-        height=SINGLE_COLUMN_WIDTH * SCALING_FACTOR,
+        width=COMMON_WIDTHS['single_column'],
+        height=COMMON_WIDTHS['single_column'] * W2H_SCALING_FACTOR,
         ticks=TickConfiguration(1, 1, 0.25, 0.25),
         ncol=3,
         bbox=(0, -0.17, 1, 0.1),
@@ -80,67 +86,67 @@ LINE_CONFIGURATIONS = {
     ),
 
     'distributed_delay1' : LineConfiguration(
-        width=DOUBLE_COLUMN_WIDTH,
-        height=SINGLE_COLUMN_WIDTH, # 3 is the magic number
+        width=COMMON_WIDTHS['double_column'],
+        height=COMMON_WIDTHS['single_column'], # Eyeballed and inelegant
         ticks=TickConfiguration(1, 1, 0.25, 0.25),
         ncol=6,
         bbox=(0, -0.17, 1, 0.1),
     ),
 
-    'semi_infinite_rod' : LineConfiguration(
-        width=SINGLE_COLUMN_WIDTH,
-        height=STANDARD_HEIGHT,
-        ncol=3,
-        bbox=(0, -0.17, 1, 0.1),
-    ),
-
     'pde_complex_k_sigma' : LineConfiguration(
-        width=SINGLE_COLUMN_WIDTH,
-        height=STANDARD_HEIGHT,
+        width=COMMON_WIDTHS['triple_subfigure'],
+        height=COMMON_WIDTHS['triple_subfigure'],
         ncol=3,
-        bbox=(0, -0.17, 1, 0.1),
+        bbox=(0, -0.19, 1, 0.1),
     ),
 
     'pde_complex_beta_sigma' : LineConfiguration(
-        width=SINGLE_COLUMN_WIDTH,
-        height=STANDARD_HEIGHT,
+        width=COMMON_WIDTHS['triple_subfigure'],
+        height=COMMON_WIDTHS['triple_subfigure'],
         ncol=3,
-        bbox=(0, -0.17, 1, 0.1),
+        bbox=(0, -0.19, 1, 0.1),
     ),
 
     'pde_complex_tau_sigma' : LineConfiguration(
-        width=SINGLE_COLUMN_WIDTH,
-        height=STANDARD_HEIGHT,
-        ncol=3,
-        bbox=(0, -0.17, 1, 0.1),
+        width=COMMON_WIDTHS['triple_subfigure'],
+        height=COMMON_WIDTHS['triple_subfigure'],
+        ncol=2,
+        bbox=(0, -0.19, 1, 0.1),
     ),
 
-    'telegrapher_x_k' : LineConfiguration(
-        width=SINGLE_COLUMN_WIDTH,
-        height=STANDARD_HEIGHT,
-        ncol=3,
-        bbox=(0, -0.17, 1, 0.1),
-    ),
+    # 'telegrapher_x_k' : LineConfiguration(
+    #     width=SINGLE_COLUMN_WIDTH,
+    #     height=STANDARD_HEIGHT,
+    #     ncol=3,
+    #     bbox=(0, -0.17, 1, 0.1),
+    # ),
 
-    'telegrapher_alpha_gamma' : LineConfiguration(
-        width=SINGLE_COLUMN_WIDTH,
-        height=STANDARD_HEIGHT,
-        ncol=3,
-        bbox=(0, -0.17, 1, 0.1),
-    ),
+    # 'telegrapher_alpha_gamma' : LineConfiguration(
+    #     width=SINGLE_COLUMN_WIDTH,
+    #     height=STANDARD_HEIGHT,
+    #     ncol=3,
+    #     bbox=(0, -0.17, 1, 0.1),
+    # ),
 
-    'finite_rod' : LineConfiguration(
-        width=SINGLE_COLUMN_WIDTH,
-        height=STANDARD_HEIGHT,
-        ncol=3,
-        bbox=(0, -0.17, 1, 0.1),
-    ),
+    # 'semi_infinite_rod' : LineConfiguration(
+    #     width=SINGLE_COLUMN_WIDTH,
+    #     height=STANDARD_HEIGHT,
+    #     ncol=3,
+    #     bbox=(0, -0.17, 1, 0.1),
+    # ),
+
+    # 'finite_rod' : LineConfiguration(
+    #     width=SINGLE_COLUMN_WIDTH,
+    #     height=STANDARD_HEIGHT,
+    #     ncol=3,
+    #     bbox=(0, -0.17, 1, 0.1),
+    # ),
 }
 
 REGION_CONFIGURATIONS = {
     'retarded1' : RegionConfiguration(
-        width=SINGLE_COLUMN_WIDTH,
-        height=SINGLE_COLUMN_WIDTH * SCALING_FACTOR,
+        width=COMMON_WIDTHS['single_column'],
+        height=COMMON_WIDTHS['single_column'] * W2H_SCALING_FACTOR,
         ticks=TickConfiguration(1, 1, 0.25, 0.25),
         ncol=3,
         bbox=(0, -0.17, 1, 0.1),
@@ -148,59 +154,59 @@ REGION_CONFIGURATIONS = {
     ),
 
     'distributed_delay1' : RegionConfiguration(
-        width=DOUBLE_COLUMN_WIDTH,
-        height=SINGLE_COLUMN_WIDTH, # 3 is the magic number
+        width=COMMON_WIDTHS['double_column'],
+        height=COMMON_WIDTHS['single_column'], # Eyeballed and inelegant
         ticks=TickConfiguration(1, 1, 0.25, 0.25),
         ncol=3,
         bbox=(0, -0.17, 1, 0.1),
     ),
 
-    'semi_infinite_rod' : RegionConfiguration(
-        width=SINGLE_COLUMN_WIDTH,
-        height=STANDARD_HEIGHT,
-        ncol=3,
-        bbox=(0, -0.17, 1, 0.1),
-    ),
+    # 'semi_infinite_rod' : RegionConfiguration(
+    #     width=SINGLE_COLUMN_WIDTH,
+    #     height=STANDARD_HEIGHT,
+    #     ncol=3,
+    #     bbox=(0, -0.17, 1, 0.1),
+    # ),
 
-    'pde_complex_k_sigma' : RegionConfiguration(
-        width=SINGLE_COLUMN_WIDTH,
-        height=STANDARD_HEIGHT,
-        ncol=3,
-        bbox=(0, -0.17, 1, 0.1),
-    ),
+    # 'pde_complex_k_sigma' : RegionConfiguration(
+    #     width=SINGLE_COLUMN_WIDTH,
+    #     height=STANDARD_HEIGHT,
+    #     ncol=3,
+    #     bbox=(0, -0.17, 1, 0.1),
+    # ),
 
-    'pde_complex_beta_sigma' : RegionConfiguration(
-        width=SINGLE_COLUMN_WIDTH,
-        height=STANDARD_HEIGHT,
-        ncol=3,
-        bbox=(0, -0.17, 1, 0.1),
-    ),
+    # 'pde_complex_beta_sigma' : RegionConfiguration(
+    #     width=SINGLE_COLUMN_WIDTH,
+    #     height=STANDARD_HEIGHT,
+    #     ncol=3,
+    #     bbox=(0, -0.17, 1, 0.1),
+    # ),
 
-    'pde_complex_tau_sigma' : RegionConfiguration(
-        width=SINGLE_COLUMN_WIDTH,
-        height=STANDARD_HEIGHT,
-        ncol=3,
-        bbox=(0, -0.17, 1, 0.1),
-    ),
+    # 'pde_complex_tau_sigma' : RegionConfiguration(
+    #     width=SINGLE_COLUMN_WIDTH,
+    #     height=STANDARD_HEIGHT,
+    #     ncol=3,
+    #     bbox=(0, -0.17, 1, 0.1),
+    # ),
 
-    'telegrapher_x_k' : RegionConfiguration(
-        width=SINGLE_COLUMN_WIDTH,
-        height=STANDARD_HEIGHT,
-        ncol=3,
-        bbox=(0, -0.17, 1, 0.1),
-    ),
+    # 'telegrapher_x_k' : RegionConfiguration(
+    #     width=SINGLE_COLUMN_WIDTH,
+    #     height=STANDARD_HEIGHT,
+    #     ncol=3,
+    #     bbox=(0, -0.17, 1, 0.1),
+    # ),
 
-     'telegrapher_alpha_gamma' : RegionConfiguration(
-        width=SINGLE_COLUMN_WIDTH,
-        height=STANDARD_HEIGHT,
-        ncol=3,
-        bbox=(0, -0.17, 1, 0.1),
-    ),
+    #  'telegrapher_alpha_gamma' : RegionConfiguration(
+    #     width=SINGLE_COLUMN_WIDTH,
+    #     height=STANDARD_HEIGHT,
+    #     ncol=3,
+    #     bbox=(0, -0.17, 1, 0.1),
+    # ),
 
-     'finite_rod' : RegionConfiguration(
-        width=SINGLE_COLUMN_WIDTH,
-        height=STANDARD_HEIGHT,
-        ncol=3,
-        bbox=(0, -0.17, 1, 0.1),
-    ),
+    #  'finite_rod' : RegionConfiguration(
+    #     width=SINGLE_COLUMN_WIDTH,
+    #     height=STANDARD_HEIGHT,
+    #     ncol=3,
+    #     bbox=(0, -0.17, 1, 0.1),
+    # ),
 }

@@ -20,6 +20,8 @@ logger = logging.getLogger(__name__)
 ORIGIN_MARKERSTYLE = 'X'
 ORIGIN_MARKERCOLOR = 'black'
 ORIGIN_MARKERSIZE = 4
+ORIGIN_LABEL_LINE = 'Origins'
+ORIGIN_LABEL_REGION = 'Origins'
 
 
 def set_general_parameters():
@@ -32,9 +34,8 @@ def set_general_parameters():
     mpl.rcParams['legend.fontsize'] = 7
 
 
-def new_figure(width, height, tight=True, constrained_layout=False):
-    INCH2CENT = 2.54
-    size = width/INCH2CENT, height/INCH2CENT
+def new_figure_inches(width, height, tight=True, constrained_layout=False):
+    size = (width, height)
     fig, ax = plt.subplots(figsize=size, constrained_layout=constrained_layout)
     if tight:
         fig.tight_layout(pad=0)
@@ -104,7 +105,7 @@ def create_figure_line(args):
     tight = False
     constrained = True
     width, height = cfg.width, cfg.height
-    fig, ax = new_figure(width, height, tight, constrained)
+    fig, ax = new_figure_inches(width, height, tight, constrained)
 
     # Configure axes
     ax.set_xlim(data.limits.p1_min, data.limits.p1_max)
@@ -139,7 +140,7 @@ def create_figure_line(args):
     # Add origin label, if necessary
     if cfg.draw_origins:
         origin_handle = Line2D([0], [0], color='black', linestyle='None',
-            markersize=4, marker='X', label='Starting points'),
+            markersize=4, marker='X', label=ORIGIN_LABEL_LINE),
         legend_handles.insert(0, *origin_handle)
 
 
@@ -279,7 +280,7 @@ def create_figure_region(args):
     tight = False
     constrained = True
     width, height = cfg.width, cfg.height
-    fig, ax = new_figure(width, height, tight, constrained)
+    fig, ax = new_figure_inches(width, height, tight, constrained)
 
     # Configure axes
     ax.set_xlim(data.limits.p1_min, data.limits.p1_max)
@@ -304,7 +305,7 @@ def create_figure_region(args):
     # Add origin label, if necessary
     if cfg.draw_origins:
         origin_handle = Line2D([0], [0], color='black', linestyle='None',
-            markersize=4, marker='X', label='Starting points'),
+            markersize=4, marker='X', label=ORIGIN_LABEL_REGION),
         legend_handles.insert(0, *origin_handle)
 
     # Call custom drawing actions for given system
