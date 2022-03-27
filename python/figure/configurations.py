@@ -3,8 +3,12 @@ from matplotlib.lines import Line2D
 import python.utils.comparison_methods.gu2005 as gu2005
 
 
-# Deprecated - factor used to get height as slightly larger than width
-W2H_SCALING_FACTOR = 1.1
+# Factor used to get height as slightly larger than width
+W2H_RATIO = 1.1    # Because extra legend rows destroy ratio
+PDE_W2HRATIO = 1.1 # Because extra legend rows destroy ratio
+ROD_W2HRATIO = 1.0 # Because there are no extra legend rows to destroy ratio
+TELEGRAPHER_X_K_W2HRATIO = 1.0
+TELEGRAPHER_ALPHA_GAMMA_W2HRATIO = 1.05
 
 # Commonly used figure widths, in inches
 COMMON_WIDTHS = {
@@ -77,7 +81,7 @@ def retarded1_custom_func(ax, legend_handles):
 LINE_CONFIGURATIONS = {
     'retarded1' : LineConfiguration(
         width=COMMON_WIDTHS['single_column'],
-        height=COMMON_WIDTHS['single_column'] * W2H_SCALING_FACTOR,
+        height=COMMON_WIDTHS['single_column'] * W2H_RATIO,
         ticks=TickConfiguration(1, 1, 0.25, 0.25),
         ncol=3,
         bbox=(0, -0.17, 1, 0.1),
@@ -95,58 +99,58 @@ LINE_CONFIGURATIONS = {
 
     'pde_complex_k_sigma' : LineConfiguration(
         width=COMMON_WIDTHS['triple_subfigure'],
-        height=COMMON_WIDTHS['triple_subfigure'],
-        ncol=3,
+        height=COMMON_WIDTHS['triple_subfigure'] * PDE_W2HRATIO,
+        ncol=1,
         bbox=(0, -0.19, 1, 0.1),
     ),
 
     'pde_complex_beta_sigma' : LineConfiguration(
         width=COMMON_WIDTHS['triple_subfigure'],
-        height=COMMON_WIDTHS['triple_subfigure'],
-        ncol=3,
+        height=COMMON_WIDTHS['triple_subfigure'] * PDE_W2HRATIO,
+        ncol=1,
         bbox=(0, -0.19, 1, 0.1),
     ),
 
     'pde_complex_tau_sigma' : LineConfiguration(
         width=COMMON_WIDTHS['triple_subfigure'],
-        height=COMMON_WIDTHS['triple_subfigure'],
+        height=COMMON_WIDTHS['triple_subfigure'] * PDE_W2HRATIO,
         ncol=2,
         bbox=(0, -0.19, 1, 0.1),
     ),
 
-    # 'telegrapher_x_k' : LineConfiguration(
-    #     width=SINGLE_COLUMN_WIDTH,
-    #     height=STANDARD_HEIGHT,
-    #     ncol=3,
-    #     bbox=(0, -0.17, 1, 0.1),
-    # ),
+    'telegrapher_x_k' : LineConfiguration(
+        width=COMMON_WIDTHS['double_subfigure'],
+        height=COMMON_WIDTHS['double_subfigure'] * TELEGRAPHER_X_K_W2HRATIO,
+        ncol=3,
+        bbox=(0, -0.17, 1, 0.1),
+    ),
 
-    # 'telegrapher_alpha_gamma' : LineConfiguration(
-    #     width=SINGLE_COLUMN_WIDTH,
-    #     height=STANDARD_HEIGHT,
-    #     ncol=3,
-    #     bbox=(0, -0.17, 1, 0.1),
-    # ),
+    'telegrapher_alpha_gamma' : LineConfiguration(
+        width=COMMON_WIDTHS['double_subfigure'],
+        height=COMMON_WIDTHS['double_subfigure'] * TELEGRAPHER_ALPHA_GAMMA_W2HRATIO,
+        ncol=3,
+        bbox=(0, -0.17, 1, 0.1),
+    ),
 
-    # 'semi_infinite_rod' : LineConfiguration(
-    #     width=SINGLE_COLUMN_WIDTH,
-    #     height=STANDARD_HEIGHT,
-    #     ncol=3,
-    #     bbox=(0, -0.17, 1, 0.1),
-    # ),
+    'semi_infinite_rod' : LineConfiguration(
+        width=COMMON_WIDTHS['double_subfigure'],
+        height=COMMON_WIDTHS['double_subfigure'] * ROD_W2HRATIO,
+        ncol=3,
+        bbox=(0, -0.17, 1, 0.1),
+    ),
 
-    # 'finite_rod' : LineConfiguration(
-    #     width=SINGLE_COLUMN_WIDTH,
-    #     height=STANDARD_HEIGHT,
-    #     ncol=3,
-    #     bbox=(0, -0.17, 1, 0.1),
-    # ),
+    'finite_rod' : LineConfiguration(
+        width=COMMON_WIDTHS['double_subfigure'],
+        height=COMMON_WIDTHS['double_subfigure'] * ROD_W2HRATIO,
+        ncol=3,
+        bbox=(0, -0.17, 1, 0.1),
+    ),
 }
 
 REGION_CONFIGURATIONS = {
     'retarded1' : RegionConfiguration(
         width=COMMON_WIDTHS['single_column'],
-        height=COMMON_WIDTHS['single_column'] * W2H_SCALING_FACTOR,
+        height=COMMON_WIDTHS['single_column'] * W2H_RATIO,
         ticks=TickConfiguration(1, 1, 0.25, 0.25),
         ncol=3,
         bbox=(0, -0.17, 1, 0.1),
@@ -161,52 +165,52 @@ REGION_CONFIGURATIONS = {
         bbox=(0, -0.17, 1, 0.1),
     ),
 
-    # 'semi_infinite_rod' : RegionConfiguration(
-    #     width=SINGLE_COLUMN_WIDTH,
-    #     height=STANDARD_HEIGHT,
-    #     ncol=3,
-    #     bbox=(0, -0.17, 1, 0.1),
-    # ),
+    'pde_complex_k_sigma' : RegionConfiguration(
+        width=COMMON_WIDTHS['triple_subfigure'],
+        height=COMMON_WIDTHS['triple_subfigure'] * PDE_W2HRATIO,
+        ncol=1,
+        bbox=(0, -0.19, 1, 0.1),
+    ),
 
-    # 'pde_complex_k_sigma' : RegionConfiguration(
-    #     width=SINGLE_COLUMN_WIDTH,
-    #     height=STANDARD_HEIGHT,
-    #     ncol=3,
-    #     bbox=(0, -0.17, 1, 0.1),
-    # ),
+    'pde_complex_beta_sigma' : RegionConfiguration(
+        width=COMMON_WIDTHS['triple_subfigure'],
+        height=COMMON_WIDTHS['triple_subfigure'] * PDE_W2HRATIO,
+        ncol=1,
+        bbox=(0, -0.19, 1, 0.1),
+    ),
 
-    # 'pde_complex_beta_sigma' : RegionConfiguration(
-    #     width=SINGLE_COLUMN_WIDTH,
-    #     height=STANDARD_HEIGHT,
-    #     ncol=3,
-    #     bbox=(0, -0.17, 1, 0.1),
-    # ),
+    'pde_complex_tau_sigma' : RegionConfiguration(
+        width=COMMON_WIDTHS['triple_subfigure'],
+        height=COMMON_WIDTHS['triple_subfigure'] * PDE_W2HRATIO,
+        ncol=2,
+        bbox=(0, -0.19, 1, 0.1),
+    ),
 
-    # 'pde_complex_tau_sigma' : RegionConfiguration(
-    #     width=SINGLE_COLUMN_WIDTH,
-    #     height=STANDARD_HEIGHT,
-    #     ncol=3,
-    #     bbox=(0, -0.17, 1, 0.1),
-    # ),
+    'telegrapher_x_k' : RegionConfiguration(
+        width=COMMON_WIDTHS['double_subfigure'],
+        height=COMMON_WIDTHS['double_subfigure'] * TELEGRAPHER_X_K_W2HRATIO,
+        ncol=3,
+        bbox=(0, -0.17, 1, 0.1),
+    ),
 
-    # 'telegrapher_x_k' : RegionConfiguration(
-    #     width=SINGLE_COLUMN_WIDTH,
-    #     height=STANDARD_HEIGHT,
-    #     ncol=3,
-    #     bbox=(0, -0.17, 1, 0.1),
-    # ),
+     'telegrapher_alpha_gamma' : RegionConfiguration(
+        width=COMMON_WIDTHS['double_subfigure'],
+        height=COMMON_WIDTHS['double_subfigure'] * TELEGRAPHER_ALPHA_GAMMA_W2HRATIO,
+        ncol=3,
+        bbox=(0, -0.17, 1, 0.1),
+    ),
 
-    #  'telegrapher_alpha_gamma' : RegionConfiguration(
-    #     width=SINGLE_COLUMN_WIDTH,
-    #     height=STANDARD_HEIGHT,
-    #     ncol=3,
-    #     bbox=(0, -0.17, 1, 0.1),
-    # ),
+    'semi_infinite_rod' : RegionConfiguration(
+        width=COMMON_WIDTHS['double_subfigure'],
+        height=COMMON_WIDTHS['double_subfigure'] * ROD_W2HRATIO,
+        ncol=3,
+        bbox=(0, -0.17, 1, 0.1),
+    ),
 
-    #  'finite_rod' : RegionConfiguration(
-    #     width=SINGLE_COLUMN_WIDTH,
-    #     height=STANDARD_HEIGHT,
-    #     ncol=3,
-    #     bbox=(0, -0.17, 1, 0.1),
-    # ),
+     'finite_rod' : RegionConfiguration(
+        width=COMMON_WIDTHS['double_subfigure'],
+        height=COMMON_WIDTHS['double_subfigure'] * ROD_W2HRATIO,
+        ncol=3,
+        bbox=(0, -0.17, 1, 0.1),
+    ),
 }

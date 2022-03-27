@@ -9,11 +9,7 @@ def save_figure(args, fig, command, subcommand, extension):
     dir = Path(dirname)
     dir.mkdir(exist_ok=True, parents=True)
     timestamp = timestamps.get_timestamp_str()
-    figpath_timestamped = f'{dirname}/{args.system}_{timestamp}.{extension}'
-    figpath = f'{dirname}/{args.system}.{extension}'
-
-    if extension == 'png':
-        fig.savefig(figpath_timestamped, pad_inches=0.0, dpi=1000)
-    else:
-        fig.savefig(figpath_timestamped, dpi=1000)
+    figpath_timestamped = f'{dirname}/{args.system}_{timestamp}_{subcommand}.{extension}'
+    figpath = f'{dirname}/{args.system}_{subcommand}.{extension}'
+    fig.savefig(figpath_timestamped, dpi=1000)
     copyfile(figpath_timestamped, figpath)
