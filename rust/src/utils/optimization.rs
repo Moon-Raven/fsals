@@ -162,20 +162,21 @@ where
         .map(|(index, _)| index)
         .expect("Error while searching for log min");
 
-    // /* Perform search on linspace */
+    /* Perform search on linspace */
     let (w_min, w_max) = match get_linsearch_interval(minind, problem.log_space) {
         Some(val) => val,
         None => return 0.0,
     };
 
     debug!("Starting linsearch on [{}, {}]", w_min, w_max);
+    let w_linspace = iter_num_tools::lin_space(w_min..=w_max, problem.lin_steps);
+    let function_vals = iter_num_tools::lin_space(w_min..=w_max, problem.lin_steps)
+        .map(|w| (problem.fraction_function)(w));
 
-    let min = iter_num_tools::lin_space(w_min..=w_max, problem.lin_steps)
-        .map(|w| (problem.fraction_function)(w))
-        .min_by(|a, b| a.partial_cmp(b).expect("Invalid value found"))
+    let (argmin, min) = w_linspace.zip(function_vals)
+        .min_by(|(_, a), (_, b)| a.partial_cmp(b).expect("Invalid value found"))
         .expect("Error while searching for lin min");
-
-        debug!("Found lin minimum f(?) = {}", min);
+    update_statistics(argmin);
 
     min
 }

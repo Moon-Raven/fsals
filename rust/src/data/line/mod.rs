@@ -290,6 +290,8 @@ pub fn run_line(args: &Args) {
         parameters: config.system.parameters,
     };
 
+    optimization::print_minmax_statistics();
+
 
     /* Store results in file */
     let config_name_option = &args.system;

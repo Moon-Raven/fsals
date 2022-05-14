@@ -10,6 +10,7 @@ use crate::systems::retarded1;
 use crate::systems::semi_infinite_rod;
 use crate::systems::telegrapher_alpha_gamma;
 use crate::systems::telegrapher_x_k;
+use crate::systems::telegrapher_standard;
 use crate::utils::geometry::Delta;
 
 use crate::nu::ContourConfiguration;
@@ -294,6 +295,34 @@ lazy_static! {
             log_space_maxw: 1e2,
             log_space_steps: 10_000,
             w_steps_linear: 10_000,
+        });
+
+        configs.insert("telegrapher_standard", LineConfiguration {
+            name: "telegrapher_standard",
+            system: telegrapher_standard::SYSTEM,
+            limits: Limits { p1_min: 0.0, p1_max: 0.2, p2_min: 1.0, p2_max: 1.5 },
+            ray_count: 160,
+            safeguard: 0.85,
+            origins: vec![
+                // Region 1
+                (0.05, 1.3),
+                (0.15, 1.15),
+                // Region 2
+                (0.1, 1.45),
+                (0.16, 1.38),
+                // Region 3
+                (0.175, 1.48),
+                ],
+            contour_conf: ContourConfiguration {
+                w_min: 1e-3,
+                w_max: 1e3,
+                steps: 1_000usize,
+                },
+            delta: Delta::Abs(1e-5),
+            log_space_minw: 1e1,
+            log_space_maxw: 1e4,
+            log_space_steps: 1_000,
+            w_steps_linear: 2_000,
         });
 
         configs

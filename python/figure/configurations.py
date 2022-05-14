@@ -145,6 +145,13 @@ LINE_CONFIGURATIONS = {
         ncol=3,
         bbox=(0, -0.17, 1, 0.1),
     ),
+
+    'telegrapher_standard' : LineConfiguration(
+        width=COMMON_WIDTHS['double_subfigure'],
+        height=COMMON_WIDTHS['double_subfigure'] * ROD_W2HRATIO,
+        ncol=4,
+        bbox=(0, -0.17, 1, 0.1),
+    ),
 }
 
 REGION_CONFIGURATIONS = {
