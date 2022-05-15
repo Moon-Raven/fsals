@@ -9,6 +9,7 @@ PDE_W2HRATIO = 1.1 # Because extra legend rows destroy ratio
 ROD_W2HRATIO = 1.0 # Because there are no extra legend rows to destroy ratio
 TELEGRAPHER_X_K_W2HRATIO = 1.0
 TELEGRAPHER_ALPHA_GAMMA_W2HRATIO = 1.05
+TELEGRAPHER_STANDARD_W2HRATIO = 1.1
 
 # Commonly used figure widths, in inches
 COMMON_WIDTHS = {
@@ -16,6 +17,7 @@ COMMON_WIDTHS = {
     'double_column': 7.221889764,
     'triple_subfigure': 2.38403,
     'double_subfigure': 3.61217,
+    # 'three_times_two': 2.0,
 }
 
 
@@ -133,23 +135,23 @@ LINE_CONFIGURATIONS = {
     ),
 
     'semi_infinite_rod' : LineConfiguration(
-        width=COMMON_WIDTHS['double_subfigure'],
-        height=COMMON_WIDTHS['double_subfigure'] * ROD_W2HRATIO,
-        ncol=3,
+        width=COMMON_WIDTHS['triple_subfigure'],
+        height=COMMON_WIDTHS['triple_subfigure'] * ROD_W2HRATIO,
+        ncol=2,
         bbox=(0, -0.17, 1, 0.1),
     ),
 
     'finite_rod' : LineConfiguration(
-        width=COMMON_WIDTHS['double_subfigure'],
-        height=COMMON_WIDTHS['double_subfigure'] * ROD_W2HRATIO,
-        ncol=3,
+        width=COMMON_WIDTHS['triple_subfigure'],
+        height=COMMON_WIDTHS['triple_subfigure'] * ROD_W2HRATIO,
+        ncol=2,
         bbox=(0, -0.17, 1, 0.1),
     ),
 
     'telegrapher_standard' : LineConfiguration(
-        width=COMMON_WIDTHS['double_subfigure'],
-        height=COMMON_WIDTHS['double_subfigure'] * ROD_W2HRATIO,
-        ncol=4,
+        width=COMMON_WIDTHS['triple_subfigure'],
+        height=COMMON_WIDTHS['triple_subfigure'] * ROD_W2HRATIO,
+        ncol=2,
         bbox=(0, -0.17, 1, 0.1),
     ),
 }
@@ -208,16 +210,23 @@ REGION_CONFIGURATIONS = {
     ),
 
     'semi_infinite_rod' : RegionConfiguration(
-        width=COMMON_WIDTHS['double_subfigure'],
-        height=COMMON_WIDTHS['double_subfigure'] * ROD_W2HRATIO,
-        ncol=3,
+        width=COMMON_WIDTHS['triple_subfigure'],
+        height=COMMON_WIDTHS['triple_subfigure'] * ROD_W2HRATIO,
+        ncol=2,
         bbox=(0, -0.17, 1, 0.1),
     ),
 
      'finite_rod' : RegionConfiguration(
-        width=COMMON_WIDTHS['double_subfigure'],
-        height=COMMON_WIDTHS['double_subfigure'] * ROD_W2HRATIO,
-        ncol=3,
+        width=COMMON_WIDTHS['triple_subfigure'],
+        height=COMMON_WIDTHS['triple_subfigure'] * ROD_W2HRATIO,
+        ncol=2,
+        bbox=(0, -0.17, 1, 0.1),
+    ),
+
+     'telegrapher_standard' : RegionConfiguration(
+        width=COMMON_WIDTHS['triple_subfigure'],
+        height=COMMON_WIDTHS['triple_subfigure'] * ROD_W2HRATIO,
+        ncol=2,
         bbox=(0, -0.17, 1, 0.1),
     ),
 }

@@ -33,64 +33,51 @@ fn line_denominator(w: f64, p: Par, angle: f64, th_min: f64, th_max: f64) -> f64
 }
 
 
-// pub fn region_fraction_precalculated_numerator<'a>(
-//     numerator: &'a [f64],
-//     w_logspace: &'a [f64],
-//     origin: Par,
-//     eps: f64) -> Box<dyn Iterator<Item=f64> + 'a>
-// {
-//     let x_min = origin.0 - eps;
-//     let k_max = origin.1 + eps;
-//     let kmax_powi = k_max.powi(2);
-//     let fraction_iter = numerator
-//         .iter()
-//         .zip(w_logspace.iter()).map(move |(num, w)| {
-//             let s = Comp::new(0.0, *w);
-//             let s_alpha = Comp::powf(s, ALPHA);
-//             let s_beta = Comp::powf(s, BETA);
-//             let num1 = s_alpha * s_beta + A * s_alpha + B;
-//             let num2 = Comp::powf(s, GAMMA) + 1.0;
-//             let numerator = num1 * num2;
-//             let denominator = s_beta + A;
-//             let psi = numerator / denominator;
-//             let r = psi.sqrt();
-//             let t = (-x_min * r.re).exp();
-//             let denominator = t * (1.0 + kmax_powi * psi.norm()).sqrt();
-//             num / denominator
-//     });
+pub fn region_fraction_precalculated_numerator<'a>(
+    numerator: &'a [f64],
+    w_logspace: &'a [f64],
+    origin: Par,
+    eps: f64) -> Box<dyn Iterator<Item=f64> + 'a>
+{
+    let k_max = origin.1 + eps;
+    let kmax_powi = k_max.powi(2);
+    let fraction_iter = numerator
+        .iter()
+        .zip(w_logspace.iter()).map(move |(num, w)| {
+            let s = Comp::new(0.0, *w);
+            let sqrt_term = Comp::sqrt((C*s + G) * (L*s + R));
+            let exponent = -X0 * sqrt_term;
+            let prefix = Comp::norm(Comp::exp(exponent));
+            let denominator = prefix * f64::sqrt(1.0 + w.powi(2) * kmax_powi);
+            num / denominator
+    });
 
-//     Box::new(fraction_iter)
-// }
+    Box::new(fraction_iter)
+}
 
 
-// pub fn region_fraction<'a>(
-//     w_linspace: &'a [f64],
-//     origin: Par,
-//     eps: f64) -> Box<dyn Iterator<Item=f64> + 'a>
-// {
-//     let x_min = origin.0 - eps;
-//     let k_max = origin.1 + eps;
-//     let kmax_powi = k_max.powi(2);
-//     let fraction_iter = w_linspace
-//         .iter()
-//         .map(move |w| {
-//             let num = f_complex(Comp::new(0.0, *w), origin).norm();
-//             let s = Comp::new(0.0, *w);
-//             let s_alpha = Comp::powf(s, ALPHA);
-//             let s_beta = Comp::powf(s, BETA);
-//             let num1 = s_alpha * s_beta + A * s_alpha + B;
-//             let num2 = Comp::powf(s, GAMMA) + 1.0;
-//             let numerator = num1 * num2;
-//             let denominator = s_beta + A;
-//             let psi = numerator / denominator;
-//             let r = psi.sqrt();
-//             let t = (-x_min * r.re).exp();
-//             let denominator = t * (1.0 + kmax_powi * psi.norm()).sqrt();
-//             num / denominator
-//     });
+pub fn region_fraction<'a>(
+    w_linspace: &'a [f64],
+    origin: Par,
+    eps: f64) -> Box<dyn Iterator<Item=f64> + 'a>
+{
+    let k_max = origin.1 + eps;
+    let kmax_powi = k_max.powi(2);
 
-//     Box::new(fraction_iter)
-// }
+    let fraction_iter = w_linspace
+        .iter()
+        .map(move |w| {
+            let num = f_complex(Comp::new(0.0, *w), origin).norm();
+            let s = Comp::new(0.0, *w);
+            let sqrt_term = Comp::sqrt((C*s + G) * (L*s + R));
+            let exponent = -X0 * sqrt_term;
+            let prefix = Comp::norm(Comp::exp(exponent));
+            let denominator = prefix * f64::sqrt(1.0 + w.powi(2) * kmax_powi);
+            num / denominator
+    });
+
+    Box::new(fraction_iter)
+}
 
 
 pub const SYSTEM: System = System {
@@ -99,6 +86,6 @@ pub const SYSTEM: System = System {
     parameters: (r"\tau", r"k"),
     line_denominator: Option::Some(line_denominator),
     region_denominator: Option::None,
-    region_fraction_precalculated_numerator: Option::None,
-    region_fraction: Option::None,
+    region_fraction_precalculated_numerator: Option::Some(region_fraction_precalculated_numerator),
+    region_fraction: Option::Some(region_fraction),
 };
