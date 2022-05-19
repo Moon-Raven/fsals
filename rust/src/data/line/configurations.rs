@@ -216,6 +216,28 @@ lazy_static! {
             log_space_steps: 1_000,
         });
 
+        configs.insert("pde_complex_tau_sigma_instructional", LineConfiguration {
+            name: "pde_complex_tau_sigma",
+            system: pde_complex_tau_sigma::SYSTEM,
+            limits: Limits { p1_min: 0.0, p1_max: 20.0, p2_min: 0.0, p2_max: 20.0 },
+            ray_count: 16,
+            safeguard: 0.90,
+            origins: vec![
+                // Region 2
+                (10.0, 10.0),
+                ],
+            contour_conf: ContourConfiguration {
+                w_min: 1e-3,
+                w_max: 1e5,
+                steps: 1_000usize,
+                },
+            delta: Delta::Abs(1e-2),
+            w_steps_linear: 1_000,
+            log_space_minw: 1e-3,
+            log_space_maxw: 1e5,
+            log_space_steps: 1_000,
+        });
+
         configs.insert("telegrapher_x_k", LineConfiguration {
             name: "telegrapher_x_k",
             system: telegrapher_x_k::SYSTEM,

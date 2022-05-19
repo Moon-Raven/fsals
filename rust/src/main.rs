@@ -38,6 +38,10 @@ pub struct Args {
     #[clap(short, long)]
     parallel: bool,
 
+    /// Save verbose data as output
+    #[clap(short, long)]
+    verbose_data: bool,
+
     #[clap(subcommand)]
     command: Command,
 }
@@ -97,6 +101,7 @@ fn print_args_verbose(args: &Args) {
         None => String::from("unspecified"),
     });
     info!("  {:<12} {}", "Parallel:", args.parallel);
+    info!("  {:<12} {}", "Verbose data:", args.verbose_data);
     info!("  {:<12} {}", "LogLevel:", args.loglevel);
 }
 

@@ -120,6 +120,13 @@ LINE_CONFIGURATIONS = {
         bbox=(0, -0.19, 1, 0.1),
     ),
 
+    'pde_complex_tau_sigma_instructional' : LineConfiguration(
+        width=COMMON_WIDTHS['triple_subfigure'],
+        height=COMMON_WIDTHS['triple_subfigure'] * PDE_W2HRATIO,
+        ncol=2,
+        bbox=(0, -0.19, 1, 0.1),
+    ),
+
     'telegrapher_x_k' : LineConfiguration(
         width=COMMON_WIDTHS['double_subfigure'],
         height=COMMON_WIDTHS['double_subfigure'] * TELEGRAPHER_X_K_W2HRATIO,

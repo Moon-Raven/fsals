@@ -23,6 +23,7 @@ pub struct Ray {
     origin: Par,
     angle: f64,
     length: f64,
+    segments: Option<Vec<f64>>,
 }
 
 
@@ -119,7 +120,8 @@ fn get_stability_segment_1_d<F1, F2>(
     limit: f64,
     conf: &LineConfiguration,
     log_space: &[f64],
-) -> f64
+    verbose: bool,
+) -> (f64, Option<Vec<f64>>)
 where
     F1: Fn(Comp, f64) -> Comp,
     F2: Fn(f64, f64, f64) -> f64
@@ -127,6 +129,11 @@ where
     debug!("Finding stability segment for theta0={}", theta0);
     let mut theta = theta0;
     let mut delta_theta = f64::INFINITY;
+
+    let mut verbose_segments: Option<Vec<f64>> = match verbose{
+        true => Option::Some(Vec::new()),
+        false => Option::None,
+    };
 
     while delta_theta > delta {
         debug!("Theta={}, delta_theta so far={}; continuing search...", theta, delta_theta);
@@ -147,13 +154,20 @@ where
 
         /* Update maximum total offset thus far */
         theta += delta_theta;
+
+        /* Update verbose segments, if needed */
+        if let Some(segment_list) = verbose_segments.as_mut() {
+            segment_list.push(theta)
+        }
+
+        /* Check if the limit has been reached */
         if theta > limit {
             theta = limit;
             break;
         }
     }
 
-    theta
+    (theta, verbose_segments)
 }
 
 
@@ -197,8 +211,9 @@ fn get_stability_segment(
     conf: &LineConfiguration,
     angle: f64,
     origin: Par,
-    log_space: &[f64]
-) -> f64
+    log_space: &[f64],
+    verbose: bool,
+) -> (f64, Option<Vec<f64>>)
 {
     info!("Getting stability segment for origin {:?}, angle {:?}", origin, angle);
     if !geometry::is_point_in_limits(origin, &conf.limits){
@@ -229,11 +244,11 @@ fn get_stability_segment(
     let limit = get_max_theta(&conf.limits, origin, angle, delta);
     let theta0 = 0.0;
 
-    get_stability_segment_1_d(f_1_d, line_denom_1_d, theta0, delta, limit, conf, log_space)
+    get_stability_segment_1_d(f_1_d, line_denom_1_d, theta0, delta, limit, conf, log_space, verbose)
 }
 
 
-fn get_rayfan(conf: &LineConfiguration, origin: Par, log_space: &[f64]) -> RayFan {
+fn get_rayfan(conf: &LineConfiguration, origin: Par, log_space: &[f64], verbose: bool) -> RayFan {
     info!("Calculating line algo for rayfan {:?}", origin);
     let angles = spawn_angles(&conf.limits, conf.ray_count);
 
@@ -242,13 +257,18 @@ fn get_rayfan(conf: &LineConfiguration, origin: Par, log_space: &[f64]) -> RayFa
     let stability_segments = angles
         .clone()
         .into_par_iter()
-        .map(|angle| get_stability_segment(conf, angle, origin, log_space));
+        .map(|angle| get_stability_segment(conf, angle, origin, log_space, verbose));
 
     let rays = angles
         .into_par_iter()
         .zip(stability_segments)
-        .map(|(angle, stability_segment)|{
-            Ray {origin: origin, angle: angle, length: stability_segment}}
+        .map(|(angle, (stability_segment, verbose_segments))|{
+            Ray {
+                origin: origin,
+                angle: angle,
+                length: stability_segment,
+                segments: verbose_segments
+            }}
     );
 
     let rayfan = RayFan { nu, rays: rays.collect(), origin: origin };
@@ -279,7 +299,7 @@ pub fn run_line(args: &Args) {
         .origins
         .clone()
         .into_par_iter()
-        .map(|origin| get_rayfan(config, origin, &w_log_space));
+        .map(|origin| get_rayfan(config, origin, &w_log_space, args.verbose_data));
 
     let results = LineResult {
         rayfans: rayfans.collect(),
