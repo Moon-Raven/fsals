@@ -242,12 +242,10 @@ fn get_rayfan(conf: &LineConfiguration, origin: Par, log_space: &[f64]) -> RayFa
     let stability_segments = angles
         .clone()
         .into_par_iter()
-        // .into_iter()
         .map(|angle| get_stability_segment(conf, angle, origin, log_space));
 
     let rays = angles
         .into_par_iter()
-        // .into_iter()
         .zip(stability_segments)
         .map(|(angle, stability_segment)|{
             Ray {origin: origin, angle: angle, length: stability_segment}}
