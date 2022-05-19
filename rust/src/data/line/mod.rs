@@ -281,7 +281,6 @@ pub fn run_line(args: &Args) {
         .origins
         .clone()
         .into_par_iter()
-        // .into_iter()
         .map(|origin| get_rayfan(config, origin, &w_log_space));
 
     let results = LineResult {
