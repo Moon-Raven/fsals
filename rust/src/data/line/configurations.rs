@@ -220,7 +220,7 @@ lazy_static! {
             name: "pde_complex_tau_sigma",
             system: pde_complex_tau_sigma::SYSTEM,
             limits: Limits { p1_min: 0.0, p1_max: 20.0, p2_min: 0.0, p2_max: 20.0 },
-            ray_count: 16,
+            ray_count: 256,
             safeguard: 0.90,
             origins: vec![
                 // Region 2
