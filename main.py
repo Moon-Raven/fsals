@@ -52,6 +52,12 @@ def parse_cli_arguments():
         choices=['debug', 'info', 'warn', 'error'],
         default='info')
 
+    arg_parser.add_argument(
+        '-c',
+        '--customscript',
+        help='custom script',
+        default='')
+
     args = arg_parser.parse_args()
     return args
 
