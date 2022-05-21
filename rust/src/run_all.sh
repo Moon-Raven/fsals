@@ -22,3 +22,5 @@ for system in ${SYSTEMS[@]}; do
         cargo run --release -- -l info -a $algo -s $system data
     done
 done
+
+# cargo run --release -- -s pde_complex_tau_sigma_instructional -a line -v -l info data

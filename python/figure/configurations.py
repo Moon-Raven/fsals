@@ -17,7 +17,6 @@ COMMON_WIDTHS = {
     'double_column': 7.221889764,
     'triple_subfigure': 2.38403,
     'double_subfigure': 3.61217,
-    # 'three_times_two': 2.0,
 }
 
 
@@ -37,11 +36,11 @@ def default_custom_func(ax, legend_handles):
 
 class FigureConfiguration:
     __slots__ = ['width', 'height', 'ticks', 'custom_func', 'ncol', 'bbox',
-                 'draw_origins']
+                 'draw_origins', 'language']
 
     def __init__(
         self, width, height, ncol, bbox, custom_func=default_custom_func,
-        draw_origins=True, ticks=None):
+        draw_origins=True, ticks=None, language='english'):
         self.width = width
         self.height = height
         self.ticks = ticks
@@ -49,33 +48,37 @@ class FigureConfiguration:
         self.ncol = ncol
         self.bbox = bbox
         self.draw_origins = draw_origins
+        self.language = language
 
 
 class LineConfiguration(FigureConfiguration):
     __slots__ = ['ratios']
 
     def __init__(
-        self, width, height, ncol, bbox,
-        ratios=None, custom_func=default_custom_func, draw_origins=True, ticks=None):
-
-        super().__init__(width, height, ncol, bbox, custom_func, draw_origins,
-            ticks=ticks)
+        self, width, height, ncol, bbox, ratios=None, custom_func=default_custom_func,
+        draw_origins=True, ticks=None, language='english'
+    ):
+        super().__init__(
+            width, height, ncol, bbox, custom_func, draw_origins, ticks=ticks,
+            language=language)
         self.ratios = ratios
 
 
 class RegionConfiguration(FigureConfiguration):
     __slots__ = []
 
-    def __init__(self, width, height, ncol, bbox,
-        custom_func=default_custom_func, draw_origins=True, ticks=None):
-        super().__init__(width, height, ncol, bbox, custom_func, draw_origins,
-            ticks=ticks)
+    def __init__(
+        self, width, height, ncol, bbox, custom_func=default_custom_func,
+        draw_origins=True, ticks=None, language='english'
+    ):
+        super().__init__(
+            width, height, ncol, bbox, custom_func, draw_origins,
+            ticks=ticks, language=language)
 
 
 def retarded1_custom_func(ax, legend_handles):
     gu2005.add_gu2005_example1(ax)
     legend_handle = Line2D([0], [0], color='black', linestyle='--', label='SCS')
-
     legend_handles.append(legend_handle)
     return ax, legend_handles
 
@@ -121,8 +124,9 @@ LINE_CONFIGURATIONS = {
     ),
 
     'pde_complex_tau_sigma_instructional' : LineConfiguration(
-        width=COMMON_WIDTHS['triple_subfigure'],
-        height=COMMON_WIDTHS['triple_subfigure'] * PDE_W2HRATIO,
+        width=COMMON_WIDTHS['single_column'],
+        height=COMMON_WIDTHS['single_column'] * PDE_W2HRATIO,
+        language='serbian',
         ncol=2,
         bbox=(0, -0.19, 1, 0.1),
     ),

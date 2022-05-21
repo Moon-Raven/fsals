@@ -225,6 +225,13 @@ lazy_static! {
             origins: vec![
                 // Region 2
                 (10.0, 10.0),
+                // Region 1
+                ( 1.0,  1.0),
+                ( 0.5, 12.0),
+                // Region 3
+                (18.0,  2.0),
+                // Region 4
+                (19.0,  0.15),
                 ],
             contour_conf: ContourConfiguration {
                 w_min: 1e-3,

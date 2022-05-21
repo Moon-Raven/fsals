@@ -20,7 +20,7 @@ logger = logging.getLogger(__name__)
 ORIGIN_MARKERSTYLE = 'X'
 ORIGIN_MARKERCOLOR = 'black'
 ORIGIN_MARKERSIZE = 4
-ORIGIN_LABEL_LINE = 'Origins'
+ORIGIN_LABEL_LINE = {'english': 'Origins', 'serbian': 'Početne tačke'}
 ORIGIN_LABEL_REGION = 'Origins'
 
 
@@ -140,7 +140,7 @@ def create_figure_line(args):
     # Add origin label, if necessary
     if cfg.draw_origins:
         origin_handle = Line2D([0], [0], color='black', linestyle='None',
-            markersize=4, marker='X', label=ORIGIN_LABEL_LINE),
+            markersize=4, marker='X', label=ORIGIN_LABEL_LINE[cfg.language]),
         legend_handles.insert(0, *origin_handle)
 
 
