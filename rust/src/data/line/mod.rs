@@ -155,14 +155,20 @@ where
         /* Update maximum total offset thus far */
         theta += delta_theta;
 
+        /* Enforce domain limits */
+        let mut domain_limit_reached = false;
+        if theta > limit {
+            domain_limit_reached = true;
+            theta = limit;
+        }
+
         /* Update verbose segments, if needed */
         if let Some(segment_list) = verbose_segments.as_mut() {
             segment_list.push(theta)
         }
 
         /* Check if the limit has been reached */
-        if theta > limit {
-            theta = limit;
+        if domain_limit_reached {
             break;
         }
     }
