@@ -36,6 +36,7 @@ pub struct RegionConfiguration {
     pub log_space_minw: f64,
     pub log_space_maxw: f64,
     pub log_space_steps: usize,
+    pub max_iter: Option<u32>,
 }
 
 
@@ -75,6 +76,7 @@ lazy_static! {
             log_space_minw: 1e-3,
             log_space_maxw: 1e5,
             log_space_steps: 10_000,
+            max_iter: Option::None,
         });
 
         configs.insert("distributed_delay1", RegionConfiguration {
@@ -106,6 +108,7 @@ lazy_static! {
             log_space_maxw: 1e3,
             log_space_steps: 10_000,
             lin_steps: 10_000,
+            max_iter: Option::None,
         });
 
         configs.insert("pde_complex_k_sigma", RegionConfiguration {
@@ -129,6 +132,7 @@ lazy_static! {
             log_space_minw: 1e-3,   // 1e-3 in python
             log_space_maxw: 1e5,    // 1e7 in python
             log_space_steps: 1_000, // 10_000 in python
+            max_iter: Option::None,
         });
 
         configs.insert("pde_complex_beta_sigma", RegionConfiguration {
@@ -152,6 +156,7 @@ lazy_static! {
             log_space_minw: 1e-3,   // 1e-3 in python
             log_space_maxw: 1e5,    // 1e7 in python
             log_space_steps: 1_000, // 10_000 in python
+            max_iter: Option::None,
         });
 
         configs.insert("pde_complex_tau_sigma", RegionConfiguration {
@@ -177,6 +182,7 @@ lazy_static! {
             log_space_minw: 1e-3,
             log_space_maxw: 1e5,
             log_space_steps: 1_000,
+            max_iter: Option::None,
         });
 
         configs.insert("telegrapher_x_k", RegionConfiguration {
@@ -200,6 +206,7 @@ lazy_static! {
             log_space_minw: 1e-2,
             log_space_maxw: 1e5,
             log_space_steps: 1_000,
+            max_iter: Option::None,
         });
 
         configs.insert("telegrapher_alpha_gamma", RegionConfiguration {
@@ -225,6 +232,7 @@ lazy_static! {
             log_space_maxw: 1e7,
             log_space_steps: 1_000,
             lin_steps: 1_000,
+            max_iter: Option::None,
         });
 
         configs.insert("semi_infinite_rod", RegionConfiguration {
@@ -248,6 +256,7 @@ lazy_static! {
             log_space_maxw: 1e-1,
             log_space_steps: 1_000,
             lin_steps: 1_000,
+            max_iter: Option::None,
         });
 
         configs.insert("finite_rod", RegionConfiguration {
@@ -271,6 +280,7 @@ lazy_static! {
             log_space_maxw: 1e4,
             log_space_steps: 1_000,
             lin_steps: 1_000,
+            max_iter: Option::None,
         });
 
         configs.insert("telegrapher_standard", RegionConfiguration {
@@ -295,6 +305,32 @@ lazy_static! {
             log_space_maxw: 1e4,
             log_space_steps: 1_000,
             lin_steps: 2_000,
+            max_iter: Option::None,
+        });
+
+        configs.insert("pde_complex_instructional", RegionConfiguration {
+            name: "pde_complex_instructional",
+            system: pde_complex_tau_sigma::SYSTEM,
+            limits: Limits { p1_min: 0.0, p1_max: 20.0, p2_min: 0.0, p2_max: 20.0 },
+            safeguard: 1.0,
+            origins: vec![
+                (10.0, 10.0),
+                (18.0,  2.0),
+                (19.0,  0.15),
+                ],
+            contour_conf: ContourConfiguration {
+                w_min: 1e-3,
+                w_max: 1e5,
+                steps: 1_000,
+                },
+            delta: Delta::Abs(1e-3),
+            spawn_count: 32,
+            enforce_limits: false,
+            lin_steps: 1_000,
+            log_space_minw: 1e-3,
+            log_space_maxw: 1e5,
+            log_space_steps: 1_000,
+            max_iter: Option::Some(5),
         });
 
         configs

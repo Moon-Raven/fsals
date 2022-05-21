@@ -30,6 +30,7 @@ pub struct RegionResult {
 pub struct PRegion {
     pub origin: Par,
     pub radius: f64,
+    pub depth: u32,
 }
 
 impl PRegion {
@@ -118,6 +119,7 @@ fn get_pregion(
     enforce_limits: bool,
     delta_abs: f64,
     log_space: &[f64],
+    depth: u32,
 ) -> PRegion
 {
     let precalculated_numerator: Vec<f64> = log_space
@@ -139,7 +141,7 @@ fn get_pregion(
     info!("Finding pregion for origin {:?}; delta={}, limit={}", origin, delta_abs, limit);
     let radius = optimization::get_maximum_condition(condition, delta_abs, limit);
 
-    PRegion { origin, radius: radius * conf.safeguard }
+    PRegion { origin, radius: radius * conf.safeguard, depth }
 }
 
 
@@ -177,6 +179,8 @@ pub fn get_region_parallel<'a>(
     pregions: &'a Arc<RwLock<Vec<PRegion>>>,
     delta: f64,
     log_space: &'a [f64],
+    depth: u32,
+    max_depth: Option<u32>,
 )
 {
     /* Check if the point is obsolete */
@@ -194,13 +198,14 @@ pub fn get_region_parallel<'a>(
     }
 
     /* Find new PRegion around the point */
-    let pregion = get_pregion(conf, origin, conf.enforce_limits, delta, log_space);
+    let pregion = get_pregion(conf, origin, conf.enforce_limits, delta, log_space, depth);
 
     let new_points = {
         let pregions_unlocked = pregions.read().unwrap();
 
         /* If necessary, spawn new points on edge of the newly obtained PRegion */
-        if pregion.radius > delta {
+        let depth_ok = if let Some(max_depth) = max_depth { depth < max_depth} else {true};
+        if pregion.radius > delta && depth_ok {
             let new_points: Vec<Par> = spawn_valid_points(
                 &pregion,
                 &conf,
@@ -220,7 +225,15 @@ pub fn get_region_parallel<'a>(
     if let Some(new_points) = new_points {
         if new_points.len() != 0 {
             for point in new_points {
-                scope.spawn_fifo(move |s| get_region_parallel(s, conf, point, pregions, delta, log_space));
+                scope.spawn_fifo(move |s| get_region_parallel(
+                    s,
+                    conf,
+                    point,
+                    pregions,
+                    delta,
+                    log_space,
+                    depth+1,
+                    max_depth));
             }
         }
     }
@@ -234,10 +247,20 @@ pub fn get_region(conf: &RegionConfiguration, origin: Par) -> Region {
     let nu = nu::calculate_nu_single(&conf.contour_conf, conf.system.f_complex, origin);
     let mut pregions = Arc::new(RwLock::new(Vec::with_capacity(VEC_PREALLOCATION_SIZE)));
     let w_log_space: Vec<f64> = conf.get_log_space();
+    let initial_depth = 1;
 
     info!("Searching for region around {:?} with nu {}", origin, nu);
     rayon::scope_fifo(|s| {
-        get_region_parallel(s, conf, origin, &mut pregions, delta, &w_log_space);
+        get_region_parallel(
+            s,
+            conf,
+            origin,
+            &mut pregions,
+            delta,
+            &w_log_space,
+            initial_depth,
+            conf.max_iter,
+        );
     });
     let pregions = Arc::try_unwrap(pregions).unwrap().into_inner().unwrap();
     info!("Returning region around {:?} with {:?} pregions", origin, pregions.len());
@@ -247,13 +270,12 @@ pub fn get_region(conf: &RegionConfiguration, origin: Par) -> Region {
 
 
 pub fn store_results(results: &RegionResult, config: &RegionConfiguration) {
-    let system_name = config.system.name;
     let command = "data";
     let extension = "data";
 
     let algorithm_option = "region";
 
-    let filename = storage::get_filepath(command, algorithm_option, extension, system_name);
+    let filename = storage::get_filepath(command, algorithm_option, extension, config.name);
 
     storage::store_results(results, &filename);
 }
@@ -271,7 +293,6 @@ pub fn args2config(args: &Args) -> &'static RegionConfiguration {
 
     config
 }
-
 
 
 pub fn run_region(args: &Args) {
