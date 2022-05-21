@@ -113,15 +113,16 @@ def instructional_line_nsc(args):
     for point in intermediate:
         ax.plot(point[0], point[1], 'o', color='black', markersize=3)
 
-    # Add \eta^1
-    ax.plot(intermediate[0][0], intermediate[0][1], 'o', color='black', markersize=3)
-    ax.annotate(
-        fr'$\eta^1$',
-        intermediate[0],
-        textcoords='offset points',
-        xytext=LABEL_OFFSET,
-        ha='right'
-    )
+    # Add \eta^1 and \eta^2
+    for i in range(0, 3):
+        ax.plot(intermediate[i][0], intermediate[i][1], 'o', color='black', markersize=3)
+        ax.annotate(
+            fr'$\eta^{i+1}$',
+            intermediate[i],
+            textcoords='offset points',
+            xytext=LABEL_OFFSET,
+            ha='right'
+        )
 
     # Add final point
     ax.plot(intermediate[-1][0], intermediate[-1][1], 'o', color='black', markersize=3)
