@@ -15,9 +15,12 @@ import python.utils.geometry as geometry
 import python.utils.storage as storage
 from python.figure.configurations import LINE_CONFIGURATIONS, REGION_CONFIGURATIONS
 from python.figure.configurations import LineConfiguration, TickConfiguration
+from python.figure.configurations import RegionConfiguration
 from python.figure.main_figure import set_general_parameters, new_figure_inches
 from python.figure.main_figure import configure_ticks, add_rayfan_to_ax
-from python.figure.main_figure import ORIGIN_LABEL_LINE
+from python.figure.main_figure import ORIGIN_LABEL_LINE, get_ax_ratio, get_corners
+from python.figure.main_figure import get_image_dimensions, get_drawable_canvas
+from python.figure.main_figure import corners2pixels
 
 
 logger = logging.getLogger(__name__)
@@ -358,6 +361,96 @@ def instructional_line_sufficient(args):
     fig.savefig(figpath, dpi=1000)
 
 
+def add_pregion_to_ax(fig, ax, pregion, limits, color):
+    ratio = get_ax_ratio(fig, ax)
+    width, height = get_image_dimensions(ratio)
+    pixel_dimensions = np.array([width, height])
+
+    image, canvas = get_drawable_canvas(width, height)
+    p1span = limits.p1_max - limits.p1_min
+    p2span = limits.p2_max - limits.p2_min
+    spans = np.array([p1span, p2span])
+    mins = np.array([limits.p1_min, limits.p2_min])
+
+    corners = get_corners(pregion)
+    upper_np, lower_np = corners2pixels(corners, spans, pixel_dimensions, mins)
+    upper, lower = (upper_np[0], upper_np[1]), (lower_np[0], lower_np[1])
+    canvas.ellipse([upper, lower], fill=color)
+
+    box = [limits.p1_min, limits.p1_max, limits.p2_min, limits.p2_max]
+    ax.imshow(image, extent=box, aspect='auto', origin='lower')
+
+
+def instructional_region_sufficient(args):
+    data = read_data(f'output/data/region/pde_complex_instructional.data')
+    cfg = RegionConfiguration(
+        width=3.486429134,
+        height=3.486429134,
+        # height=3.486429134 * 1.05,
+        ncol=2,
+        bbox=(0, -0.19, 1, 0.1),
+    )
+    PREGION_COLOR = 'lightsteelblue'
+
+    set_general_parameters()
+
+    # Fetch figure
+    tight = False
+    constrained = True
+    width, height = cfg.width, cfg.height
+    fig, ax = new_figure_inches(width, height, tight, constrained)
+
+    # Configure axes
+    ax.set_xlim(data.limits.p1_min, data.limits.p1_max)
+    ax.set_ylim(data.limits.p2_min, data.limits.p2_max)
+    ax.set_xlabel(f'${data.parameters[0]}$')
+    ax.set_ylabel(f'${data.parameters[1]}$')
+    ax.xaxis.labelpad, ax.yaxis.labelpad = 0, 0
+
+    configure_ticks(ax, cfg)
+
+    # Fetch pregions of interest
+    region = data.regions[1]
+    pregion = region.pregions[0]
+    add_pregion_to_ax(fig, ax, pregion, data.limits, PREGION_COLOR)
+
+    # Add origin
+    ax.plot(region.origin[0], region.origin[1], 'x', color='black', markersize=3)
+
+    # Add varepsilon_q
+    eps = pregion.radius
+    ax.plot([10, 10+eps], [10, 10], ':', linewidth=0.8, color='black')
+    ax.annotate(r'$\varepsilon_q$', [10+eps/2, 10], textcoords='offset points',
+                xytext=(0, 5) , ha='center')
+
+    # Draw the legend
+    legend_handles = [
+        Line2D(
+            [0], [0],
+            color='black',
+            linestyle='None',
+            markersize=3,
+            marker='x',
+            label=r'Početna tačka $\eta^0$',
+        ),
+        Line2D(
+            [0], [0],
+            color=PREGION_COLOR,
+            label=r'$\mathcal{S}_1$',
+            linewidth=8,
+        )
+    ]
+    ax.legend(handles=legend_handles, loc='upper left', frameon=False,
+              bbox_to_anchor=cfg.bbox, mode='expand', ncol=cfg.ncol)
+
+    # Save fig
+    dirname = f'output/custom'
+    dir = Path(dirname)
+    dir.mkdir(exist_ok=True, parents=True)
+    figpath = f'{dirname}/{args.customscript}.pdf'
+    fig.savefig(figpath, dpi=1000)
+
+
 def main(args):
     logger.info(f'Running custom script {args.customscript}!')
 
@@ -367,5 +460,7 @@ def main(args):
         instructional_line_sufficient(args)
     elif args.customscript == 'instructional_line_nsc_multiple':
         instructional_line_nsc_multiple(args)
+    elif args.customscript == 'instructional_region_sufficient':
+        instructional_region_sufficient(args)
     else:
         raise Exception(f'Unknown custom script {args.customscript}')

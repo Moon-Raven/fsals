@@ -175,7 +175,8 @@ lazy_static! {
                 w_max: 1e5,
                 steps: 1_000,
                 },
-            delta: Delta::Abs(1e-3),
+            // delta: Delta::Abs(1e-3),
+            delta: Delta::Abs(1e-1),
             spawn_count: 32,
             enforce_limits: false,
             lin_steps: 1_000,
@@ -314,6 +315,7 @@ lazy_static! {
             limits: Limits { p1_min: 0.0, p1_max: 20.0, p2_min: 0.0, p2_max: 20.0 },
             safeguard: 1.0,
             origins: vec![
+                ( 1.0,  1.0),
                 (10.0, 10.0),
                 (18.0,  2.0),
                 (19.0,  0.15),
