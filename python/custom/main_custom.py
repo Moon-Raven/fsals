@@ -483,9 +483,6 @@ def instructional_region_nsc(args):
             ax.set_title(f'$k = {k}$', fontsize=8)
             ax.set_xlim(data.limits.p1_min, data.limits.p1_max)
             ax.set_ylim(data.limits.p2_min, data.limits.p2_max)
-            # ax.set_xlabel(f'${data.parameters[0]}$')
-            # ax.set_ylabel(f'${data.parameters[1]}$')
-            # ax.xaxis.labelpad, ax.yaxis.labelpad = 0, 0
 
             configure_ticks(ax, cfg)
 
@@ -494,26 +491,6 @@ def instructional_region_nsc(args):
 
             # Add origin
             ax.plot(region.origin[0], region.origin[1], 'x', color='black', markersize=3)
-
-    # Draw the legend
-    # legend_handles = [
-    #     Line2D(
-    #         [0], [0],
-    #         color='black',
-    #         linestyle='None',
-    #         markersize=3,
-    #         marker='x',
-    #         label=r'Početna tačka $\eta^0$',
-    #     ),
-    #     Line2D(
-    #         [0], [0],
-    #         color=PREGION_COLOR,
-    #         label=r'$\mathcal{S}_1$',
-    #         linewidth=8,
-    #     )
-    # ]
-    # fig.legend(handles=legend_handles, loc='upper left', frameon=False,
-    #           bbox_to_anchor=cfg.bbox, mode='expand', ncol=cfg.ncol)
 
     # Save fig
     dirname = f'output/custom'

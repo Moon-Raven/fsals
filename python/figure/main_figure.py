@@ -42,10 +42,12 @@ def new_figure_inches(width, height, tight=True, constrained_layout=False):
     return fig, ax
 
 
-def read_data(args):
+def read_data(args, conf):
     data = None
 
-    with open(f'output/data/{args.algorithm}/{args.system}.data', 'r') as read_file:
+    path = f'output/data/{args.algorithm}/{conf.system}.data'
+    with open(path, 'r') as read_file:
+        logging.info(f'Reading data from {path}')
         data = json.load(read_file, object_hook=lambda d: SimpleNamespace(**d))
 
     if data == None:
@@ -96,8 +98,8 @@ def add_rayfan_to_ax(ax, rayfan, linecolor, linewidth, ratio, origins=False):
 
 
 def create_figure_line(args):
-    data = read_data(args)
     cfg = LINE_CONFIGURATIONS[args.system]
+    data = read_data(args, cfg)
 
     set_general_parameters()
 
@@ -142,7 +144,6 @@ def create_figure_line(args):
         origin_handle = Line2D([0], [0], color='black', linestyle='None',
             markersize=4, marker='X', label=ORIGIN_LABEL_LINE[cfg.language]),
         legend_handles.insert(0, *origin_handle)
-
 
     # Call custom drawing actions for given system
     ax, legend_handles = cfg.custom_func(ax, legend_handles)
@@ -270,8 +271,8 @@ def add_polygon(ax, poly_boundary, style_string='g', fill=True):
 
 
 def create_figure_region(args):
-    data = read_data(args)
     cfg = REGION_CONFIGURATIONS[args.system]
+    data = read_data(args, cfg)
     colors = {0: 'g', 2: 'darkred', 4: 'cornflowerblue', 6: 'orange', 8: 'mediumpurple'}
 
     set_general_parameters()
@@ -305,7 +306,7 @@ def create_figure_region(args):
     # Add origin label, if necessary
     if cfg.draw_origins:
         origin_handle = Line2D([0], [0], color='black', linestyle='None',
-            markersize=4, marker='X', label=ORIGIN_LABEL_REGION),
+            markersize=4, marker='X', label=ORIGIN_LABEL_LINE[cfg.language]),
         legend_handles.insert(0, *origin_handle)
 
     # Call custom drawing actions for given system
