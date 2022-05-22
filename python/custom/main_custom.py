@@ -361,7 +361,7 @@ def instructional_line_sufficient(args):
     fig.savefig(figpath, dpi=1000)
 
 
-def add_pregion_to_ax(fig, ax, pregion, limits, color):
+def add_pregions_to_ax(fig, ax, pregions, limits, color):
     ratio = get_ax_ratio(fig, ax)
     width, height = get_image_dimensions(ratio)
     pixel_dimensions = np.array([width, height])
@@ -372,10 +372,11 @@ def add_pregion_to_ax(fig, ax, pregion, limits, color):
     spans = np.array([p1span, p2span])
     mins = np.array([limits.p1_min, limits.p2_min])
 
-    corners = get_corners(pregion)
-    upper_np, lower_np = corners2pixels(corners, spans, pixel_dimensions, mins)
-    upper, lower = (upper_np[0], upper_np[1]), (lower_np[0], lower_np[1])
-    canvas.ellipse([upper, lower], fill=color)
+    for pregion in pregions:
+        corners = get_corners(pregion)
+        upper_np, lower_np = corners2pixels(corners, spans, pixel_dimensions, mins)
+        upper, lower = (upper_np[0], upper_np[1]), (lower_np[0], lower_np[1])
+        canvas.ellipse([upper, lower], fill=color)
 
     box = [limits.p1_min, limits.p1_max, limits.p2_min, limits.p2_max]
     ax.imshow(image, extent=box, aspect='auto', origin='lower')
@@ -412,7 +413,7 @@ def instructional_region_sufficient(args):
     # Fetch pregions of interest
     region = data.regions[1]
     pregion = region.pregions[0]
-    add_pregion_to_ax(fig, ax, pregion, data.limits, PREGION_COLOR)
+    add_pregions_to_ax(fig, ax, [pregion], data.limits, PREGION_COLOR)
 
     # Add origin
     ax.plot(region.origin[0], region.origin[1], 'x', color='black', markersize=3)
@@ -422,6 +423,7 @@ def instructional_region_sufficient(args):
     ax.plot([10, 10+eps], [10, 10], ':', linewidth=0.8, color='black')
     ax.annotate(r'$\varepsilon_q$', [10+eps/2, 10], textcoords='offset points',
                 xytext=(0, 5) , ha='center')
+    logging.info(f'Drawing varepsilon_q = {eps}...')
 
     # Draw the legend
     legend_handles = [
@@ -451,6 +453,76 @@ def instructional_region_sufficient(args):
     fig.savefig(figpath, dpi=1000)
 
 
+def instructional_region_nsc(args):
+    data = read_data(f'output/data/region/pde_complex_instructional.data')
+    cfg = RegionConfiguration(
+        width=4.7747,
+        height=4.7747 / 3 * 4.2,
+        # height=3.486429134 * 1.05,
+        ncol=2,
+        bbox=(0, -0.19, 1, 0.1),
+    )
+    PREGION_COLOR = 'lightsteelblue'
+
+    set_general_parameters()
+
+    # Fetch figure
+    size = (cfg.width, cfg.height)
+    rows, cols = 4, 3
+    fig, axes = plt.subplots(rows, cols, figsize=size, constrained_layout=True)
+
+    # Fetch region of interest
+    region = data.regions[1]
+
+    # # Configure axes
+    k = 0
+    for r in range(rows):
+        for c in range(cols):
+            k += 1
+            ax = axes[r][c]
+            ax.set_title(f'$k = {k}$', fontsize=8)
+            ax.set_xlim(data.limits.p1_min, data.limits.p1_max)
+            ax.set_ylim(data.limits.p2_min, data.limits.p2_max)
+            # ax.set_xlabel(f'${data.parameters[0]}$')
+            # ax.set_ylabel(f'${data.parameters[1]}$')
+            # ax.xaxis.labelpad, ax.yaxis.labelpad = 0, 0
+
+            configure_ticks(ax, cfg)
+
+            pregions = [p for p in region.pregions if p.depth <= k]
+            add_pregions_to_ax(fig, ax, pregions, data.limits, PREGION_COLOR)
+
+            # Add origin
+            ax.plot(region.origin[0], region.origin[1], 'x', color='black', markersize=3)
+
+    # Draw the legend
+    # legend_handles = [
+    #     Line2D(
+    #         [0], [0],
+    #         color='black',
+    #         linestyle='None',
+    #         markersize=3,
+    #         marker='x',
+    #         label=r'Početna tačka $\eta^0$',
+    #     ),
+    #     Line2D(
+    #         [0], [0],
+    #         color=PREGION_COLOR,
+    #         label=r'$\mathcal{S}_1$',
+    #         linewidth=8,
+    #     )
+    # ]
+    # fig.legend(handles=legend_handles, loc='upper left', frameon=False,
+    #           bbox_to_anchor=cfg.bbox, mode='expand', ncol=cfg.ncol)
+
+    # Save fig
+    dirname = f'output/custom'
+    dir = Path(dirname)
+    dir.mkdir(exist_ok=True, parents=True)
+    figpath = f'{dirname}/{args.customscript}.pdf'
+    fig.savefig(figpath, dpi=1000)
+
+
 def main(args):
     logger.info(f'Running custom script {args.customscript}!')
 
@@ -462,5 +534,7 @@ def main(args):
         instructional_line_nsc_multiple(args)
     elif args.customscript == 'instructional_region_sufficient':
         instructional_region_sufficient(args)
+    elif args.customscript == 'instructional_region_nsc':
+        instructional_region_nsc(args)
     else:
         raise Exception(f'Unknown custom script {args.customscript}')

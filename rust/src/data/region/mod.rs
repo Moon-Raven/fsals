@@ -192,7 +192,14 @@ pub fn get_region_parallel<'a>(
         if pregions_unlocked.len() > THRESHOLD { return }
 
         /* Check if the point is obsolete */
-        if pregions_unlocked.iter().map(|preg| preg.is_point_inside(origin)).any(|b| b) {
+        if pregions_unlocked
+            .iter()
+            .map(|preg|
+                /* If obsoletion is not to be fully checked, then consider only shallower pregs */
+                preg.is_point_inside(origin) && (preg.depth < depth || conf.check_obsoletion))
+            .any(|b| b)
+        
+        {
             return;
         }
     }
