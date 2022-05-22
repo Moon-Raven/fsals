@@ -80,9 +80,15 @@ class RegionConfiguration(FigureConfiguration):
         )
 
 
-def retarded1_custom_func(ax, legend_handles):
+def retarded1_custom_func(ax, legend_handles, language='english'):
+    SCS_LABELS = {'english': 'SCS', 'serbian': 'SPS'}
     gu2005.add_gu2005_example1(ax)
-    legend_handle = Line2D([0], [0], color='black', linestyle='--', label='SCS')
+    legend_handle = Line2D(
+        [0], [0],
+        color='black',
+        linestyle='--',
+        label=SCS_LABELS[language],
+    )
     legend_handles.append(legend_handle)
     return ax, legend_handles
 
@@ -97,6 +103,18 @@ LINE_CONFIGURATIONS = {
         bbox=(0, -0.17, 1, 0.1),
         ratios=[1, 2, 5, 5, 8],
         custom_func=retarded1_custom_func,
+    ),
+
+    'retarded1_thesis' : LineConfiguration(
+        system='retarded1',
+        width=COMMON_WIDTHS['single_column'],
+        height=COMMON_WIDTHS['single_column'] * W2H_RATIO,
+        ticks=TickConfiguration(1, 1, 0.25, 0.25),
+        ncol=3,
+        bbox=(0, -0.17, 1, 0.1),
+        ratios=[1, 2, 5, 5, 8],
+        custom_func=retarded1_custom_func,
+        language='serbian',
     ),
 
     'distributed_delay1' : LineConfiguration(
@@ -193,10 +211,21 @@ REGION_CONFIGURATIONS = {
         custom_func=retarded1_custom_func,
     ),
 
+    'retarded1_thesis' : RegionConfiguration(
+        system='retarded1',
+        width=COMMON_WIDTHS['single_column'],
+        height=COMMON_WIDTHS['single_column'] * W2H_RATIO,
+        ticks=TickConfiguration(1, 1, 0.25, 0.25),
+        ncol=3,
+        bbox=(0, -0.17, 1, 0.1),
+        custom_func=retarded1_custom_func,
+        language='serbian',
+    ),
+
     'distributed_delay1' : RegionConfiguration(
         system='distributed_delay1',
         width=COMMON_WIDTHS['double_column'],
-        height=COMMON_WIDTHS['single_column'], # Eyeballed and inelegant
+        height=COMMON_WIDTHS['single_column'],
         ticks=TickConfiguration(1, 1, 0.25, 0.25),
         ncol=3,
         bbox=(0, -0.17, 1, 0.1),

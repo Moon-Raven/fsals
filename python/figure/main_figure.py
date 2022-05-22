@@ -146,7 +146,7 @@ def create_figure_line(args):
         legend_handles.insert(0, *origin_handle)
 
     # Call custom drawing actions for given system
-    ax, legend_handles = cfg.custom_func(ax, legend_handles)
+    ax, legend_handles = cfg.custom_func(ax, legend_handles, cfg.language)
 
     # Draw the legend
     ax.legend(handles=legend_handles, loc='upper left', frameon=False,
@@ -310,7 +310,7 @@ def create_figure_region(args):
         legend_handles.insert(0, *origin_handle)
 
     # Call custom drawing actions for given system
-    ax, legend_handles = cfg.custom_func(ax, legend_handles)
+    ax, legend_handles = cfg.custom_func(ax, legend_handles, cfg.language)
 
     # Draw the legend
     ax.legend(handles=legend_handles, loc='upper left', frameon=False,
