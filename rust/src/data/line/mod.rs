@@ -35,11 +35,15 @@ pub struct RayFan {
 }
 
 
-fn spawn_angles(limits: &Limits, count: usize) -> Vec<f64> {
+fn spawn_angles(limits: &Limits, count: usize, corrective_ratio: Option<f64>) -> Vec<f64> {
     let angles_lin = iter_num_tools::lin_space(-PI..PI, count);
     let p1_span = limits.p1_max - limits.p1_min;
     let p2_span = limits.p2_max - limits.p2_min;
-    let ratio = p1_span / p2_span;
+    let mut ratio = p1_span / p2_span;
+
+    if let Some(corrective_ratio) = corrective_ratio {
+        ratio /= corrective_ratio;
+    }
 
     /* Find out which angles are in the first and fourth quadrant */
     let is_right = angles_lin.into_iter().map(|angle| angle >= -PI/2.0 && angle <= PI/2.0);
@@ -57,8 +61,6 @@ fn spawn_angles(limits: &Limits, count: usize) -> Vec<f64> {
 }
 
 
-
-
 fn check_jump_validity<F1, F2> (
     f: F1,
     line_denominator: F2,
@@ -68,8 +70,8 @@ fn check_jump_validity<F1, F2> (
     log_space: &[f64],
 ) -> bool
 where
-F1: Fn(Comp, f64) -> Comp,
-F2: Fn(f64, f64, f64) -> f64
+    F1: Fn(Comp, f64) -> Comp,
+    F2: Fn(f64, f64, f64) -> f64
 {
     let theta_min = theta0;
     let theta_max = theta0 + delta_theta;
@@ -256,7 +258,7 @@ fn get_stability_segment(
 
 fn get_rayfan(conf: &LineConfiguration, origin: Par, log_space: &[f64], verbose: bool) -> RayFan {
     info!("Calculating line algo for rayfan {:?}", origin);
-    let angles = spawn_angles(&conf.limits, conf.ray_count);
+    let angles = spawn_angles(&conf.limits, conf.ray_count, conf.corrective_ratio);
 
     let nu = nu::calculate_nu_single(&conf.contour_conf, conf.system.f_complex, origin);
 

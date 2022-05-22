@@ -32,6 +32,7 @@ pub struct LineConfiguration {
     pub log_space_minw: f64,
     pub log_space_maxw: f64,
     pub log_space_steps: usize,
+    pub corrective_ratio: Option<f64>,
 }
 
 
@@ -53,6 +54,7 @@ lazy_static! {
             limits: Limits { p1_min: 0.0, p1_max: 2.6, p2_min: 0.0, p2_max: 3.3 },
             ray_count: 320,
             safeguard: 0.95,
+            corrective_ratio: Option::None,
             origins: vec![
                 (1e-2, 1e-2),
                 (1.75, 1.20),
@@ -75,11 +77,16 @@ lazy_static! {
         configs.insert("distributed_delay1", LineConfiguration {
             name: "distributed_delay1",
             system: distributed_delay1::SYSTEM,
-            limits: Limits { p1_min: 0.0, p1_max: 20.5, p2_min: 0.0, p2_max: 1.3 },
+            limits: Limits { p1_min: 0.0, p1_max: 20.5, p2_min: 0.0, p2_max: 0.5 },
             ray_count: 160,
-            safeguard: 0.95, // 0.75 in python
+            safeguard: 0.95,
+            corrective_ratio: Option::Some(5.0),
             origins: vec![
-                (0.05, 1.0),
+                // Region 1
+                (1.0, 0.4),
+                (10.0, 0.4),
+                (17.0, 0.4),
+                // Other regions
                 (4.9, 0.1),
                 (8.0, 0.04),
                 (11.3, 0.08),
@@ -108,6 +115,7 @@ lazy_static! {
             limits: Limits { p1_min: 0.0, p1_max: 100.0, p2_min: 0.0, p2_max: 7e4 },
             ray_count: 160,
             safeguard: 0.80,
+            corrective_ratio: Option::None,
             origins: vec![
                 // Region 1
                 (1.0, 0.5e4),
@@ -137,6 +145,7 @@ lazy_static! {
             limits: Limits { p1_min: 0.1, p1_max: 20.0, p2_min: 0.1, p2_max: 20.0 },
             ray_count: 160,
             safeguard: 0.90,
+            corrective_ratio: Option::None,
             origins: vec![
                 // Region 1
                 (0.5, 0.5),
@@ -166,6 +175,7 @@ lazy_static! {
             limits: Limits { p1_min: 0.0, p1_max: 2.0, p2_min: 0.0, p2_max: 2.0 },
             ray_count: 160,
             safeguard: 0.90,
+            corrective_ratio: Option::None,
             origins: vec![
                 // Region 1
                 // (1.00, 1.00),
@@ -193,6 +203,7 @@ lazy_static! {
             limits: Limits { p1_min: 0.0, p1_max: 20.0, p2_min: 0.0, p2_max: 20.0 },
             ray_count: 160,
             safeguard: 0.90,
+            corrective_ratio: Option::None,
             origins: vec![
                 // Region 1
                 ( 1.0,  1.0),
@@ -222,6 +233,7 @@ lazy_static! {
             limits: Limits { p1_min: 0.0, p1_max: 20.0, p2_min: 0.0, p2_max: 20.0 },
             ray_count: 256,
             safeguard: 0.90,
+            corrective_ratio: Option::None,
             origins: vec![
                 // Region 2
                 (10.0, 10.0),
@@ -251,6 +263,7 @@ lazy_static! {
             limits: Limits { p1_min: 0.1, p1_max: 4.0, p2_min: 4.1, p2_max: 8.0 },
             ray_count: 160,
             safeguard: 0.90,
+            corrective_ratio: Option::None,
             origins: vec![
                 // Region 1
                 (0.4, 7.0),
@@ -278,6 +291,7 @@ lazy_static! {
             limits: Limits { p1_min: 0.2, p1_max: 0.9, p2_min: 0.2, p2_max: 0.9 },
             ray_count: 160,
             safeguard: 0.90,
+            corrective_ratio: Option::None,
             origins: vec![
                 // Region 1
                 (0.40, 0.40),
@@ -306,6 +320,7 @@ lazy_static! {
             limits: Limits { p1_min: 0.0, p1_max: 100.0, p2_min: 0.0, p2_max: 7e4 },
             ray_count: 160,
             safeguard: 0.80,
+            corrective_ratio: Option::None,
             origins: vec![
                 // Region 1
                 (17.0, 22_000.0),
@@ -331,6 +346,7 @@ lazy_static! {
             system: telegrapher_standard::SYSTEM,
             limits: Limits { p1_min: 0.0, p1_max: 0.2, p2_min: 1.0, p2_max: 1.5 },
             ray_count: 160,
+            corrective_ratio: Option::None,
             safeguard: 0.85,
             origins: vec![
                 // Region 1

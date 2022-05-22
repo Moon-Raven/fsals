@@ -30,7 +30,7 @@ class TickConfiguration:
         self.minor_y = minor_y
 
 
-def default_custom_func(ax, legend_handles):
+def default_custom_func(ax, legend_handles, language='english'):
     return ax, legend_handles
 
 
@@ -120,10 +120,20 @@ LINE_CONFIGURATIONS = {
     'distributed_delay1' : LineConfiguration(
         system='distributed_delay1',
         width=COMMON_WIDTHS['double_column'],
-        height=COMMON_WIDTHS['single_column'], # Eyeballed and inelegant
+        height=COMMON_WIDTHS['single_column'],
         ticks=TickConfiguration(1, 1, 0.25, 0.25),
         ncol=6,
         bbox=(0, -0.17, 1, 0.1),
+    ),
+
+    'distributed_delay1_thesis' : LineConfiguration(
+        system='distributed_delay1',
+        width=4.7747,
+        height=4.7747 / 3,
+        ticks=TickConfiguration(2, 0.1, 1, 0.05),
+        ncol=3,
+        bbox=(0, -0.30, 1, 0.1),
+        language='serbian',
     ),
 
     'pde_complex_k_sigma' : LineConfiguration(
@@ -226,7 +236,7 @@ REGION_CONFIGURATIONS = {
         system='distributed_delay1',
         width=COMMON_WIDTHS['double_column'],
         height=COMMON_WIDTHS['single_column'],
-        ticks=TickConfiguration(1, 1, 0.25, 0.25),
+        ticks=TickConfiguration(1, 0.5, 0.25, 0.25),
         ncol=3,
         bbox=(0, -0.17, 1, 0.1),
     ),
