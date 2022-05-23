@@ -17,6 +17,7 @@ COMMON_WIDTHS = {
     'double_column': 7.221889764,
     'triple_subfigure': 2.38403,
     'double_subfigure': 3.61217,
+    'thesis_standard': 3.486429134,
 }
 
 
@@ -144,6 +145,15 @@ LINE_CONFIGURATIONS = {
         bbox=(0, -0.19, 1, 0.1),
     ),
 
+    'pde_complex_k_sigma_thesis' : LineConfiguration(
+        system='pde_complex_k_sigma',
+        width=COMMON_WIDTHS['thesis_standard'],
+        height=COMMON_WIDTHS['thesis_standard'] * 1.05,
+        ncol=3,
+        bbox=(0, -0.17, 1, 0.1),
+        language='serbian',
+    ),
+
     'pde_complex_beta_sigma' : LineConfiguration(
         system='pde_complex_beta_sigma',
         width=COMMON_WIDTHS['triple_subfigure'],
@@ -177,12 +187,30 @@ LINE_CONFIGURATIONS = {
         bbox=(0, -0.17, 1, 0.1),
     ),
 
+    'telegrapher_x_k_thesis' : LineConfiguration(
+        system='telegrapher_x_k',
+        width=COMMON_WIDTHS['thesis_standard'],
+        height=COMMON_WIDTHS['thesis_standard'] * 1.05,
+        ncol=3,
+        bbox=(0, -0.17, 1, 0.1),
+        language='serbian',
+    ),
+
     'telegrapher_alpha_gamma' : LineConfiguration(
         system='telegrapher_alpha_gamma',
         width=COMMON_WIDTHS['double_subfigure'],
         height=COMMON_WIDTHS['double_subfigure'] * TELEGRAPHER_ALPHA_GAMMA_W2HRATIO,
         ncol=3,
         bbox=(0, -0.17, 1, 0.1),
+    ),
+
+    'telegrapher_alpha_gamma_thesis' : LineConfiguration(
+        system='telegrapher_alpha_gamma',
+        width=COMMON_WIDTHS['thesis_standard'],
+        height=COMMON_WIDTHS['thesis_standard'] * 1.05,
+        ncol=3,
+        bbox=(0, -0.17, 1, 0.1),
+        language='serbian',
     ),
 
     'semi_infinite_rod' : LineConfiguration(
@@ -193,6 +221,15 @@ LINE_CONFIGURATIONS = {
         bbox=(0, -0.17, 1, 0.1),
     ),
 
+    'semi_infinite_rod_thesis' : LineConfiguration(
+        system='semi_infinite_rod',
+        width=COMMON_WIDTHS['thesis_standard'],
+        height=COMMON_WIDTHS['thesis_standard'],
+        ncol=3,
+        bbox=(0, -0.17, 1, 0.1),
+        language='serbian',
+    ),
+
     'finite_rod' : LineConfiguration(
         system='finite_rod',
         width=COMMON_WIDTHS['triple_subfigure'],
@@ -201,12 +238,31 @@ LINE_CONFIGURATIONS = {
         bbox=(0, -0.17, 1, 0.1),
     ),
 
+    'finite_rod_thesis' : LineConfiguration(
+        system='finite_rod',
+        width=COMMON_WIDTHS['thesis_standard'],
+        height=COMMON_WIDTHS['thesis_standard'],
+        ncol=3,
+        bbox=(0, -0.17, 1, 0.1),
+        language='serbian',
+    ),
+
     'telegrapher_standard' : LineConfiguration(
         system='telegrapher_standard',
         width=COMMON_WIDTHS['triple_subfigure'],
         height=COMMON_WIDTHS['triple_subfigure'] * ROD_W2HRATIO,
         ncol=2,
         bbox=(0, -0.17, 1, 0.1),
+    ),
+
+    'telegrapher_standard_thesis' : LineConfiguration(
+        system='telegrapher_standard',
+        width=COMMON_WIDTHS['thesis_standard'],
+        height=COMMON_WIDTHS['thesis_standard'],
+        ncol=3,
+        bbox=(0, -0.17, 1, 0.1),
+        ticks=TickConfiguration(0.05, 0.1, 0.05, 0.1),
+        language='serbian',
     ),
 }
 
@@ -241,12 +297,31 @@ REGION_CONFIGURATIONS = {
         bbox=(0, -0.17, 1, 0.1),
     ),
 
+    'distributed_delay1_thesis' : RegionConfiguration(
+        system='distributed_delay1',
+        width=4.7747,
+        height=4.7747 / 3,
+        ticks=TickConfiguration(2, 0.1, 1, 0.05),
+        ncol=3,
+        bbox=(0, -0.30, 1, 0.1),
+        language='serbian',
+    ),
+
     'pde_complex_k_sigma' : RegionConfiguration(
         system='pde_complex_k_sigma',
         width=COMMON_WIDTHS['triple_subfigure'],
         height=COMMON_WIDTHS['triple_subfigure'] * PDE_W2HRATIO,
         ncol=1,
         bbox=(0, -0.19, 1, 0.1),
+    ),
+
+    'pde_complex_k_sigma_thesis' : RegionConfiguration(
+        system='pde_complex_k_sigma',
+        width=COMMON_WIDTHS['thesis_standard'],
+        height=COMMON_WIDTHS['thesis_standard'],
+        ncol=3,
+        bbox=(0, -0.17, 1, 0.1),
+        language='serbian',
     ),
 
     'pde_complex_beta_sigma' : RegionConfiguration(
@@ -273,12 +348,30 @@ REGION_CONFIGURATIONS = {
         bbox=(0, -0.17, 1, 0.1),
     ),
 
+    'telegrapher_x_k_thesis' : RegionConfiguration(
+        system='telegrapher_x_k',
+        width=COMMON_WIDTHS['thesis_standard'],
+        height=COMMON_WIDTHS['thesis_standard'] * 1.05,
+        ncol=3,
+        bbox=(0, -0.17, 1, 0.1),
+        language='serbian',
+    ),
+
      'telegrapher_alpha_gamma' : RegionConfiguration(
         system='telegrapher_alpha_gamma',
         width=COMMON_WIDTHS['double_subfigure'],
         height=COMMON_WIDTHS['double_subfigure'] * TELEGRAPHER_ALPHA_GAMMA_W2HRATIO,
         ncol=3,
         bbox=(0, -0.17, 1, 0.1),
+    ),
+
+    'telegrapher_alpha_gamma_thesis' : RegionConfiguration(
+        system='telegrapher_alpha_gamma',
+        width=COMMON_WIDTHS['thesis_standard'],
+        height=COMMON_WIDTHS['thesis_standard'] * 1.05,
+        ncol=3,
+        bbox=(0, -0.17, 1, 0.1),
+        language='serbian',
     ),
 
     'semi_infinite_rod' : RegionConfiguration(
@@ -289,11 +382,28 @@ REGION_CONFIGURATIONS = {
         bbox=(0, -0.17, 1, 0.1),
     ),
 
+    'semi_infinite_rod_thesis' : RegionConfiguration(
+        system='semi_infinite_rod',
+        width=COMMON_WIDTHS['thesis_standard'],
+        height=COMMON_WIDTHS['thesis_standard'],
+        ncol=3,
+        bbox=(0, -0.17, 1, 0.1),
+        language='serbian',
+    ),
+
     'finite_rod' : RegionConfiguration(
         system='finite_rod',
         width=COMMON_WIDTHS['triple_subfigure'],
         height=COMMON_WIDTHS['triple_subfigure'] * ROD_W2HRATIO,
         ncol=2,
+        bbox=(0, -0.17, 1, 0.1),
+    ),
+
+    'finite_rod_thesis' : RegionConfiguration(
+        system='finite_rod',
+        width=COMMON_WIDTHS['thesis_standard'],
+        height=COMMON_WIDTHS['thesis_standard'],
+        ncol=3,
         bbox=(0, -0.17, 1, 0.1),
     ),
 
@@ -303,6 +413,15 @@ REGION_CONFIGURATIONS = {
         height=COMMON_WIDTHS['triple_subfigure'] * ROD_W2HRATIO,
         ncol=2,
         bbox=(0, -0.17, 1, 0.1),
+    ),
+
+    'telegrapher_standard_thesis' : RegionConfiguration(
+        system='telegrapher_standard',
+        width=COMMON_WIDTHS['thesis_standard'],
+        height=COMMON_WIDTHS['thesis_standard'],
+        ncol=3,
+        bbox=(0, -0.17, 1, 0.1),
+        ticks=TickConfiguration(0.05, 0.1, 0.05, 0.1),
     ),
 
     'pde_complex_instructional' : RegionConfiguration(

@@ -84,11 +84,11 @@ lazy_static! {
         configs.insert("distributed_delay1", RegionConfiguration {
             name: "distributed_delay1",
             system: distributed_delay1::SYSTEM,
-            limits: Limits { p1_min: 0.0, p1_max: 20.5, p2_min: 0.0, p2_max: 1.3 },
+            limits: Limits { p1_min: 0.0, p1_max: 20.5, p2_min: 0.0, p2_max: 0.5 },
             safeguard: 0.95,
             check_obsoletion: true,
             origins: vec![
-                (0.05, 1.0),
+                (1.0, 0.2),
                 (4.9, 0.1),
                 (8.0, 0.04),
                 (11.3, 0.08),
@@ -104,11 +104,11 @@ lazy_static! {
                 w_max: 1e5,
                 steps: 1_000,
                 },
-            delta: Delta::Abs(0.0005),
+            delta: Delta::Abs(5e-4),
             spawn_count: 32,
             enforce_limits: false,
-            log_space_minw: 1e-3,
-            log_space_maxw: 1e3,
+            log_space_minw: 1e-4,
+            log_space_maxw: 1e1,
             log_space_steps: 10_000,
             lin_steps: 10_000,
             max_iter: Option::None,
@@ -130,7 +130,7 @@ lazy_static! {
                 steps: 1_000,
                 },
             delta: Delta::Abs(1e-2),
-            spawn_count: 32,
+            spawn_count: 32, // Changing to higher value might fix issue in upper right corner
             enforce_limits: false,
             lin_steps: 1_000,      // 10_000 in python
             log_space_minw: 1e-3,   // 1e-3 in python

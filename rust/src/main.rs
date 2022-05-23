@@ -31,7 +31,7 @@ pub struct Args {
     algorithm: Option<Algorithm>,
 
     /// Logging Level
-    #[clap(short, long, default_value_t = LevelFilter::Debug)]
+    #[clap(short, long, default_value_t = LevelFilter::Info)]
     loglevel: LevelFilter,
 
     /// Parallelize code execution
@@ -42,6 +42,7 @@ pub struct Args {
     #[clap(short, long)]
     verbose_data: bool,
 
+    /// Main command that should be run
     #[clap(subcommand)]
     command: Command,
 }
@@ -128,7 +129,7 @@ fn main() {
     match args.command {
         Command::Nu => nu::run(&args),
         Command::Data => data::run(&args),
-        Command::Custom => info!("Should run custom"),
+        Command::Custom => info!("Dummy placeholder for running custom commands"),
     };
 
     let end = Instant::now();
