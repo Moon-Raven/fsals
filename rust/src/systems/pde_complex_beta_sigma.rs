@@ -56,15 +56,6 @@ fn line_denominator(w: f64, p: Par, angle: f64, th_min: f64, th_max: f64) -> f64
 
     let result = c1.abs() * derivative_beta + c2.abs() * derivative_sigma;
 
-    /* Temporary check */
-    if result.is_nan() {
-        println!("Result is {}", result);
-        println!("Derivative_beta = {}", derivative_beta);
-        println!("Derivative_sigma = {}", derivative_sigma);
-        println!("Sigma_min = {}", sigma_min);
-        panic!();
-    }
-
     result
 }
 
