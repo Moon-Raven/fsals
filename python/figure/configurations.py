@@ -162,6 +162,15 @@ LINE_CONFIGURATIONS = {
         bbox=(0, -0.19, 1, 0.1),
     ),
 
+    'pde_complex_beta_sigma_thesis' : LineConfiguration(
+        system='pde_complex_beta_sigma',
+        width=COMMON_WIDTHS['thesis_standard'],
+        height=COMMON_WIDTHS['thesis_standard'],
+        ncol=3,
+        bbox=(0, -0.17, 1, 0.1),
+        language='serbian',
+    ),
+
     'pde_complex_tau_sigma' : LineConfiguration(
         system='pde_complex_tau_sigma',
         width=COMMON_WIDTHS['triple_subfigure'],
@@ -330,6 +339,15 @@ REGION_CONFIGURATIONS = {
         height=COMMON_WIDTHS['triple_subfigure'] * PDE_W2HRATIO,
         ncol=1,
         bbox=(0, -0.19, 1, 0.1),
+    ),
+
+    'pde_complex_beta_sigma_thesis' : RegionConfiguration(
+        system='pde_complex_beta_sigma',
+        width=COMMON_WIDTHS['thesis_standard'],
+        height=COMMON_WIDTHS['thesis_standard'],
+        ncol=3,
+        bbox=(0, -0.17, 1, 0.1),
+        language='serbian',
     ),
 
     'pde_complex_tau_sigma' : RegionConfiguration(
