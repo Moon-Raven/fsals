@@ -245,6 +245,7 @@ LINE_CONFIGURATIONS = {
         height=COMMON_WIDTHS['triple_subfigure'] * ROD_W2HRATIO,
         ncol=2,
         bbox=(0, -0.17, 1, 0.1),
+        ratios=[4, 4, 4, 4],
     ),
 
     'finite_rod_thesis' : LineConfiguration(
@@ -262,6 +263,7 @@ LINE_CONFIGURATIONS = {
         height=COMMON_WIDTHS['triple_subfigure'] * ROD_W2HRATIO,
         ncol=2,
         bbox=(0, -0.17, 1, 0.1),
+        ratios=[3, 3, 6, 6, 8],
     ),
 
     'telegrapher_standard_thesis' : LineConfiguration(
