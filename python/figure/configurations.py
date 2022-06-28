@@ -94,6 +94,12 @@ def retarded1_custom_func(ax, legend_handles, language='english'):
     return ax, legend_handles
 
 
+def distributed_delay1_narrow_custom_func(ax, legend_handles, language='english'):
+    ax.set_xlim(0, 20.0)
+    ax.set_ylim(0, 0.30)
+    return ax, legend_handles
+
+
 LINE_CONFIGURATIONS = {
     'retarded1' : LineConfiguration(
         system='retarded1',
@@ -305,6 +311,16 @@ REGION_CONFIGURATIONS = {
         height=COMMON_WIDTHS['single_column'],
         ticks=TickConfiguration(1, 0.5, 0.25, 0.25),
         ncol=3,
+        bbox=(0, -0.17, 1, 0.1),
+    ),
+
+    'distributed_delay1_narrow' : RegionConfiguration(
+        system='distributed_delay1',
+        width=COMMON_WIDTHS['single_column'],
+        height=COMMON_WIDTHS['single_column'] * W2H_RATIO,
+        ticks=TickConfiguration(5, 0.1, 1, 0.05),
+        ncol=3,
+        custom_func=distributed_delay1_narrow_custom_func,
         bbox=(0, -0.17, 1, 0.1),
     ),
 
