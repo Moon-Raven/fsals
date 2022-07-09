@@ -503,15 +503,19 @@ def instructional_region_nsc(args):
 def main(args):
     logger.info(f'Running custom script {args.customscript}!')
 
-    if args.customscript == 'instructional_line_nsc':
-        instructional_line_nsc(args)
-    elif args.customscript == 'instructional_line_sufficient':
-        instructional_line_sufficient(args)
-    elif args.customscript == 'instructional_line_nsc_multiple':
-        instructional_line_nsc_multiple(args)
-    elif args.customscript == 'instructional_region_sufficient':
-        instructional_region_sufficient(args)
-    elif args.customscript == 'instructional_region_nsc':
-        instructional_region_nsc(args)
+    custom_scripts = {
+        'instructional_line_nsc' : instructional_line_nsc,
+        'instructional_line_sufficient' : instructional_line_sufficient,
+        'instructional_line_nsc_multiple' : instructional_line_nsc_multiple,
+        'instructional_region_sufficient' : instructional_region_sufficient,
+        'instructional_region_nsc' : instructional_region_nsc,
+    }
+
+    if args.customscript in custom_scripts:
+        custom_scripts[args.customscript](args)
     else:
+        print(f'Error: Unknown custom script {args.customscript}')
+        print(f'Possible scripts:')
+        for script in custom_scripts:
+            print(f'  {script}')
         raise Exception(f'Unknown custom script {args.customscript}')
