@@ -18,7 +18,8 @@ def log_args(args):
     logger.info(f'  Algorithm: {args.algorithm}')
     logger.info(f'  System: {args.system}')
     logger.info(f'  Parallel: {args.parallel}')
-    logger.info(f'  LogLevel: {args.loglevel}')
+    logger.info(f'  Log level: {args.loglevel}')
+    logger.info(f'  Custom script: {args.customscript}')
 
 
 def parse_cli_arguments():
@@ -55,7 +56,7 @@ def parse_cli_arguments():
     arg_parser.add_argument(
         '-c',
         '--customscript',
-        help='custom script',
+        help='custom script to be run',
         default='')
 
     args = arg_parser.parse_args()
