@@ -281,7 +281,16 @@ LINE_CONFIGURATIONS = {
         ticks=TickConfiguration(0.05, 0.1, 0.05, 0.1),
         language='serbian',
     ),
+
+    'test_system' : LineConfiguration(
+        system='test_system',
+        ncol=3,
+        width=COMMON_WIDTHS['single_column'],
+        height=COMMON_WIDTHS['single_column'] * W2H_RATIO,
+        bbox=(0, -0.17, 1, 0.1),
+    ),
 }
+
 
 REGION_CONFIGURATIONS = {
     'retarded1' : RegionConfiguration(
@@ -467,5 +476,13 @@ REGION_CONFIGURATIONS = {
         ncol=2,
         bbox=(0, -0.19, 1, 0.1),
         language='serbian'
+    ),
+
+    'test_system' : RegionConfiguration(
+        system='test_system',
+        ncol=3,
+        width=COMMON_WIDTHS['single_column'],
+        height=COMMON_WIDTHS['single_column'] * W2H_RATIO,
+        bbox=(0, -0.17, 1, 0.1),
     ),
 }

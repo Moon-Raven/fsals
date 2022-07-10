@@ -119,7 +119,7 @@ def create_figure_line(args):
     configure_ticks(ax, cfg)
 
     linewidth = 1
-    colors = {0: 'g', 2: 'darkred', 4: 'cornflowerblue', 6: 'orange', 8: 'mediumpurple'}
+    colors = {0: 'g', 1: 'pink', 2: 'darkred', 4: 'cornflowerblue', 6: 'orange', 8: 'mediumpurple'}
     nus = set()
 
     if cfg.ratios == None:
@@ -273,7 +273,7 @@ def add_polygon(ax, poly_boundary, style_string='g', fill=True):
 def create_figure_region(args):
     cfg = REGION_CONFIGURATIONS[args.system]
     data = read_data(args, cfg)
-    colors = {0: 'g', 2: 'darkred', 4: 'cornflowerblue', 6: 'orange', 8: 'mediumpurple'}
+    colors = {0: 'g', 1: 'pink', 2: 'darkred', 4: 'cornflowerblue', 6: 'orange', 8: 'mediumpurple'}
 
     set_general_parameters()
 

@@ -11,6 +11,7 @@ use crate::systems::semi_infinite_rod;
 use crate::systems::telegrapher_alpha_gamma;
 use crate::systems::telegrapher_x_k;
 use crate::systems::telegrapher_standard;
+use crate::systems::test_system;
 
 use crate::nu::ContourConfiguration;
 use crate::types::{Limits, Par, System};
@@ -346,6 +347,32 @@ lazy_static! {
             log_space_steps: 1_000,
             max_iter: Option::Some(12),
         });
+
+        configs.insert("test_system", RegionConfiguration {
+            name: "test_system",
+            system: test_system::SYSTEM,
+            limits: Limits { p1_min: 0.0, p1_max: 1.0, p2_min: 0.0, p2_max: 1.0 },
+            safeguard: 0.9,
+            check_obsoletion: false,
+            origins: vec![
+                (0.1, 0.1),
+                (0.9, 0.9),
+                ],
+            contour_conf: ContourConfiguration {
+                w_min: 1e-3,
+                w_max: 1e5,
+                steps: 1_000,
+                },
+            delta: Delta::Abs(1e-3),
+            spawn_count: 32,
+            enforce_limits: false,
+            lin_steps: 1_000,
+            log_space_minw: 1e-3,
+            log_space_maxw: 1e5,
+            log_space_steps: 10_000,
+            max_iter: Option::None,
+        });
+
 
         configs
     };

@@ -11,12 +11,11 @@ use crate::systems::semi_infinite_rod;
 use crate::systems::telegrapher_alpha_gamma;
 use crate::systems::telegrapher_x_k;
 use crate::systems::telegrapher_standard;
+use crate::systems::test_system;
 use crate::utils::geometry::Delta;
 
 use crate::nu::ContourConfiguration;
 use crate::types::{Limits, Par, System};
-
-
 
 
 pub struct LineConfiguration {
@@ -368,6 +367,31 @@ lazy_static! {
             log_space_maxw: 1e4,
             log_space_steps: 1_000,
             w_steps_linear: 2_000,
+        });
+
+        configs.insert("test_system", LineConfiguration {
+            name: "test_system",
+            system: test_system::SYSTEM,
+            limits: Limits { p1_min: 0.0, p1_max: 1.0, p2_min: 0.0, p2_max: 1.0 },
+            ray_count: 160,
+            corrective_ratio: Option::None,
+            safeguard: 0.90,
+            origins: vec![
+                // Region 1
+                (0.1, 0.1),
+                // Region 2
+                (0.9, 0.9),
+                ],
+            contour_conf: ContourConfiguration {
+                w_min: 1e-3,
+                w_max: 1e3,
+                steps: 1_000usize,
+                },
+            delta: Delta::Abs(1e-3),
+            log_space_minw: 1e-3,
+            log_space_maxw: 1e4,
+            log_space_steps: 10_000,
+            w_steps_linear: 10_000,
         });
 
         configs
