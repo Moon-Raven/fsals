@@ -12,7 +12,7 @@ use crate::utils::storage;
 pub fn run(args: &Args) {
     /* Check if necessary optional parameters were provided (a paradox, huh?) */
     let algorithm_option = &args.algorithm;
-    let algorithm = algorithm_option.as_ref().expect("data requires algorithm to be set");
+    let algorithm = algorithm_option.as_ref().expect("data command requires algorithm parameter");
 
     match algorithm {
          Algorithm::Line => line::run_line(args),

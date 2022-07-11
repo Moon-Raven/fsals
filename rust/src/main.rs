@@ -50,20 +50,20 @@ pub struct Args {
 
 #[derive(Subcommand, Debug)]
 pub enum Command {
-    /// Determines the number of unstable poles for the given system
+    /// Determine number of unstable poles for the given system using Cauchy's argument principle
     Nu,
-    /// Runs the specified algorithm
+    /// Run the specified algorithm
     Data,
-    /// Runs a custom snippet of Rust code
+    /// Run a custom snippet of Rust code
     Custom,
 }
 
 
 #[derive(Debug)]
 pub enum Algorithm {
-    /// Line algorithm
+    /// Line fsals algorithm
     Line,
-    /// Region algorithm
+    /// Region fsals algorithm
     Region,
 }
 
