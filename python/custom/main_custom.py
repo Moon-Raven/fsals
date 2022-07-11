@@ -4,21 +4,15 @@ import json
 from pathlib import Path
 
 import matplotlib.pyplot as plt
-import matplotlib as mpl
 from matplotlib.lines import Line2D
-import matplotlib.image as mpimg
 import numpy as np
-from PIL import Image, ImageDraw
-from matplotlib.offsetbox import TextArea, DrawingArea, OffsetImage, AnnotationBbox
 
 import python.utils.geometry as geometry
-import python.utils.storage as storage
-from python.figure.configurations import LINE_CONFIGURATIONS, REGION_CONFIGURATIONS
-from python.figure.configurations import LineConfiguration, TickConfiguration
+from python.figure.configurations import LineConfiguration
 from python.figure.configurations import RegionConfiguration
 from python.figure.main_figure import set_general_parameters, new_figure_inches
-from python.figure.main_figure import configure_ticks, add_rayfan_to_ax
-from python.figure.main_figure import ORIGIN_LABEL_LINE, get_ax_ratio, get_corners
+from python.figure.main_figure import configure_ticks
+from python.figure.main_figure import get_ax_ratio, get_corners
 from python.figure.main_figure import get_image_dimensions, get_drawable_canvas
 from python.figure.main_figure import corners2pixels
 
@@ -27,6 +21,7 @@ logger = logging.getLogger(__name__)
 
 
 def read_data(path):
+    """Read fsals results from storage."""
     data = None
 
     with open(path, 'r') as read_file:
@@ -39,6 +34,9 @@ def read_data(path):
 
 
 def instructional_line_nsc(args):
+    """Draw the complete line fsals algorithm."""
+
+    # Create a line configuration as a container for figure parameters
     figure_cfg = LineConfiguration(
         width=3.486429134,
         height=3.486429134 * 1.05,
@@ -149,6 +147,7 @@ def instructional_line_nsc(args):
 
 
 def instructional_line_nsc_multiple(args):
+    """Draw several steps of the fsals line algorithm."""
     figure_cfg = LineConfiguration(
         width=3.486429134,
         height=3.486429134 * 1.05,
@@ -263,6 +262,7 @@ def instructional_line_nsc_multiple(args):
 
 
 def instructional_line_sufficient(args):
+    """Draw a single sufficient step of the fsals line algorithm."""
     figure_cfg = LineConfiguration(
         width=3.486429134,
         height=3.486429134 * 1.05,
@@ -384,6 +384,7 @@ def add_pregions_to_ax(fig, ax, pregions, limits, color):
 
 
 def instructional_region_sufficient(args):
+    """Draw a single sufficient fsals region step."""
     data = read_data(f'output/data/region/pde_complex_instructional.data')
     cfg = RegionConfiguration(
         width=3.486429134,
@@ -455,6 +456,7 @@ def instructional_region_sufficient(args):
 
 
 def instructional_region_nsc(args):
+    """Draw step-by-step evolution of the region fsals algorithm."""
     data = read_data(f'output/data/region/pde_complex_instructional.data')
     cfg = RegionConfiguration(
         width=4.7747,
@@ -502,6 +504,7 @@ def instructional_region_nsc(args):
 
 
 def main(args):
+    """Run a python function pre-written to serve a non-generic fsals purpose."""
     logger.info(f'Running custom script {args.customscript}!')
 
     custom_scripts = {

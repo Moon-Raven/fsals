@@ -40,7 +40,8 @@ class FigureConfiguration:
                  'draw_origins', 'language', 'rust_configuration']
 
     def __init__(
-        self, rust_configuration, width, height, ncol, bbox,
+        self, width, height, ncol, bbox,
+        rust_configuration=None,
         custom_func=default_custom_func,
         draw_origins=True,
         ticks=None,
@@ -61,12 +62,21 @@ class LineConfiguration(FigureConfiguration):
     __slots__ = ['ratios']
 
     def __init__(
-        self, rust_configuration, width, height, ncol, bbox, ratios=None,
-        custom_func=default_custom_func, draw_origins=True, ticks=None, language='english'
+        self, width, height, ncol, bbox,
+        rust_configuration=None,
+        ratios=None,
+        custom_func=default_custom_func,
+        draw_origins=True,
+        ticks=None,
+        language='english'
     ):
         super().__init__(
-            rust_configuration, width, height, ncol, bbox, custom_func, draw_origins,
-            ticks=ticks, language=language
+            width, height, ncol, bbox,
+            rust_configuration=rust_configuration,
+            custom_func=custom_func,
+            draw_origins=draw_origins,
+            ticks=ticks,
+            language=language,
         )
         self.ratios = ratios
 
@@ -75,15 +85,20 @@ class RegionConfiguration(FigureConfiguration):
     __slots__ = []
 
     def __init__(
-        self, rust_configuration, width, height, ncol, bbox,
+        self, width, height, ncol, bbox,
+        rust_configuration=None,
         custom_func=default_custom_func,
         draw_origins=True,
         ticks=None,
         language='english',
     ):
         super().__init__(
-            rust_configuration, width, height, ncol, bbox, custom_func, draw_origins,
-            ticks=ticks, language=language
+            width, height, ncol, bbox,
+            rust_configuration=rust_configuration,
+            custom_func=custom_func,
+            draw_origins=draw_origins,
+            ticks=ticks,
+            language=language,
         )
 
 
