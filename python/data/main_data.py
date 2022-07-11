@@ -1,3 +1,4 @@
+"""This module invokes the rust subsystem for executing fsals algorithms."""
 import logging
 import subprocess
 from pathlib import Path

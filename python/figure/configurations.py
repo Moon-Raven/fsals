@@ -1,3 +1,4 @@
+"""Configurations for plotting fsals results on matplotlib figures."""
 from matplotlib.lines import Line2D
 
 import python.utils.comparison_methods.gu2005 as gu2005
@@ -22,6 +23,7 @@ COMMON_WIDTHS = {
 
 
 class TickConfiguration:
+    """Container for major and minor tick parameters of a matplotlib axes."""
     __slots__ = ['major_x', 'major_y', 'minor_x', 'minor_y']
 
     def __init__(self, major_x, major_y, minor_x, minor_y):
@@ -32,10 +34,12 @@ class TickConfiguration:
 
 
 def default_custom_func(ax, legend_handles, language='english'):
+    """Dummy custom axes modifier function (no behavior)."""
     return ax, legend_handles
 
 
 class FigureConfiguration:
+    """Parameters for creating a fsals results figure."""
     __slots__ = ['width', 'height', 'ticks', 'custom_func', 'ncol', 'bbox',
                  'draw_origins', 'language', 'rust_configuration']
 
@@ -59,6 +63,7 @@ class FigureConfiguration:
 
 
 class LineConfiguration(FigureConfiguration):
+    """Parameters for creating a line fsals results figure."""
     __slots__ = ['ratios']
 
     def __init__(
@@ -82,6 +87,8 @@ class LineConfiguration(FigureConfiguration):
 
 
 class RegionConfiguration(FigureConfiguration):
+    """Parameters for creating a region fsals results figure."""
+    __slots__ = ['ratios']
     __slots__ = []
 
     def __init__(
@@ -103,6 +110,7 @@ class RegionConfiguration(FigureConfiguration):
 
 
 def retarded1_custom_func(ax, legend_handles, language='english'):
+    """Add results from Gu2005 to given axes."""
     SCS_LABELS = {'english': 'SCS', 'serbian': 'SPS'}
     gu2005.add_gu2005_example1(ax)
     legend_handle = Line2D(
@@ -116,6 +124,7 @@ def retarded1_custom_func(ax, legend_handles, language='english'):
 
 
 def distributed_delay1_narrow_custom_func(ax, legend_handles, language='english'):
+    """Cut off portion of axes in order to hide uninteresting areas."""
     ax.set_xlim(0, 20.0)
     ax.set_ylim(0, 0.30)
     return ax, legend_handles

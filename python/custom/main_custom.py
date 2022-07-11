@@ -1,3 +1,4 @@
+"""Module for functions performing non-general and non-standard fsals actions."""
 import logging
 from types import SimpleNamespace
 import json

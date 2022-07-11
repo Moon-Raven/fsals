@@ -1,3 +1,14 @@
+"""This module contains facilities for applying Cauchy's argument principle.
+
+It may be useful to quickly investigate system stability with respect to
+system parameters without invoking fsals.
+This module contains facilities for doing so by applying the Cauchy's argument principle
+to equidistant parametric points.
+Such analysis is not robust, but provides a rough sketch of the stability/instability
+regions.
+The results are visualized on a matplotlib figure, which is stored in the
+output directory.
+"""
 import logging
 import subprocess
 import contextlib
@@ -14,7 +25,7 @@ logger = logging.getLogger(__name__)
 
 
 def calculate_nu(args):
-    """ Invoke rust subsystem to calculate nu for given configuration. """
+    """Invoke rust subsystem to calculate nu for given configuration."""
 
     rust_args = rust_utils.build_rust_command(args)
     logger.info(f'Invoking Rust subsystem for nu')
@@ -30,7 +41,7 @@ def calculate_nu(args):
 
 
 def nu2color(nu):
-    """ Determine the color of the number for this nu. """
+    """Determine the color of the number for this nu."""
 
     COLOR_MAX = 255
     COLOR_MID = 128
@@ -53,7 +64,7 @@ def nu2color(nu):
 
 
 def create_figure(args):
-    """ Visualize nu data on a new figure. """
+    """Visualize nu data on a new figure."""
 
     nu_results = None
 
@@ -84,7 +95,7 @@ def create_figure(args):
 
 
 def main(args):
-    """ Calculate, visualize and store nu for given configuration. """
+    """Calculate, visualize and store nu for given configuration."""
     calculate_nu(args)
     fig = create_figure(args)
     extension = 'pdf'

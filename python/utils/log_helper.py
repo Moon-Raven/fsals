@@ -1,8 +1,9 @@
+"""This module initializes and partially provides logging facilities."""
 import logging
 import sys
 from pathlib import Path
 import os
-from datetime import datetime, time
+from datetime import datetime
 
 
 LOG_DIRNAME = 'log'
@@ -11,6 +12,7 @@ LOG_FILENAME_EXTENSION = '.txt'
 
 
 def get_formatter():
+    """Get formatter to be used for generating log entries."""
     datefmt = '%H:%M:%S'
 
     level_str = '[%(levelname)s]'
@@ -24,6 +26,7 @@ def get_formatter():
 
 
 def get_log_filename():
+    """Get timestamped filename for a new log file."""
     format = '%y-%m-%d-%Hh-%Mm-%Ss'
     timestamp = datetime.now().strftime(format)
     log_filename = LOG_FILENAME_BASE + '_' + timestamp + LOG_FILENAME_EXTENSION
@@ -32,6 +35,7 @@ def get_log_filename():
 
 
 def str2loglevel(loglevel_str):
+    """Convert string version of a log level to an enumeration from the logging module."""
     if loglevel_str == 'debug':
         return logging.DEBUG
     elif loglevel_str == 'info':
@@ -45,6 +49,7 @@ def str2loglevel(loglevel_str):
 
 
 def init_logging(loglevel_str='info'):
+    """Initialize logging."""
     loglevel = str2loglevel(loglevel_str)
     Path(LOG_DIRNAME).mkdir(parents=True, exist_ok=True)
     formatter = get_formatter()

@@ -1,3 +1,4 @@
+"""This module contains 2D geometric facilities."""
 import numpy as np
 
 

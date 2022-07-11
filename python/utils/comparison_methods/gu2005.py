@@ -1,3 +1,7 @@
+"""Calculate the stability of system retarded1 using the Gu2005 method.
+
+For more information about the method, see https://doi.org/10.1016/j.jmaa.2005.02.034.
+"""
 import logging
 
 import numpy as np

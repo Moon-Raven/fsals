@@ -1,3 +1,4 @@
+"""This module contains facilities for plotting fsals results on matplotlib figures."""
 import logging
 from types import SimpleNamespace
 import json

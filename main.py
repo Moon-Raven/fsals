@@ -1,3 +1,4 @@
+"""This module is the entry point for all fsals-related facilities."""
 import argparse
 import logging
 import time
@@ -13,6 +14,7 @@ logger = None
 
 
 def log_args(args):
+    """Log arguments passed to the script."""
     logger.info('Running script with following parameters:')
     logger.info(f'  Command: {args.command}')
     logger.info(f'  Algorithm: {args.algorithm}')
@@ -23,6 +25,7 @@ def log_args(args):
 
 
 def parse_cli_arguments():
+    """Parse command-line arguments."""
     arg_parser = argparse.ArgumentParser()
 
     arg_parser.add_argument(
@@ -72,6 +75,7 @@ def parse_cli_arguments():
 
 
 def main():
+    """Parse command-line arguments and invoke the corresponding subsystem."""
     global logger
 
     start = time.monotonic()

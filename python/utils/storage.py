@@ -1,3 +1,4 @@
+"""This module contains facilities for saving figures to files."""
 from pathlib import Path
 from shutil import copyfile
 
