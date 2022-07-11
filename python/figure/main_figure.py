@@ -92,65 +92,6 @@ def add_rayfan_to_ax(ax, rayfan, linecolor, linewidth, ratio, origins=False):
                 clip_on=False, markersize=ORIGIN_MARKERSIZE)
 
 
-def create_figure_line(args):
-    """Visualize fsals line results from file on a figure."""
-    cfg = LINE_CONFIGURATIONS[args.configuration]
-    data = storage.read_data(args, cfg)
-
-    set_general_parameters()
-
-    # Fetch figure
-    tight = False
-    constrained = True
-    width, height = cfg.width, cfg.height
-    fig, ax = new_figure_inches(width, height, tight, constrained)
-
-    # Configure axes
-    ax.set_xlim(data.limits.p1_min, data.limits.p1_max)
-    ax.set_ylim(data.limits.p2_min, data.limits.p2_max)
-    ax.set_xlabel(f'${data.parameters[0]}$')
-    ax.set_ylabel(f'${data.parameters[1]}$')
-    ax.xaxis.labelpad = 0
-    ax.yaxis.labelpad = 0
-    configure_ticks(ax, cfg)
-
-    linewidth = 1
-    nus = set()
-
-    if cfg.ratios == None:
-        ratios = [1] * len(data.rayfans)
-    else:
-        ratios = cfg.ratios
-
-    for rayfan, ratio in zip(data.rayfans, ratios):
-        nu = rayfan.nu
-        nus.add(nu)
-        color = COLORS[nu]
-        logging.debug(f'Taking color {color} for nu {nu}')
-        add_rayfan_to_ax(ax, rayfan, color, linewidth, ratio, cfg.draw_origins)
-
-    # Prepare regular legend labels
-    nus = sorted(list(nus))
-    legend_handles = [
-        Line2D([0], [0], color=COLORS[nu], label=f'$NU_f$ = {nu}') for nu in nus
-    ]
-
-    # Add origin label, if necessary
-    if cfg.draw_origins:
-        origin_handle = Line2D([0], [0], color='black', linestyle='None',
-            markersize=4, marker='X', label=ORIGIN_LABEL_LINE[cfg.language]),
-        legend_handles.insert(0, *origin_handle)
-
-    # Call custom drawing actions for given system
-    ax, legend_handles = cfg.custom_func(ax, legend_handles, cfg.language)
-
-    # Draw the legend
-    ax.legend(handles=legend_handles, loc='upper left', frameon=False,
-              bbox_to_anchor=cfg.bbox, mode='expand', ncol=cfg.ncol)
-
-    return fig
-
-
 def get_ax_ratio(fig, ax):
     """Get heigth / width ratio of given axes"""
     bbox = ax.get_window_extent().transformed(fig.dpi_scale_trans.inverted())
@@ -185,6 +126,12 @@ def add_origins_to_ax(ax, regions):
     """Draw region origins on given axes."""
     for region in regions:
         add_origin_to_ax(ax, region.origin)
+
+
+def add_origin_to_ax(ax, origin):
+    """Draw origin to given axes."""
+    ax.plot(origin[0], origin[1], ORIGIN_MARKERSTYLE, color=ORIGIN_MARKERCOLOR,
+            clip_on=False, markersize=ORIGIN_MARKERSIZE)
 
 
 def get_corners(pregion):
@@ -260,18 +207,71 @@ def add_pregion_to_ax(ax, pregion, color, fill=True):
     add_polygon(ax, region_boundary, color, fill)
 
 
-def add_origin_to_ax(ax, origin):
-    """Draw origin to given axes."""
-    ax.plot(origin[0], origin[1], ORIGIN_MARKERSTYLE, color=ORIGIN_MARKERCOLOR,
-            clip_on=False, markersize=ORIGIN_MARKERSIZE)
-
-
 def add_polygon(ax, poly_boundary, style_string='g', fill=True):
     """Draw polygon to given axes."""
     if fill:
         ax.fill(poly_boundary[0,:], poly_boundary[1,:], style_string, rasterized=True)
     else:
         ax.plot(poly_boundary[0,:], poly_boundary[1,:], style_string)
+
+
+def create_figure_line(args):
+    """Visualize fsals line results from file on a figure."""
+    cfg = LINE_CONFIGURATIONS[args.configuration]
+    data = storage.read_data(args, cfg)
+
+    set_general_parameters()
+
+    # Fetch figure
+    tight = False
+    constrained = True
+    width, height = cfg.width, cfg.height
+    fig, ax = new_figure_inches(width, height, tight, constrained)
+
+    # Configure axes
+    ax.set_xlim(data.limits.p1_min, data.limits.p1_max)
+    ax.set_ylim(data.limits.p2_min, data.limits.p2_max)
+    ax.set_xlabel(f'${data.parameters[0]}$')
+    ax.set_ylabel(f'${data.parameters[1]}$')
+    ax.xaxis.labelpad = 0
+    ax.yaxis.labelpad = 0
+    configure_ticks(ax, cfg)
+
+    linewidth = 1
+    nus = set()
+
+    if cfg.ratios == None:
+        ratios = [1] * len(data.rayfans)
+    else:
+        ratios = cfg.ratios
+
+    for rayfan, ratio in zip(data.rayfans, ratios):
+        nu = rayfan.nu
+        nus.add(nu)
+        color = COLORS[nu]
+        logging.debug(f'Taking color {color} for nu {nu}')
+        add_rayfan_to_ax(ax, rayfan, color, linewidth, ratio, cfg.draw_origins)
+
+    # Prepare regular legend labels
+    nus = sorted(list(nus))
+    legend_handles = [
+        Line2D([0], [0], color=COLORS[nu], label=f'$NU_f$ = {nu}') for nu in nus
+    ]
+
+    # Add origin label, if necessary
+    if cfg.draw_origins:
+        origin_handle = Line2D([0], [0], color='black', linestyle='None',
+            markersize=4, marker='X', label=ORIGIN_LABEL_LINE[cfg.language]),
+        legend_handles.insert(0, *origin_handle)
+
+    # Call custom drawing actions for given system
+    ax, legend_handles = cfg.custom_func(ax, legend_handles, cfg.language)
+
+    # Draw the legend
+    ax.legend(handles=legend_handles, loc='upper left', frameon=False,
+              bbox_to_anchor=cfg.bbox, mode='expand', ncol=cfg.ncol)
+
+    return fig
 
 
 def create_figure_region(args):
