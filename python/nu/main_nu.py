@@ -51,7 +51,7 @@ def nu2color(nu):
 def create_figure(args):
     nu_results = None
 
-    with open(f'output/nu/temp_data/{args.system}.nudata', 'r') as read_file:
+    with open(f'output/nu/temp_data/{args.configuration}.nudata', 'r') as read_file:
         nu_results = json.load(read_file, object_hook=lambda d: SimpleNamespace(**d))
 
     if nu_results == None:
@@ -81,4 +81,4 @@ def main(args):
     calculate_nu(args)
     fig = create_figure(args)
     extension = 'pdf'
-    storage.save_figure(args, fig, 'nu', 'figures', extension)
+    storage.save_figure(args, fig, 'nu', 'figure', extension)

@@ -348,8 +348,8 @@ lazy_static! {
             max_iter: Option::Some(12),
         });
 
-        configs.insert("test_system", RegionConfiguration {
-            name: "test_system",
+        configs.insert("test_configuration", RegionConfiguration {
+            name: "test_configuration",
             system: test_system::SYSTEM,
             limits: Limits { p1_min: 0.0, p1_max: 1.0, p2_min: 0.0, p2_max: 1.0 },
             safeguard: 0.9,

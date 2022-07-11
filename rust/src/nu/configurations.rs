@@ -238,9 +238,9 @@ lazy_static! {
         );
 
         configs.insert(
-            "test_system",
+            "test_configuration",
             NuConfiguration {
-                name: "test_system",
+                name: "test_configuration",
                 system: test_system::SYSTEM,
                 contour_conf: ContourConfiguration {
                     w_min: 1e-3,

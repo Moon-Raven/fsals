@@ -3,7 +3,7 @@ from matplotlib.lines import Line2D
 import python.utils.comparison_methods.gu2005 as gu2005
 
 
-# Factor used to get height as slightly larger than width
+# Factors used to get height as slightly larger than width
 W2H_RATIO = 1.1    # Because extra legend rows destroy ratio
 PDE_W2HRATIO = 1.1 # Because extra legend rows destroy ratio
 ROD_W2HRATIO = 1.0 # Because there are no extra legend rows to destroy ratio
@@ -37,13 +37,16 @@ def default_custom_func(ax, legend_handles, language='english'):
 
 class FigureConfiguration:
     __slots__ = ['width', 'height', 'ticks', 'custom_func', 'ncol', 'bbox',
-                 'draw_origins', 'language', 'system']
+                 'draw_origins', 'language', 'rust_configuration']
 
     def __init__(
-        self, system, width, height, ncol, bbox, custom_func=default_custom_func,
-        draw_origins=True, ticks=None, language='english'
+        self, rust_configuration, width, height, ncol, bbox,
+        custom_func=default_custom_func,
+        draw_origins=True,
+        ticks=None,
+        language='english',
     ):
-        self.system = system
+        self.rust_configuration = rust_configuration
         self.width = width
         self.height = height
         self.ticks = ticks
@@ -58,11 +61,11 @@ class LineConfiguration(FigureConfiguration):
     __slots__ = ['ratios']
 
     def __init__(
-        self, system, width, height, ncol, bbox, ratios=None,
+        self, rust_configuration, width, height, ncol, bbox, ratios=None,
         custom_func=default_custom_func, draw_origins=True, ticks=None, language='english'
     ):
         super().__init__(
-            system, width, height, ncol, bbox, custom_func, draw_origins,
+            rust_configuration, width, height, ncol, bbox, custom_func, draw_origins,
             ticks=ticks, language=language
         )
         self.ratios = ratios
@@ -72,11 +75,14 @@ class RegionConfiguration(FigureConfiguration):
     __slots__ = []
 
     def __init__(
-        self, system, width, height, ncol, bbox, custom_func=default_custom_func,
-        draw_origins=True, ticks=None, language='english'
+        self, rust_configuration, width, height, ncol, bbox,
+        custom_func=default_custom_func,
+        draw_origins=True,
+        ticks=None,
+        language='english',
     ):
         super().__init__(
-            system, width, height, ncol, bbox, custom_func, draw_origins,
+            rust_configuration, width, height, ncol, bbox, custom_func, draw_origins,
             ticks=ticks, language=language
         )
 
@@ -102,7 +108,7 @@ def distributed_delay1_narrow_custom_func(ax, legend_handles, language='english'
 
 LINE_CONFIGURATIONS = {
     'retarded1' : LineConfiguration(
-        system='retarded1',
+        rust_configuration='retarded1',
         width=COMMON_WIDTHS['single_column'],
         height=COMMON_WIDTHS['single_column'] * W2H_RATIO,
         ticks=TickConfiguration(1, 1, 0.25, 0.25),
@@ -113,7 +119,7 @@ LINE_CONFIGURATIONS = {
     ),
 
     'retarded1_thesis' : LineConfiguration(
-        system='retarded1',
+        rust_configuration='retarded1',
         width=COMMON_WIDTHS['single_column'],
         height=COMMON_WIDTHS['single_column'] * W2H_RATIO,
         ticks=TickConfiguration(1, 1, 0.25, 0.25),
@@ -125,7 +131,7 @@ LINE_CONFIGURATIONS = {
     ),
 
     'distributed_delay1' : LineConfiguration(
-        system='distributed_delay1',
+        rust_configuration='distributed_delay1',
         width=COMMON_WIDTHS['double_column'],
         height=COMMON_WIDTHS['single_column'],
         ticks=TickConfiguration(1, 1, 0.25, 0.25),
@@ -134,7 +140,7 @@ LINE_CONFIGURATIONS = {
     ),
 
     'distributed_delay1_thesis' : LineConfiguration(
-        system='distributed_delay1',
+        rust_configuration='distributed_delay1',
         width=4.7747,
         height=4.7747 / 3,
         ticks=TickConfiguration(2, 0.1, 1, 0.05),
@@ -144,7 +150,7 @@ LINE_CONFIGURATIONS = {
     ),
 
     'pde_complex_k_sigma' : LineConfiguration(
-        system='pde_complex_k_sigma',
+        rust_configuration='pde_complex_k_sigma',
         width=COMMON_WIDTHS['triple_subfigure'],
         height=COMMON_WIDTHS['triple_subfigure'] * PDE_W2HRATIO,
         ncol=1,
@@ -152,7 +158,7 @@ LINE_CONFIGURATIONS = {
     ),
 
     'pde_complex_k_sigma_thesis' : LineConfiguration(
-        system='pde_complex_k_sigma',
+        rust_configuration='pde_complex_k_sigma',
         width=COMMON_WIDTHS['thesis_standard'],
         height=COMMON_WIDTHS['thesis_standard'] * 1.05,
         ncol=3,
@@ -161,7 +167,7 @@ LINE_CONFIGURATIONS = {
     ),
 
     'pde_complex_beta_sigma' : LineConfiguration(
-        system='pde_complex_beta_sigma',
+        rust_configuration='pde_complex_beta_sigma',
         width=COMMON_WIDTHS['triple_subfigure'],
         height=COMMON_WIDTHS['triple_subfigure'] * PDE_W2HRATIO,
         ncol=1,
@@ -169,7 +175,7 @@ LINE_CONFIGURATIONS = {
     ),
 
     'pde_complex_beta_sigma_thesis' : LineConfiguration(
-        system='pde_complex_beta_sigma',
+        rust_configuration='pde_complex_beta_sigma',
         width=COMMON_WIDTHS['thesis_standard'],
         height=COMMON_WIDTHS['thesis_standard'],
         ncol=3,
@@ -178,7 +184,7 @@ LINE_CONFIGURATIONS = {
     ),
 
     'pde_complex_tau_sigma' : LineConfiguration(
-        system='pde_complex_tau_sigma',
+        rust_configuration='pde_complex_tau_sigma',
         width=COMMON_WIDTHS['triple_subfigure'],
         height=COMMON_WIDTHS['triple_subfigure'] * PDE_W2HRATIO,
         ncol=2,
@@ -186,7 +192,7 @@ LINE_CONFIGURATIONS = {
     ),
 
     'pde_complex_tau_sigma_instructional' : LineConfiguration(
-        system='pde_complex_tau_sigma_instructional',
+        rust_configuration='pde_complex_tau_sigma_instructional',
         width=COMMON_WIDTHS['single_column'],
         height=COMMON_WIDTHS['single_column'] * PDE_W2HRATIO,
         language='serbian',
@@ -195,7 +201,7 @@ LINE_CONFIGURATIONS = {
     ),
 
     'telegrapher_x_k' : LineConfiguration(
-        system='telegrapher_x_k',
+        rust_configuration='telegrapher_x_k',
         width=COMMON_WIDTHS['double_subfigure'],
         height=COMMON_WIDTHS['double_subfigure'] * TELEGRAPHER_X_K_W2HRATIO,
         ncol=3,
@@ -203,7 +209,7 @@ LINE_CONFIGURATIONS = {
     ),
 
     'telegrapher_x_k_thesis' : LineConfiguration(
-        system='telegrapher_x_k',
+        rust_configuration='telegrapher_x_k',
         width=COMMON_WIDTHS['thesis_standard'],
         height=COMMON_WIDTHS['thesis_standard'] * 1.05,
         ncol=3,
@@ -212,7 +218,7 @@ LINE_CONFIGURATIONS = {
     ),
 
     'telegrapher_alpha_gamma' : LineConfiguration(
-        system='telegrapher_alpha_gamma',
+        rust_configuration='telegrapher_alpha_gamma',
         width=COMMON_WIDTHS['double_subfigure'],
         height=COMMON_WIDTHS['double_subfigure'] * TELEGRAPHER_ALPHA_GAMMA_W2HRATIO,
         ncol=3,
@@ -220,7 +226,7 @@ LINE_CONFIGURATIONS = {
     ),
 
     'telegrapher_alpha_gamma_thesis' : LineConfiguration(
-        system='telegrapher_alpha_gamma',
+        rust_configuration='telegrapher_alpha_gamma',
         width=COMMON_WIDTHS['thesis_standard'],
         height=COMMON_WIDTHS['thesis_standard'] * 1.05,
         ncol=3,
@@ -229,7 +235,7 @@ LINE_CONFIGURATIONS = {
     ),
 
     'semi_infinite_rod' : LineConfiguration(
-        system='semi_infinite_rod',
+        rust_configuration='semi_infinite_rod',
         width=COMMON_WIDTHS['triple_subfigure'],
         height=COMMON_WIDTHS['triple_subfigure'] * ROD_W2HRATIO,
         ncol=2,
@@ -237,7 +243,7 @@ LINE_CONFIGURATIONS = {
     ),
 
     'semi_infinite_rod_thesis' : LineConfiguration(
-        system='semi_infinite_rod',
+        rust_configuration='semi_infinite_rod',
         width=COMMON_WIDTHS['thesis_standard'],
         height=COMMON_WIDTHS['thesis_standard'],
         ncol=3,
@@ -246,7 +252,7 @@ LINE_CONFIGURATIONS = {
     ),
 
     'finite_rod' : LineConfiguration(
-        system='finite_rod',
+        rust_configuration='finite_rod',
         width=COMMON_WIDTHS['triple_subfigure'],
         height=COMMON_WIDTHS['triple_subfigure'] * ROD_W2HRATIO,
         ncol=2,
@@ -255,7 +261,7 @@ LINE_CONFIGURATIONS = {
     ),
 
     'finite_rod_thesis' : LineConfiguration(
-        system='finite_rod',
+        rust_configuration='finite_rod',
         width=COMMON_WIDTHS['thesis_standard'],
         height=COMMON_WIDTHS['thesis_standard'],
         ncol=3,
@@ -264,7 +270,7 @@ LINE_CONFIGURATIONS = {
     ),
 
     'telegrapher_standard' : LineConfiguration(
-        system='telegrapher_standard',
+        rust_configuration='telegrapher_standard',
         width=COMMON_WIDTHS['triple_subfigure'],
         height=COMMON_WIDTHS['triple_subfigure'] * ROD_W2HRATIO,
         ncol=2,
@@ -273,7 +279,7 @@ LINE_CONFIGURATIONS = {
     ),
 
     'telegrapher_standard_thesis' : LineConfiguration(
-        system='telegrapher_standard',
+        rust_configuration='telegrapher_standard',
         width=COMMON_WIDTHS['thesis_standard'],
         height=COMMON_WIDTHS['thesis_standard'],
         ncol=3,
@@ -282,8 +288,8 @@ LINE_CONFIGURATIONS = {
         language='serbian',
     ),
 
-    'test_system' : LineConfiguration(
-        system='test_system',
+    'test_configuration' : LineConfiguration(
+        rust_configuration='test_configuration',
         ncol=3,
         width=COMMON_WIDTHS['single_column'],
         height=COMMON_WIDTHS['single_column'] * W2H_RATIO,
@@ -294,7 +300,7 @@ LINE_CONFIGURATIONS = {
 
 REGION_CONFIGURATIONS = {
     'retarded1' : RegionConfiguration(
-        system='retarded1',
+        rust_configuration='retarded1',
         width=COMMON_WIDTHS['single_column'],
         height=COMMON_WIDTHS['single_column'] * W2H_RATIO,
         ticks=TickConfiguration(1, 1, 0.25, 0.25),
@@ -304,7 +310,7 @@ REGION_CONFIGURATIONS = {
     ),
 
     'retarded1_thesis' : RegionConfiguration(
-        system='retarded1',
+        rust_configuration='retarded1',
         width=COMMON_WIDTHS['single_column'],
         height=COMMON_WIDTHS['single_column'] * W2H_RATIO,
         ticks=TickConfiguration(1, 1, 0.25, 0.25),
@@ -315,7 +321,7 @@ REGION_CONFIGURATIONS = {
     ),
 
     'distributed_delay1' : RegionConfiguration(
-        system='distributed_delay1',
+        rust_configuration='distributed_delay1',
         width=COMMON_WIDTHS['double_column'],
         height=COMMON_WIDTHS['single_column'],
         ticks=TickConfiguration(1, 0.5, 0.25, 0.25),
@@ -324,7 +330,7 @@ REGION_CONFIGURATIONS = {
     ),
 
     'distributed_delay1_narrow' : RegionConfiguration(
-        system='distributed_delay1',
+        rust_configuration='distributed_delay1',
         width=COMMON_WIDTHS['single_column'],
         height=COMMON_WIDTHS['single_column'] * W2H_RATIO,
         ticks=TickConfiguration(5, 0.1, 1, 0.05),
@@ -334,7 +340,7 @@ REGION_CONFIGURATIONS = {
     ),
 
     'distributed_delay1_thesis' : RegionConfiguration(
-        system='distributed_delay1',
+        rust_configuration='distributed_delay1',
         width=4.7747,
         height=4.7747 / 3,
         ticks=TickConfiguration(2, 0.1, 1, 0.05),
@@ -344,7 +350,7 @@ REGION_CONFIGURATIONS = {
     ),
 
     'pde_complex_k_sigma' : RegionConfiguration(
-        system='pde_complex_k_sigma',
+        rust_configuration='pde_complex_k_sigma',
         width=COMMON_WIDTHS['triple_subfigure'],
         height=COMMON_WIDTHS['triple_subfigure'] * PDE_W2HRATIO,
         ncol=1,
@@ -352,7 +358,7 @@ REGION_CONFIGURATIONS = {
     ),
 
     'pde_complex_k_sigma_thesis' : RegionConfiguration(
-        system='pde_complex_k_sigma',
+        rust_configuration='pde_complex_k_sigma',
         width=COMMON_WIDTHS['thesis_standard'],
         height=COMMON_WIDTHS['thesis_standard'],
         ncol=3,
@@ -361,7 +367,7 @@ REGION_CONFIGURATIONS = {
     ),
 
     'pde_complex_beta_sigma' : RegionConfiguration(
-        system='pde_complex_beta_sigma',
+        rust_configuration='pde_complex_beta_sigma',
         width=COMMON_WIDTHS['triple_subfigure'],
         height=COMMON_WIDTHS['triple_subfigure'] * PDE_W2HRATIO,
         ncol=1,
@@ -369,7 +375,7 @@ REGION_CONFIGURATIONS = {
     ),
 
     'pde_complex_beta_sigma_thesis' : RegionConfiguration(
-        system='pde_complex_beta_sigma',
+        rust_configuration='pde_complex_beta_sigma',
         width=COMMON_WIDTHS['thesis_standard'],
         height=COMMON_WIDTHS['thesis_standard'],
         ncol=3,
@@ -378,7 +384,7 @@ REGION_CONFIGURATIONS = {
     ),
 
     'pde_complex_tau_sigma' : RegionConfiguration(
-        system='pde_complex_tau_sigma',
+        rust_configuration='pde_complex_tau_sigma',
         width=COMMON_WIDTHS['triple_subfigure'],
         height=COMMON_WIDTHS['triple_subfigure'] * PDE_W2HRATIO,
         ncol=2,
@@ -386,7 +392,7 @@ REGION_CONFIGURATIONS = {
     ),
 
     'telegrapher_x_k' : RegionConfiguration(
-        system='telegrapher_x_k',
+        rust_configuration='telegrapher_x_k',
         width=COMMON_WIDTHS['double_subfigure'],
         height=COMMON_WIDTHS['double_subfigure'] * TELEGRAPHER_X_K_W2HRATIO,
         ncol=3,
@@ -394,7 +400,7 @@ REGION_CONFIGURATIONS = {
     ),
 
     'telegrapher_x_k_thesis' : RegionConfiguration(
-        system='telegrapher_x_k',
+        rust_configuration='telegrapher_x_k',
         width=COMMON_WIDTHS['thesis_standard'],
         height=COMMON_WIDTHS['thesis_standard'] * 1.05,
         ncol=3,
@@ -403,7 +409,7 @@ REGION_CONFIGURATIONS = {
     ),
 
      'telegrapher_alpha_gamma' : RegionConfiguration(
-        system='telegrapher_alpha_gamma',
+        rust_configuration='telegrapher_alpha_gamma',
         width=COMMON_WIDTHS['double_subfigure'],
         height=COMMON_WIDTHS['double_subfigure'] * TELEGRAPHER_ALPHA_GAMMA_W2HRATIO,
         ncol=3,
@@ -411,7 +417,7 @@ REGION_CONFIGURATIONS = {
     ),
 
     'telegrapher_alpha_gamma_thesis' : RegionConfiguration(
-        system='telegrapher_alpha_gamma',
+        rust_configuration='telegrapher_alpha_gamma',
         width=COMMON_WIDTHS['thesis_standard'],
         height=COMMON_WIDTHS['thesis_standard'] * 1.05,
         ncol=3,
@@ -420,7 +426,7 @@ REGION_CONFIGURATIONS = {
     ),
 
     'semi_infinite_rod' : RegionConfiguration(
-        system='semi_infinite_rod',
+        rust_configuration='semi_infinite_rod',
         width=COMMON_WIDTHS['triple_subfigure'],
         height=COMMON_WIDTHS['triple_subfigure'] * ROD_W2HRATIO,
         ncol=2,
@@ -428,7 +434,7 @@ REGION_CONFIGURATIONS = {
     ),
 
     'semi_infinite_rod_thesis' : RegionConfiguration(
-        system='semi_infinite_rod',
+        rust_configuration='semi_infinite_rod',
         width=COMMON_WIDTHS['thesis_standard'],
         height=COMMON_WIDTHS['thesis_standard'],
         ncol=3,
@@ -437,7 +443,7 @@ REGION_CONFIGURATIONS = {
     ),
 
     'finite_rod' : RegionConfiguration(
-        system='finite_rod',
+        rust_configuration='finite_rod',
         width=COMMON_WIDTHS['triple_subfigure'],
         height=COMMON_WIDTHS['triple_subfigure'] * ROD_W2HRATIO,
         ncol=2,
@@ -445,7 +451,7 @@ REGION_CONFIGURATIONS = {
     ),
 
     'finite_rod_thesis' : RegionConfiguration(
-        system='finite_rod',
+        rust_configuration='finite_rod',
         width=COMMON_WIDTHS['thesis_standard'],
         height=COMMON_WIDTHS['thesis_standard'],
         ncol=3,
@@ -453,7 +459,7 @@ REGION_CONFIGURATIONS = {
     ),
 
     'telegrapher_standard' : RegionConfiguration(
-        system='telegrapher_standard',
+        rust_configuration='telegrapher_standard',
         width=COMMON_WIDTHS['triple_subfigure'],
         height=COMMON_WIDTHS['triple_subfigure'] * ROD_W2HRATIO,
         ncol=2,
@@ -461,7 +467,7 @@ REGION_CONFIGURATIONS = {
     ),
 
     'telegrapher_standard_thesis' : RegionConfiguration(
-        system='telegrapher_standard',
+        rust_configuration='telegrapher_standard',
         width=COMMON_WIDTHS['thesis_standard'],
         height=COMMON_WIDTHS['thesis_standard'],
         ncol=3,
@@ -470,7 +476,7 @@ REGION_CONFIGURATIONS = {
     ),
 
     'pde_complex_instructional' : RegionConfiguration(
-        system='pde_complex_tau_sigma',
+        rust_configuration='pde_complex_tau_sigma',
         width=COMMON_WIDTHS['single_column'],
         height=COMMON_WIDTHS['single_column'] * PDE_W2HRATIO,
         ncol=2,
@@ -478,8 +484,8 @@ REGION_CONFIGURATIONS = {
         language='serbian'
     ),
 
-    'test_system' : RegionConfiguration(
-        system='test_system',
+    'test_configuration' : RegionConfiguration(
+        rust_configuration='test_configuration',
         ncol=3,
         width=COMMON_WIDTHS['single_column'],
         height=COMMON_WIDTHS['single_column'] * W2H_RATIO,

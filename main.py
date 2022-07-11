@@ -16,7 +16,7 @@ def log_args(args):
     logger.info('Running script with following parameters:')
     logger.info(f'  Command: {args.command}')
     logger.info(f'  Algorithm: {args.algorithm}')
-    logger.info(f'  System: {args.system}')
+    logger.info(f'  Configuration: {args.configuration}')
     logger.info(f'  Parallel: {args.parallel}')
     logger.info(f'  Log level: {args.loglevel}')
     logger.info(f'  Custom script: {args.customscript}')
@@ -30,34 +30,42 @@ def parse_cli_arguments():
         metavar='command',
         type=str,
         help='command to run',
-        choices=['data', 'figure', 'nu', 'custom'])
+        choices=['data', 'figure', 'nu', 'custom'],
+    )
 
-    arg_parser.add_argument('-s', '--system', help='system to analyze')
+    arg_parser.add_argument(
+        '-c',
+        '--configuration',
+        help='configuration to be run',
+    )
 
     arg_parser.add_argument(
         '-a',
         '--algorithm',
         help='algorithm to run',
-        choices=['line', 'region'])
+        choices=['line', 'region'],
+    )
 
     arg_parser.add_argument(
         '-p',
         '--parallel',
         action='store_true',
-        help='parellelize code execution')
+        help='parellelize code execution',
+    )
 
     arg_parser.add_argument(
         '-l',
         '--loglevel',
         help='logging level',
         choices=['debug', 'info', 'warn', 'error'],
-        default='info')
+        default='info',
+    )
 
     arg_parser.add_argument(
-        '-c',
         '--customscript',
         help='custom script to be run',
-        default='')
+        default='',
+    )
 
     args = arg_parser.parse_args()
     return args

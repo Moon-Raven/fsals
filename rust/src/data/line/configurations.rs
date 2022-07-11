@@ -12,8 +12,8 @@ use crate::systems::telegrapher_alpha_gamma;
 use crate::systems::telegrapher_x_k;
 use crate::systems::telegrapher_standard;
 use crate::systems::test_system;
-use crate::utils::geometry::Delta;
 
+use crate::utils::geometry::Delta;
 use crate::nu::ContourConfiguration;
 use crate::types::{Limits, Par, System};
 
@@ -369,8 +369,8 @@ lazy_static! {
             w_steps_linear: 2_000,
         });
 
-        configs.insert("test_system", LineConfiguration {
-            name: "test_system",
+        configs.insert("test_configuration", LineConfiguration {
+            name: "test_configuration",
             system: test_system::SYSTEM,
             limits: Limits { p1_min: 0.0, p1_max: 1.0, p2_min: 0.0, p2_max: 1.0 },
             ray_count: 160,

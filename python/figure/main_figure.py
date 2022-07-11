@@ -45,7 +45,7 @@ def new_figure_inches(width, height, tight=True, constrained_layout=False):
 def read_data(args, conf):
     data = None
 
-    path = f'output/data/{args.algorithm}/{conf.system}.data'
+    path = f'output/data/{args.algorithm}/{conf.rust_configuration}.data'
     with open(path, 'r') as read_file:
         logging.info(f'Reading data from {path}')
         data = json.load(read_file, object_hook=lambda d: SimpleNamespace(**d))
@@ -98,7 +98,7 @@ def add_rayfan_to_ax(ax, rayfan, linecolor, linewidth, ratio, origins=False):
 
 
 def create_figure_line(args):
-    cfg = LINE_CONFIGURATIONS[args.system]
+    cfg = LINE_CONFIGURATIONS[args.configuration]
     data = read_data(args, cfg)
 
     set_general_parameters()
@@ -271,7 +271,7 @@ def add_polygon(ax, poly_boundary, style_string='g', fill=True):
 
 
 def create_figure_region(args):
-    cfg = REGION_CONFIGURATIONS[args.system]
+    cfg = REGION_CONFIGURATIONS[args.configuration]
     data = read_data(args, cfg)
     colors = {0: 'g', 1: 'pink', 2: 'darkred', 4: 'cornflowerblue', 6: 'orange', 8: 'mediumpurple'}
 
