@@ -5,10 +5,8 @@ import json
 import matplotlib.pyplot as plt
 import matplotlib as mpl
 from matplotlib.lines import Line2D
-import matplotlib.image as mpimg
 import numpy as np
 from PIL import Image, ImageDraw
-from matplotlib.offsetbox import TextArea, DrawingArea, OffsetImage, AnnotationBbox
 
 import python.utils.geometry as geometry
 import python.utils.storage as storage
@@ -22,9 +20,18 @@ ORIGIN_MARKERCOLOR = 'black'
 ORIGIN_MARKERSIZE = 4
 ORIGIN_LABEL_LINE = {'english': 'Origins', 'serbian': 'Početne tačke'}
 ORIGIN_LABEL_REGION = 'Origins'
+COLORS = {
+    0: 'g',
+    1: 'pink',
+    2: 'darkred',
+    4: 'cornflowerblue',
+    6: 'orange',
+    8: 'mediumpurple',
+}
 
 
 def set_general_parameters():
+    """Set general mpl parameters applicable to all figures."""
     mpl.rcParams['font.family'] = 'serif'
     mpl.rcParams['font.serif'] = ['Computer Modern Roman']
     mpl.rcParams['text.usetex'] = True
@@ -35,6 +42,7 @@ def set_general_parameters():
 
 
 def new_figure_inches(width, height, tight=True, constrained_layout=False):
+    """Create new figure with size specified in inches."""
     size = (width, height)
     fig, ax = plt.subplots(figsize=size, constrained_layout=constrained_layout)
     if tight:
@@ -43,6 +51,7 @@ def new_figure_inches(width, height, tight=True, constrained_layout=False):
 
 
 def read_data(args, conf):
+    """Fetch fsals results from storage."""
     data = None
 
     path = f'output/data/{args.algorithm}/{conf.rust_configuration}.data'
@@ -57,6 +66,7 @@ def read_data(args, conf):
 
 
 def configure_ticks(ax, cfg):
+    """Configure axes ticks."""
     MAJOR_SIZE = 3
     MINOR_SIZE = 2
     MAJOR_WIDTH = 0.9
@@ -78,6 +88,7 @@ def configure_ticks(ax, cfg):
 
 
 def add_ray_to_ax(ax, ray, linecolor, linewidth):
+    """Add given ray to given axes."""
     ray_start = ray.origin
     ray_end = geometry.theta2point(ray.origin, ray.length, ray.angle)
     line = np.vstack((ray_start, ray_end)).T
@@ -86,7 +97,7 @@ def add_ray_to_ax(ax, ray, linecolor, linewidth):
 
 
 def add_rayfan_to_ax(ax, rayfan, linecolor, linewidth, ratio, origins=False):
-
+    """Add given rayfan to given axes."""
     for ray in rayfan.rays[0::ratio]:
         add_ray_to_ax(ax, ray, linecolor, linewidth)
 
@@ -98,6 +109,7 @@ def add_rayfan_to_ax(ax, rayfan, linecolor, linewidth, ratio, origins=False):
 
 
 def create_figure_line(args):
+    """Visualize fsals line results from file on a figure."""
     cfg = LINE_CONFIGURATIONS[args.configuration]
     data = read_data(args, cfg)
 
@@ -119,7 +131,6 @@ def create_figure_line(args):
     configure_ticks(ax, cfg)
 
     linewidth = 1
-    colors = {0: 'g', 1: 'pink', 2: 'darkred', 4: 'cornflowerblue', 6: 'orange', 8: 'mediumpurple'}
     nus = set()
 
     if cfg.ratios == None:
@@ -130,14 +141,15 @@ def create_figure_line(args):
     for rayfan, ratio in zip(data.rayfans, ratios):
         nu = rayfan.nu
         nus.add(nu)
-        color = colors[nu]
+        color = COLORS[nu]
         logging.debug(f'Taking color {color} for nu {nu}')
         add_rayfan_to_ax(ax, rayfan, color, linewidth, ratio, cfg.draw_origins)
 
     # Prepare regular legend labels
     nus = sorted(list(nus))
     legend_handles = [
-        Line2D([0], [0], color=colors[nu], label=f'$NU_f$ = {nu}') for nu in nus]
+        Line2D([0], [0], color=COLORS[nu], label=f'$NU_f$ = {nu}') for nu in nus
+    ]
 
     # Add origin label, if necessary
     if cfg.draw_origins:
@@ -163,6 +175,7 @@ def get_ax_ratio(fig, ax):
 
 
 def get_nus(regions):
+    """Get all nus of a regin list."""
     nus = set()
     for region in regions:
         nus.add(region.nu)
@@ -170,12 +183,14 @@ def get_nus(regions):
 
 
 def get_image_dimensions(desired_ratio):
+    """Get dimensions of 5000px wide image with given ratio."""
     width = 5000 # pixels
     height = round(width * desired_ratio)
     return width, height
 
 
 def get_drawable_canvas(width, height):
+    """Create a new drawable PIL canvas for drawing region results."""
     WHITE = (255, 255, 255)
     img  = Image.new(mode = "RGB", size = (width, height), color=WHITE)
     drawable = ImageDraw.Draw(img)
@@ -183,11 +198,13 @@ def get_drawable_canvas(width, height):
 
 
 def add_origins_to_ax(ax, regions):
+    """Draw region origins on given axes."""
     for region in regions:
         add_origin_to_ax(ax, region.origin)
 
 
 def get_corners(pregion):
+    """Get corners of rectangle surrounding given pregion."""
     upper_left_p1 = pregion.origin[0] - pregion.radius
     upper_left_p2 = pregion.origin[1] - pregion.radius
     lower_right_p1 = pregion.origin[0] + pregion.radius
@@ -200,6 +217,7 @@ def get_corners(pregion):
 
 
 def corners2pixels(corners, spans, pixel_dimensions, mins):
+    """Transform corner coordinates to pixel coordinates."""
     upper, lower = corners
 
     upper_ratios = (upper - mins) / spans
@@ -212,6 +230,7 @@ def corners2pixels(corners, spans, pixel_dimensions, mins):
 
 
 def add_regions_to_ax(fig, ax, data, colors):
+    """Add given regions to given axes."""
     ratio = get_ax_ratio(fig, ax)
     width, height = get_image_dimensions(ratio)
     pixel_dimensions = np.array([width, height])
@@ -258,6 +277,7 @@ def add_pregion_to_ax(ax, pregion, color, fill=True):
 
 
 def add_origin_to_ax(ax, origin):
+    """Draw origin to given axes."""
     ax.plot(origin[0], origin[1], ORIGIN_MARKERSTYLE, color=ORIGIN_MARKERCOLOR,
             clip_on=False, markersize=ORIGIN_MARKERSIZE)
 
@@ -271,9 +291,9 @@ def add_polygon(ax, poly_boundary, style_string='g', fill=True):
 
 
 def create_figure_region(args):
+    """Visualize fsals region results from file on a figure."""
     cfg = REGION_CONFIGURATIONS[args.configuration]
     data = read_data(args, cfg)
-    colors = {0: 'g', 1: 'pink', 2: 'darkred', 4: 'cornflowerblue', 6: 'orange', 8: 'mediumpurple'}
 
     set_general_parameters()
 
@@ -292,7 +312,7 @@ def create_figure_region(args):
 
     configure_ticks(ax, cfg)
 
-    add_regions_to_ax(fig, ax, data, colors)
+    add_regions_to_ax(fig, ax, data, COLORS)
     nus = get_nus(data.regions)
 
     if cfg.draw_origins:
@@ -301,7 +321,8 @@ def create_figure_region(args):
     # Prepare regular legend labels
     nus = sorted(list(nus))
     legend_handles = [
-        Line2D([0], [0], color=colors[nu], label=f'$NU_f$ = {nu}') for nu in nus]
+        Line2D([0], [0], color=COLORS[nu], label=f'$NU_f$ = {nu}') for nu in nus
+    ]
 
     # Add origin label, if necessary
     if cfg.draw_origins:
@@ -320,6 +341,7 @@ def create_figure_region(args):
 
 
 def main(args):
+    """Read fsals results from storage, visualize on figure and save the figure."""
     if args.algorithm == 'line':
         fig = create_figure_line(args)
         extension = 'pdf'

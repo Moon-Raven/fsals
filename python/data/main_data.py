@@ -10,6 +10,8 @@ logger = logging.getLogger(__name__)
 
 
 def main(args):
+    """ Invoke rust subsystem to run fsals for given configuration. """
+
     rust_args = rust_utils.build_rust_command(args)
     logger.info(f'Invoking Rust subsystem for data generation')
 

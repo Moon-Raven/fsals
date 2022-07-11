@@ -362,6 +362,7 @@ def instructional_line_sufficient(args):
 
 
 def add_pregions_to_ax(fig, ax, pregions, limits, color):
+    """Add pregions go given axes object."""
     ratio = get_ax_ratio(fig, ax)
     width, height = get_image_dimensions(ratio)
     pixel_dimensions = np.array([width, height])

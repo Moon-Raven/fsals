@@ -14,6 +14,8 @@ logger = logging.getLogger(__name__)
 
 
 def calculate_nu(args):
+    """ Invoke rust subsystem to calculate nu for given configuration. """
+
     rust_args = rust_utils.build_rust_command(args)
     logger.info(f'Invoking Rust subsystem for nu')
 
@@ -28,6 +30,8 @@ def calculate_nu(args):
 
 
 def nu2color(nu):
+    """ Determine the color of the number for this nu. """
+
     COLOR_MAX = 255
     COLOR_MID = 128
 
@@ -37,7 +41,7 @@ def nu2color(nu):
     MAX_NU_SATURATION = 1    # How red are the most red labels
     saturation_range = MAX_NU_SATURATION - MIN_NU_SATURATION # Range od redness
 
-    # Calculate color of given nu
+    # Calculate color of given nu (a bit of overengineering which is unimportant)
     nu_cut = min(nu, MAX_NU_THRESHOLD) # Compare nu to threshold
     ratio = (nu_cut - MIN_NU_THRESHOLD)/(MAX_NU_THRESHOLD - MIN_NU_THRESHOLD)
     saturation = MIN_NU_SATURATION + ratio * saturation_range
@@ -49,6 +53,8 @@ def nu2color(nu):
 
 
 def create_figure(args):
+    """ Visualize nu data on a new figure. """
+
     nu_results = None
 
     with open(f'output/nu/temp_data/{args.configuration}.nudata', 'r') as read_file:
@@ -78,6 +84,7 @@ def create_figure(args):
 
 
 def main(args):
+    """ Calculate, visualize and store nu for given configuration. """
     calculate_nu(args)
     fig = create_figure(args)
     extension = 'pdf'
