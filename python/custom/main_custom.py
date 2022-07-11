@@ -16,22 +16,10 @@ from python.figure.main_figure import configure_ticks
 from python.figure.main_figure import get_ax_ratio, get_corners
 from python.figure.main_figure import get_image_dimensions, get_drawable_canvas
 from python.figure.main_figure import corners2pixels
+import python.utils.storage as storage
 
 
 logger = logging.getLogger(__name__)
-
-
-def read_data(path):
-    """Read fsals results from storage."""
-    data = None
-
-    with open(path, 'r') as read_file:
-        data = json.load(read_file, object_hook=lambda d: SimpleNamespace(**d))
-
-    if data == None:
-        raise Exception(f'Error reading nu results from file')
-
-    return data
 
 
 def instructional_line_nsc(args):
@@ -60,7 +48,7 @@ def instructional_line_nsc(args):
     fig, ax = new_figure_inches(width, height, tight, constrained)
 
     # Configure axes
-    data = read_data(f'output/data/line/pde_complex_tau_sigma_instructional.data')
+    data = storage.read_data_from_path(f'output/data/line/pde_complex_tau_sigma_instructional.data')
     ax.set_xlim(data.limits.p1_min, data.limits.p1_max)
     ax.set_ylim(data.limits.p2_min, data.limits.p2_max)
     ax.set_xlabel(f'${data.parameters[0]}$')
@@ -171,7 +159,7 @@ def instructional_line_nsc_multiple(args):
     fig, ax = new_figure_inches(width, height, tight, constrained)
 
     # Configure axes
-    data = read_data(f'output/data/line/pde_complex_tau_sigma_instructional.data')
+    data = storage.read_data_from_path(f'output/data/line/pde_complex_tau_sigma_instructional.data')
     ax.set_xlim(data.limits.p1_min, data.limits.p1_max)
     ax.set_ylim(data.limits.p2_min, data.limits.p2_max)
     ax.set_xlabel(f'${data.parameters[0]}$')
@@ -286,7 +274,7 @@ def instructional_line_sufficient(args):
     fig, ax = new_figure_inches(width, height, tight, constrained)
 
     # Configure axes
-    data = read_data(f'output/data/line/pde_complex_tau_sigma_instructional.data')
+    data = storage.read_data_from_path(f'output/data/line/pde_complex_tau_sigma_instructional.data')
     ax.set_xlim(data.limits.p1_min, data.limits.p1_max)
     ax.set_ylim(data.limits.p2_min, data.limits.p2_max)
     ax.set_xlabel(f'${data.parameters[0]}$')
@@ -386,7 +374,7 @@ def add_pregions_to_ax(fig, ax, pregions, limits, color):
 
 def instructional_region_sufficient(args):
     """Draw a single sufficient fsals region step."""
-    data = read_data(f'output/data/region/pde_complex_instructional.data')
+    data = storage.read_data_from_path(f'output/data/region/pde_complex_instructional.data')
     cfg = RegionConfiguration(
         width=3.486429134,
         height=3.486429134,
@@ -458,7 +446,7 @@ def instructional_region_sufficient(args):
 
 def instructional_region_nsc(args):
     """Draw step-by-step evolution of the region fsals algorithm."""
-    data = read_data(f'output/data/region/pde_complex_instructional.data')
+    data = storage.read_data_from_path(f'output/data/region/pde_complex_instructional.data')
     cfg = RegionConfiguration(
         width=4.7747,
         height=4.7747 / 3 * 4.2,

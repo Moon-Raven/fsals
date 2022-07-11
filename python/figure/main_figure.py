@@ -1,7 +1,5 @@
 """This module contains facilities for plotting fsals results on matplotlib figures."""
 import logging
-from types import SimpleNamespace
-import json
 
 import matplotlib.pyplot as plt
 import matplotlib as mpl
@@ -51,21 +49,6 @@ def new_figure_inches(width, height, tight=True, constrained_layout=False):
     return fig, ax
 
 
-def read_data(args, conf):
-    """Fetch fsals results from storage."""
-    data = None
-
-    path = f'output/data/{args.algorithm}/{conf.rust_configuration}.data'
-    with open(path, 'r') as read_file:
-        logging.info(f'Reading data from {path}')
-        data = json.load(read_file, object_hook=lambda d: SimpleNamespace(**d))
-
-    if data == None:
-        raise Exception(f'Error reading nu results from file')
-
-    return data
-
-
 def configure_ticks(ax, cfg):
     """Configure axes ticks."""
     MAJOR_SIZE = 3
@@ -112,7 +95,7 @@ def add_rayfan_to_ax(ax, rayfan, linecolor, linewidth, ratio, origins=False):
 def create_figure_line(args):
     """Visualize fsals line results from file on a figure."""
     cfg = LINE_CONFIGURATIONS[args.configuration]
-    data = read_data(args, cfg)
+    data = storage.read_data(args, cfg)
 
     set_general_parameters()
 
@@ -294,7 +277,7 @@ def add_polygon(ax, poly_boundary, style_string='g', fill=True):
 def create_figure_region(args):
     """Visualize fsals region results from file on a figure."""
     cfg = REGION_CONFIGURATIONS[args.configuration]
-    data = read_data(args, cfg)
+    data = storage.read_data(args, cfg)
 
     set_general_parameters()
 
