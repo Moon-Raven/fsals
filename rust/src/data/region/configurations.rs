@@ -24,21 +24,21 @@ pub enum Delta {
 
 
 pub struct RegionConfiguration {
-    pub name: &'static str,
-    pub system: System,
-    pub limits: Limits,
-    pub origins: Vec<Par>,
-    pub contour_conf: ContourConfiguration,
-    pub delta: Delta,
-    pub safeguard: f64,
-    pub spawn_count: usize,
-    pub enforce_limits: bool,
-    pub lin_steps: usize,
-    pub log_space_minw: f64,
-    pub log_space_maxw: f64,
-    pub log_space_steps: usize,
-    pub max_iter: Option<u32>,
-    pub check_obsoletion: bool,
+    pub name: &'static str,                  // Config name
+    pub system: System,                      // System to be used
+    pub limits: Limits,                      // Parametric search domain
+    pub origins: Vec<Par>,                   // Origins upon which to run fsals
+    pub contour_conf: ContourConfiguration,  // Contour used for evaluating NU
+    pub delta: Delta,                        // Termination criteria (relative or absolute)
+    pub safeguard: f64,                      // Safeguard against numerical optimization errors
+    pub spawn_count: usize,                  // Sample point count for newly obtained regions
+    pub enforce_limits: bool,                // Enforce searching domain limits?
+    pub lin_steps: usize,                    // Domain granularity for linear minimization
+    pub log_space_minw: f64,                 // Lower w for logarithmic minimization
+    pub log_space_maxw: f64,                 // Upper w for logarithmic minimization
+    pub log_space_steps: usize,              // Domain granularity for logarithmic minimization
+    pub max_iter: Option<u32>,               // Maximal number of allowed iterations (depth)
+    pub check_obsoletion: bool,              // Check if points are obsolete before evaluating them
 }
 
 

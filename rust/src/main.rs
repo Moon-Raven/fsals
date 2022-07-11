@@ -24,7 +24,7 @@ use std::process;
 pub struct Args {
     /// Name of the system which the program should analyze
     #[clap(short, long)]
-    system: Option<String>,
+    configuration: Option<String>,
 
     /// Algorithm which should be run on the given system
     #[clap(short, long)]
@@ -97,7 +97,7 @@ fn print_args_verbose(args: &Args) {
         Some(algo) => algo.to_string(),
         None =>  String::from("unspecified"),
     });
-    info!("  {:<12} {}", "System:", match &args.system {
+    info!("  {:<12} {}", "Configuration:", match &args.configuration {
         Some(name) => String::from(name),
         None => String::from("unspecified"),
     });
@@ -107,13 +107,18 @@ fn print_args_verbose(args: &Args) {
 }
 
 
-fn main() {
+fn set_panic_hook() {
     let orig_hook = panic::take_hook();
     panic::set_hook(Box::new(move |panic_info| {
         // invoke the default handler and exit the process
         orig_hook(panic_info);
         process::exit(1);
     }));
+}
+
+
+fn main() {
+    set_panic_hook();
 
     let start = Instant::now();
     let args = Args::parse();
@@ -129,7 +134,7 @@ fn main() {
     match args.command {
         Command::Nu => nu::run(&args),
         Command::Data => data::run(&args),
-        Command::Custom => info!("Dummy placeholder for running custom commands"),
+        Command::Custom => info!("Placeholder for running custom commands"),
     };
 
     let end = Instant::now();

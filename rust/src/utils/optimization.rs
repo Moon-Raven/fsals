@@ -118,22 +118,22 @@ pub fn get_linsearch_interval(
 
 
 lazy_static!(
-    static ref min_w: Mutex<f64> = Mutex::new(f64::INFINITY);
-    static ref max_w: Mutex<f64> = Mutex::new(0.0);
+    static ref MIN_W: Mutex<f64> = Mutex::new(f64::INFINITY);
+    static ref MAX_W: Mutex<f64> = Mutex::new(0.0);
 );
 
 
 pub fn update_statistics(w: f64) {
     /* Update statistics used for optimization purposes */
     {
-        let mut min_w_unlocked = min_w.lock().unwrap();
+        let mut min_w_unlocked = MIN_W.lock().unwrap();
         if w < *min_w_unlocked {
             *min_w_unlocked = w;
         }
     }
 
     {
-        let mut max_w_unlocked = max_w.lock().unwrap();
+        let mut max_w_unlocked = MAX_W.lock().unwrap();
         if w > *max_w_unlocked {
             *max_w_unlocked = w;
         }
@@ -183,8 +183,8 @@ where
 
 
 pub fn print_minmax_statistics() {
-    let min = min_w.lock().unwrap();
-    let max = max_w.lock().unwrap();
+    let min = MIN_W.lock().unwrap();
+    let max = MAX_W.lock().unwrap();
 
     info!("Roots for found for w in ({}, {})", min, max);
 }

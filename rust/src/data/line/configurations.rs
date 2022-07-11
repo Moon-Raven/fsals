@@ -19,19 +19,19 @@ use crate::types::{Limits, Par, System};
 
 
 pub struct LineConfiguration {
-    pub name: &'static str,
-    pub system: System,
-    pub limits: Limits,
-    pub origins: Vec<Par>,
-    pub ray_count: usize,
-    pub contour_conf: ContourConfiguration,
-    pub delta: Delta,
-    pub safeguard: f64,
-    pub w_steps_linear: usize,
-    pub log_space_minw: f64,
-    pub log_space_maxw: f64,
-    pub log_space_steps: usize,
-    pub corrective_ratio: Option<f64>,
+    pub name: &'static str,                  // Config name
+    pub system: System,                      // System to be used
+    pub limits: Limits,                      // Parametric search domain
+    pub origins: Vec<Par>,                   // Origins upon which to run fsals
+    pub ray_count: usize,                    // Number of rays emanating from each origin
+    pub contour_conf: ContourConfiguration,  // Contour used for evaluating NU
+    pub delta: Delta,                        // Termination criteria
+    pub safeguard: f64,                      // Safeguard against numerical optimization errors
+    pub w_steps_linear: usize,               // Domain granularity for linear minimization
+    pub log_space_minw: f64,                 // Lower w for logarithmic minimization
+    pub log_space_maxw: f64,                 // Upper w for logarithmic minimization
+    pub log_space_steps: usize,              // Domain granularity for logarithmic minimization
+    pub corrective_ratio: Option<f64>,       // Correction for achieving 1:1 perceived aspect ratio
 }
 
 

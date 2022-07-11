@@ -103,8 +103,8 @@ fn find_max_delta_theta<F1, F2>(
     log_space: &[f64],
 ) -> f64
 where
-F1: Fn(Comp, f64) -> Comp,
-F2: Fn(f64, f64, f64) -> f64
+    F1: Fn(Comp, f64) -> Comp,
+    F2: Fn(f64, f64, f64) -> f64
 {
     let min_step = delta;
     let condition = |delta_theta: f64| {
@@ -233,7 +233,7 @@ fn get_stability_segment(
         Delta::Rel(rel) => delta_rel2abs(&conf.limits, rel, angle),
     };
 
-    // Create a closure which converts the 2d function to 1d function
+    // Create a closure which converts the 2d characteristic function to a 1d function
     let directional_vec = (f64::cos(angle), f64::sin(angle));
     let f_1_d = |s: Comp, theta: f64 | -> Comp {
         let p0 = origin.0 + theta*directional_vec.0;
@@ -242,7 +242,7 @@ fn get_stability_segment(
         (conf.system.f_complex)(s, p)
     };
 
-    // Create a closure which converts the 2d denom into 1d denom
+    // Create a closure which converts the 2d denom function into a 1d denom function
     let line_denom_2_d = conf.system.line_denominator.expect("System must have line denom impl");
 
     let line_denom_1_d  = |w: f64, th_min: f64, th_max: f64| {
@@ -258,10 +258,12 @@ fn get_stability_segment(
 
 fn get_rayfan(conf: &LineConfiguration, origin: Par, log_space: &[f64], verbose: bool) -> RayFan {
     info!("Calculating line algo for rayfan {:?}", origin);
-    let angles = spawn_angles(&conf.limits, conf.ray_count, conf.corrective_ratio);
 
+    /* Determine NU for given rayfan (used in python figure subsystem for plotting results) */
     let nu = nu::calculate_nu_single(&conf.contour_conf, conf.system.f_complex, origin);
 
+    /* Determine maximal stability equivalent segment along each rayfan angle */
+    let angles = spawn_angles(&conf.limits, conf.ray_count, conf.corrective_ratio);
     let stability_segments = angles
         .clone()
         .into_par_iter()
@@ -294,15 +296,16 @@ pub struct LineResult {
 
 
 pub fn run_line(args: &Args) {
-    let config_name_option = &args.system;
+    let config_name_option = &args.configuration;
     let config_name = config_name_option
         .as_ref()
-        .expect("data requires system to be specified");
+        .expect("data requires configuration to be specified");
+    let config = CONFIGURATONS.get(config_name.as_str()).expect("Unknown configuration");
 
-    let config = CONFIGURATONS.get(config_name.as_str()).expect("Unknown system");
-
+    /* Log space is configuration-specific due to different ranges */
     let w_log_space = config.get_log_space();
 
+    /* Determine a stability equivalent rayfan for each given origin */
     let rayfans = config
         .origins
         .clone()
@@ -315,17 +318,16 @@ pub fn run_line(args: &Args) {
         parameters: config.system.parameters,
     };
 
+    /* Log minimal and maximal w at which function minima were evaluated */
     optimization::print_minmax_statistics();
 
-
     /* Store results in file */
-    let config_name_option = &args.system;
+    let config_name_option = &args.configuration;
     let config_name = config_name_option
         .as_ref()
-        .expect("data requires system to be specified");
+        .expect("data requires configuration to be specified");
     let command = "data";
     let extension = "data";
-
     let algorithm_option = &args.algorithm;
     let algorithm = algorithm_option.as_ref().expect("data requires algorithm to be set");
 

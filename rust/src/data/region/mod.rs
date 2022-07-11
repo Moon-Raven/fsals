@@ -18,6 +18,7 @@ use rayon::{prelude::*, ScopeFifo};
 use configurations::{Delta, RegionConfiguration, CONFIGURATONS};
 use crate::systems::distributed_delay1;
 
+
 #[derive(Serialize, Debug)]
 pub struct RegionResult {
     pub regions: Vec<Region>,
@@ -32,6 +33,14 @@ pub struct PRegion {
     pub radius: f64,
     pub depth: u32,
 }
+
+#[derive(Serialize, Debug)]
+pub struct Region {
+    pub pregions: Vec<PRegion>,
+    pub nu: i32,
+    pub origin: Par,
+}
+
 
 impl PRegion {
     fn spawn_edge_points(&self, point_count: usize) -> Vec<Par> {
@@ -52,15 +61,6 @@ impl PRegion {
         distance < self.radius * SAFEGUARD
     }
 }
-
-
-#[derive(Serialize, Debug)]
-pub struct Region {
-    pub pregions: Vec<PRegion>,
-    pub nu: i32,
-    pub origin: Par,
-}
-
 
 
 fn check_jump_validity (
@@ -85,7 +85,6 @@ fn check_jump_validity (
     };
 
     let min = optimization::find_minimum_fraction_fast(minimization_problem);
-
 
     eps < min
 }
@@ -229,6 +228,7 @@ pub fn get_region_parallel<'a>(
         pregions_unlocked.push(pregion);
     }
 
+    /* Add new points to the breadth-first evaluation queue */
     if let Some(new_points) = new_points {
         if new_points.len() != 0 {
             for point in new_points {
@@ -256,6 +256,7 @@ pub fn get_region(conf: &RegionConfiguration, origin: Par) -> Region {
     let w_log_space: Vec<f64> = conf.get_log_space();
     let initial_depth = 1;
 
+    /* The region fsals is parallelized in a breadth-first fashion */
     info!("Searching for region around {:?} with nu {}", origin, nu);
     rayon::scope_fifo(|s| {
         get_region_parallel(
@@ -272,14 +273,13 @@ pub fn get_region(conf: &RegionConfiguration, origin: Par) -> Region {
     let pregions = Arc::try_unwrap(pregions).unwrap().into_inner().unwrap();
     info!("Returning region around {:?} with {:?} pregions", origin, pregions.len());
 
-    Region { pregions, nu, origin}
+    Region { pregions, nu, origin }
 }
 
 
 pub fn store_results(results: &RegionResult, config: &RegionConfiguration) {
     let command = "data";
     let extension = "data";
-
     let algorithm_option = "region";
 
     let filename = storage::get_filepath(command, algorithm_option, extension, config.name);
@@ -289,33 +289,33 @@ pub fn store_results(results: &RegionResult, config: &RegionConfiguration) {
 
 
 pub fn args2config(args: &Args) -> &'static RegionConfiguration {
-    let config_name_option = &args.system;
+    let config_name_option = &args.configuration;
     let config_name = config_name_option
         .as_ref()
-        .expect("data requires system to be specified");
+        .expect("data requires configuration to be specified");
 
     let config = CONFIGURATONS
         .get(config_name.as_str())
-        .expect("Unknown system");
+        .expect("Unknown configuration");
 
     config
 }
 
 
 pub fn run_region(args: &Args) {
+    /* Things may get memory hungry, so we need a large stack */
     const MEGABYTE: usize = 1024 * 1024;
     const STACK_SIZE: usize = MEGABYTE * 128;
     rayon::ThreadPoolBuilder::new().stack_size(STACK_SIZE).build_global().unwrap();
 
     let config = args2config(args);
 
+    /* Determine maximal stability equivalence region surrounding each given origin */
     let regions = config
         .origins
         .clone()
         .into_par_iter()
-        // .into_iter()
         .map(|origin| get_region(config, origin));
-
 
     let results = RegionResult {
         regions: regions.collect(),
@@ -323,6 +323,7 @@ pub fn run_region(args: &Args) {
         parameters: config.system.parameters,
     };
 
+    /* Log minimal and maximal w at which function minima were evaluated */
     optimization::print_minmax_statistics();
 
     store_results(&results, &config);

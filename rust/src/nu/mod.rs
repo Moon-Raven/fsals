@@ -134,9 +134,11 @@ fn get_nu_path(config_name: &String) -> String {
 
 pub fn run(args: &Args) {
     /* Calculate nu */
-    let config_name_option = &args.system;
-    let config_name = config_name_option.as_ref().expect("nu requires system to be specified");
-    let config = CONFIGURATONS.get(config_name.as_str()).expect("Unknown system");
+    let config_name_option = &args.configuration;
+    let config_name = config_name_option
+        .as_ref()
+        .expect("nu requires configuration to be specified");
+    let config = CONFIGURATONS.get(config_name.as_str()).expect("Unknown configuration");
     let results = calculate_nu(&config, args.parallel);
 
     /* Store results in file */
