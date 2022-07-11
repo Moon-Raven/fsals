@@ -1,4 +1,5 @@
 # Framework for Stability Analysis of Linear Systems
 
-Framework which analyzes stability of LTI systems with respect to parameter values of the given system.
-The framework is based on the application of Rouche's theorem.
+Framework which analyzes stability of (generally irrational) LTI systems
+with respect to system parameters.
+The framework is based on iterative application of Rouche's theorem.
