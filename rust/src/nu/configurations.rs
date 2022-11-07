@@ -7,6 +7,7 @@ use crate::systems::pde_complex_beta_sigma;
 use crate::systems::pde_complex_k_sigma;
 use crate::systems::pde_complex_tau_sigma;
 use crate::systems::retarded1;
+use crate::systems::retarded2;
 use crate::systems::semi_infinite_rod;
 use crate::systems::telegrapher_alpha_gamma;
 use crate::systems::telegrapher_x_k;
@@ -52,6 +53,26 @@ lazy_static! {
                     p1_max: 2.6,
                     p2_min: 0.0,
                     p2_max: 3.3,
+                },
+                grid_step: 40usize,
+            },
+        );
+
+        configs.insert(
+            "retarded2",
+            NuConfiguration {
+                name: "retarded2",
+                system: retarded2::SYSTEM,
+                contour_conf: ContourConfiguration {
+                    w_min: 1e-3,
+                    w_max: 1e5,
+                    steps: 10_000usize,
+                },
+                limits: Limits {
+                    p1_min: 0.0,
+                    p1_max: 5.0,
+                    p2_min: 0.0,
+                    p2_max: 5.0,
                 },
                 grid_step: 40usize,
             },

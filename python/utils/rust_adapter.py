@@ -11,7 +11,7 @@ def build_rust_command(args):
     if args.algorithm is not None:
         rust_command += ['-a', args.algorithm]
     if args.configuration is not None:
-        rust_command += ['-s', args.configuration]
+        rust_command += ['-c', args.configuration]
     if args.parallel:
         rust_command += ['--parallel']
     rust_command += ['--loglevel', args.loglevel]

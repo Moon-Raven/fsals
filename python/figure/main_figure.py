@@ -278,6 +278,8 @@ def create_figure_region(args):
     """Visualize fsals region results from file on a figure."""
     cfg = REGION_CONFIGURATIONS[args.configuration]
     data = storage.read_data(args, cfg)
+    # i = 0
+    # data.regions = data.regions[i:i+1]
 
     set_general_parameters()
 

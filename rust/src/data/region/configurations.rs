@@ -7,6 +7,7 @@ use crate::systems::pde_complex_beta_sigma;
 use crate::systems::pde_complex_k_sigma;
 use crate::systems::pde_complex_tau_sigma;
 use crate::systems::retarded1;
+use crate::systems::retarded2;
 use crate::systems::semi_infinite_rod;
 use crate::systems::telegrapher_alpha_gamma;
 use crate::systems::telegrapher_x_k;
@@ -81,6 +82,41 @@ lazy_static! {
             log_space_steps: 10_000,
             max_iter: Option::None,
         });
+
+        configs.insert("retarded2", RegionConfiguration {
+            name: "retarded2",
+            system: retarded2::SYSTEM,
+            limits: Limits { p1_min: 0.0, p1_max: 5.0, p2_min: 0.0, p2_max: 5.0 },
+            safeguard: 0.80,
+            check_obsoletion: true,
+            origins: vec![
+                (1.5, 1.5),
+                // (0.1, 0.1),
+                // (0.1, 3.0),
+                // (3.55, 0.5),
+                // (4.0, 4.0),
+                (0.55, 2.8),
+                // (2.95, 4.95),
+                // (4.5, 0.5),
+                // (0.5, 4.0),
+                // (0.44, 4.95),
+                // (2.2, 4.95),
+                ],
+            contour_conf: ContourConfiguration {
+                w_min: 1e-3,
+                w_max: 1e5,
+                steps: 10_000,
+                },
+            delta: Delta::Abs(0.00010),
+            spawn_count: 16,
+            enforce_limits: false,
+            lin_steps: 150_000,
+            log_space_minw: 0.65,
+            log_space_maxw: 1e4,
+            log_space_steps: 30_000,
+            max_iter: Option::None,
+        });
+
 
         configs.insert("distributed_delay1", RegionConfiguration {
             name: "distributed_delay1",
