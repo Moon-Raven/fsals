@@ -226,10 +226,11 @@ LINE_CONFIGURATIONS = {
 
     'telegrapher_x_k' : LineConfiguration(
         rust_configuration='telegrapher_x_k',
-        width=COMMON_WIDTHS['double_subfigure'],
-        height=COMMON_WIDTHS['double_subfigure'] * TELEGRAPHER_X_K_W2HRATIO,
-        ncol=3,
+        width=COMMON_WIDTHS['triple_subfigure'],
+        height=COMMON_WIDTHS['triple_subfigure'] * 1.05,
+        ncol=2,
         bbox=(0, -0.17, 1, 0.1),
+        ratios = [4, 4, 4, 4, 4],
     ),
 
     'telegrapher_x_k_thesis' : LineConfiguration(
@@ -243,10 +244,11 @@ LINE_CONFIGURATIONS = {
 
     'telegrapher_alpha_gamma' : LineConfiguration(
         rust_configuration='telegrapher_alpha_gamma',
-        width=COMMON_WIDTHS['double_subfigure'],
-        height=COMMON_WIDTHS['double_subfigure'] * TELEGRAPHER_ALPHA_GAMMA_W2HRATIO,
-        ncol=3,
+        width=COMMON_WIDTHS['triple_subfigure'],
+        height=COMMON_WIDTHS['triple_subfigure'] * 1.15,
+        ncol=2,
         bbox=(0, -0.17, 1, 0.1),
+        ratios = [2, 2, 4, 8],
     ),
 
     'telegrapher_alpha_gamma_thesis' : LineConfiguration(
@@ -417,9 +419,9 @@ REGION_CONFIGURATIONS = {
 
     'telegrapher_x_k' : RegionConfiguration(
         rust_configuration='telegrapher_x_k',
-        width=COMMON_WIDTHS['double_subfigure'],
-        height=COMMON_WIDTHS['double_subfigure'] * TELEGRAPHER_X_K_W2HRATIO,
-        ncol=3,
+        width=COMMON_WIDTHS['triple_subfigure'],
+        height=COMMON_WIDTHS['triple_subfigure'] * 1.05,
+        ncol=2,
         bbox=(0, -0.17, 1, 0.1),
     ),
 
@@ -434,9 +436,9 @@ REGION_CONFIGURATIONS = {
 
      'telegrapher_alpha_gamma' : RegionConfiguration(
         rust_configuration='telegrapher_alpha_gamma',
-        width=COMMON_WIDTHS['double_subfigure'],
-        height=COMMON_WIDTHS['double_subfigure'] * TELEGRAPHER_ALPHA_GAMMA_W2HRATIO,
-        ncol=3,
+        width=COMMON_WIDTHS['triple_subfigure'],
+        height=COMMON_WIDTHS['triple_subfigure'] * 1.15,
+        ncol=2,
         bbox=(0, -0.17, 1, 0.1),
     ),
 
