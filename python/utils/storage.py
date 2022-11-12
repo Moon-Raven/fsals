@@ -3,12 +3,21 @@ import logging
 from pathlib import Path
 from shutil import copyfile
 from types import SimpleNamespace
+from typing import Any
 import json
+from json.encoder import JSONEncoder
 
 import python.utils.timestamps as timestamps
 
 
 logger = logging.getLogger(__name__)
+
+
+class SimpleNamespaceJSONEncoder(JSONEncoder):
+    def default(self, o: Any) -> Any:
+        if isinstance(o, SimpleNamespace):
+            return o.__dict__
+        return super().default(o)
 
 
 def read_data(args, conf):
@@ -37,6 +46,16 @@ def read_data_from_path(path):
         raise Exception(f'Error reading nu results from file')
 
     return data
+
+
+def write_data_to_path(data, path):
+    """
+        Save fsals results directly to specified path.
+        Provided as a supplementary function.
+    """
+    with open(path, 'w') as write_file:
+        logging.info(f'Writing data to {path}')
+        json.dump(data, write_file, cls=SimpleNamespaceJSONEncoder)
 
 
 def save_figure(args, fig, command, subcommand, extension):

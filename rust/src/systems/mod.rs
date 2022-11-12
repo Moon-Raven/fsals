@@ -1,4 +1,5 @@
 pub mod retarded1;
+pub mod retarded2;
 pub mod distributed_delay1;
 pub mod semi_infinite_rod;
 pub mod finite_rod;

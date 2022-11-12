@@ -335,6 +335,16 @@ REGION_CONFIGURATIONS = {
         custom_func=retarded1_custom_func,
     ),
 
+    'retarded2' : RegionConfiguration(
+        rust_configuration='retarded2',
+        width=COMMON_WIDTHS['single_column'],
+        height=COMMON_WIDTHS['single_column'] * W2H_RATIO,
+        ticks=TickConfiguration(1, 1, 0.25, 0.25),
+        ncol=2,
+        bbox=(0, -0.17, 1, 0.1),
+    ),
+
+
     'retarded1_thesis' : RegionConfiguration(
         rust_configuration='retarded1',
         width=COMMON_WIDTHS['single_column'],
