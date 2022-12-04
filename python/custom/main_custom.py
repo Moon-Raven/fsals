@@ -492,6 +492,58 @@ def instructional_region_nsc(args):
     fig.savefig(figpath, dpi=1000)
 
 
+def iterative_alpha_gamma_nsc(args):
+    """
+        Draw step-by-step evolution of the region fsals algorithm
+        for the telegrapher_alpha_gamma example.
+    """
+    datapath = 'output/data/region/telegrapher_alpha_gamma_instructional.data'
+    data = storage.read_data_from_path(datapath)
+    cfg = RegionConfiguration(
+        width=4.7747,
+        height=4.7747 / 3 * 4.2,
+        # height=3.486429134 * 1.05,
+        ncol=2,
+        bbox=(0, -0.19, 1, 0.1),
+    )
+    PREGION_COLOR = 'lightsteelblue'
+
+    set_general_parameters()
+
+    # Fetch figure
+    size = (cfg.width, cfg.height)
+    rows, cols = 4, 3
+    fig, axes = plt.subplots(rows, cols, figsize=size, constrained_layout=True)
+
+    # Fetch region of interest
+    region = data.regions[1]
+
+    # # Configure axes
+    k = 0
+    for r in range(rows):
+        for c in range(cols):
+            k += 1
+            ax = axes[r][c]
+            ax.set_title(f'$k = {k}$', fontsize=8)
+            ax.set_xlim(data.limits.p1_min, data.limits.p1_max)
+            ax.set_ylim(data.limits.p2_min, data.limits.p2_max)
+
+            configure_ticks(ax, cfg)
+
+            pregions = [p for p in region.pregions if p.depth <= k]
+            add_pregions_to_ax(fig, ax, pregions, data.limits, PREGION_COLOR)
+
+            # Add origin
+            ax.plot(region.origin[0], region.origin[1], 'x', color='black', markersize=3)
+
+    # Save fig
+    dirname = f'output/custom'
+    dir = Path(dirname)
+    dir.mkdir(exist_ok=True, parents=True)
+    figpath = f'{dirname}/{args.customscript}.pdf'
+    fig.savefig(figpath, dpi=1000)
+
+
 def main(args):
     """Run a python function pre-written to serve a non-generic fsals purpose."""
     logger.info(f'Running custom script {args.customscript}!')
@@ -502,6 +554,7 @@ def main(args):
         'instructional_line_nsc_multiple' : instructional_line_nsc_multiple,
         'instructional_region_sufficient' : instructional_region_sufficient,
         'instructional_region_nsc' : instructional_region_nsc,
+        'iterative_alpha_gamma_nsc' : iterative_alpha_gamma_nsc,
     }
 
     if args.customscript in custom_scripts:
