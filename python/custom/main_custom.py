@@ -492,12 +492,40 @@ def instructional_region_nsc(args):
     fig.savefig(figpath, dpi=1000)
 
 
-def iterative_alpha_gamma_nsc(args):
+def iterative_telegrapher_alpha_gamma_nsc(args):
     """
         Draw step-by-step evolution of the region fsals algorithm
         for the telegrapher_alpha_gamma example.
     """
-    datapath = 'output/data/region/telegrapher_alpha_gamma_instructional.data'
+    data_filename="telegrapher_alpha_gamma_instructional.data"
+    figure_filename="telegrapher_alpha_gamma_iterative.pdf"
+    color='darkred'
+    create_iterative_region_figure(
+        data_filename,
+        figure_filename,
+        region_index=1,
+        rows=4,
+        cols=3,
+        color=color,
+        fontsize=8,
+        # xlabel=r'$\alpha$',
+        # ylabel=r'$\gamma$',
+    )
+
+
+def create_iterative_region_figure(
+        data_filename,
+        figure_filename,
+        region_index=1,
+        rows=4,
+        cols=3,
+        color='lightsteelblue',
+        fontsize=8,
+        xlabel='',
+        ylabel='',
+    ):
+    """Draw step-by-step evolution of the region fsals algorithm for given example."""
+    datapath = f'output/data/region/{data_filename}'
     data = storage.read_data_from_path(datapath)
     cfg = RegionConfiguration(
         width=4.7747,
@@ -506,41 +534,41 @@ def iterative_alpha_gamma_nsc(args):
         ncol=2,
         bbox=(0, -0.19, 1, 0.1),
     )
-    PREGION_COLOR = 'lightsteelblue'
 
     set_general_parameters()
 
     # Fetch figure
     size = (cfg.width, cfg.height)
-    rows, cols = 4, 3
     fig, axes = plt.subplots(rows, cols, figsize=size, constrained_layout=True)
 
     # Fetch region of interest
-    region = data.regions[1]
+    region = data.regions[region_index]
 
     # # Configure axes
     k = 0
-    for r in range(rows):
-        for c in range(cols):
+    for row in range(rows):
+        for column in range(cols):
             k += 1
-            ax = axes[r][c]
-            ax.set_title(f'$k = {k}$', fontsize=8)
+            ax = axes[row][column]
+            ax.set_title(f'$k = {k}$', fontsize=fontsize)
             ax.set_xlim(data.limits.p1_min, data.limits.p1_max)
             ax.set_ylim(data.limits.p2_min, data.limits.p2_max)
+            ax.set_xlabel(xlabel)
+            ax.set_ylabel(ylabel)
 
             configure_ticks(ax, cfg)
 
             pregions = [p for p in region.pregions if p.depth <= k]
-            add_pregions_to_ax(fig, ax, pregions, data.limits, PREGION_COLOR)
+            add_pregions_to_ax(fig, ax, pregions, data.limits, color)
 
             # Add origin
             ax.plot(region.origin[0], region.origin[1], 'x', color='black', markersize=3)
 
     # Save fig
-    dirname = f'output/custom'
+    dirname = f'output/custom/iterative_region'
     dir = Path(dirname)
     dir.mkdir(exist_ok=True, parents=True)
-    figpath = f'{dirname}/{args.customscript}.pdf'
+    figpath = f'{dirname}/{figure_filename}'
     fig.savefig(figpath, dpi=1000)
 
 
@@ -554,7 +582,7 @@ def main(args):
         'instructional_line_nsc_multiple' : instructional_line_nsc_multiple,
         'instructional_region_sufficient' : instructional_region_sufficient,
         'instructional_region_nsc' : instructional_region_nsc,
-        'iterative_alpha_gamma_nsc' : iterative_alpha_gamma_nsc,
+        'iterative_telegrapher_alpha_gamma_nsc' : iterative_telegrapher_alpha_gamma_nsc,
     }
 
     if args.customscript in custom_scripts:
