@@ -497,13 +497,13 @@ def iterative_telegrapher_alpha_gamma_nsc(args):
         Draw step-by-step evolution of the region fsals algorithm
         for the telegrapher_alpha_gamma example.
     """
-    data_filename="telegrapher_alpha_gamma_instructional.data"
+    data_filename="telegrapher_alpha_gamma_single_region.data"
     figure_filename="telegrapher_alpha_gamma_iterative.pdf"
     color='darkred'
     create_iterative_region_figure(
         data_filename,
         figure_filename,
-        region_index=1,
+        region_index=0,
         rows=4,
         cols=3,
         color=color,
@@ -511,7 +511,7 @@ def iterative_telegrapher_alpha_gamma_nsc(args):
         # xlabel=r'$\alpha$',
         # ylabel=r'$\gamma$',
         k_start=1,
-        k_step=1,
+        k_step=2,
     )
 
 
