@@ -510,6 +510,8 @@ def iterative_telegrapher_alpha_gamma_nsc(args):
         fontsize=8,
         # xlabel=r'$\alpha$',
         # ylabel=r'$\gamma$',
+        k_start=1,
+        k_step=1,
     )
 
 
@@ -523,6 +525,8 @@ def create_iterative_region_figure(
         fontsize=8,
         xlabel='',
         ylabel='',
+        k_start=1,
+        k_step=1,
     ):
     """Draw step-by-step evolution of the region fsals algorithm for given example."""
     datapath = f'output/data/region/{data_filename}'
@@ -545,10 +549,9 @@ def create_iterative_region_figure(
     region = data.regions[region_index]
 
     # # Configure axes
-    k = 0
+    k = k_start
     for row in range(rows):
         for column in range(cols):
-            k += 1
             ax = axes[row][column]
             ax.set_title(f'$k = {k}$', fontsize=fontsize)
             ax.set_xlim(data.limits.p1_min, data.limits.p1_max)
@@ -563,6 +566,8 @@ def create_iterative_region_figure(
 
             # Add origin
             ax.plot(region.origin[0], region.origin[1], 'x', color='black', markersize=3)
+
+            k += k_step
 
     # Save fig
     dirname = f'output/custom/iterative_region'

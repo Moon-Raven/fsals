@@ -281,6 +281,30 @@ lazy_static! {
             max_iter: Option::None,
         });
 
+        configs.insert("telegrapher_alpha_gamma_single_region", RegionConfiguration {
+            name: "telegrapher_alpha_gamma_single_region",
+            system: telegrapher_alpha_gamma::SYSTEM,
+            limits: Limits { p1_min: 0.2, p1_max: 0.9, p2_min: 0.2, p2_max: 0.9 },
+            safeguard: 1.0,
+            check_obsoletion: true,
+            origins: vec![
+                (0.70, 0.70),
+                ],
+            contour_conf: ContourConfiguration {
+                w_min: 1e-3,
+                w_max: 1e7,
+                steps: 10_000,
+                },
+            delta: Delta::Abs(0.00005),
+            spawn_count: 32,
+            enforce_limits: false,
+            log_space_minw: 1e-3,
+            log_space_maxw: 1e7,
+            log_space_steps: 1_000,
+            lin_steps: 1_000,
+            max_iter: Option::None,
+        });
+
         configs.insert("semi_infinite_rod", RegionConfiguration {
             name: "semi_infinite_rod",
             system: semi_infinite_rod::SYSTEM,
