@@ -6,11 +6,12 @@ from pathlib import Path
 
 import matplotlib.pyplot as plt
 from matplotlib.lines import Line2D
+import matplotlib.ticker as ticker
 import numpy as np
 
 import python.utils.geometry as geometry
 from python.figure.configurations import LineConfiguration
-from python.figure.configurations import RegionConfiguration
+from python.figure.configurations import RegionConfiguration, TickConfiguration
 from python.figure.main_figure import set_general_parameters, new_figure_inches
 from python.figure.main_figure import configure_ticks
 from python.figure.main_figure import get_ax_ratio, get_corners
@@ -18,6 +19,8 @@ from python.figure.main_figure import get_image_dimensions, get_drawable_canvas
 from python.figure.main_figure import corners2pixels
 import python.utils.storage as storage
 
+
+THESIS_FIGWIDTH = 3.256429134
 
 logger = logging.getLogger(__name__)
 
@@ -27,8 +30,8 @@ def instructional_line_nsc(args):
 
     # Create a line configuration as a container for figure parameters
     figure_cfg = LineConfiguration(
-        width=3.486429134,
-        height=3.486429134 * 1.05,
+        width=THESIS_FIGWIDTH,
+        height=THESIS_FIGWIDTH * 1.05,
         ncol=3,
         bbox=(0, -0.21, 1, 0.1),
     )
@@ -138,8 +141,8 @@ def instructional_line_nsc(args):
 def instructional_line_nsc_multiple(args):
     """Draw several steps of the fsals line algorithm."""
     figure_cfg = LineConfiguration(
-        width=3.486429134,
-        height=3.486429134 * 1.05,
+        width=THESIS_FIGWIDTH,
+        height=THESIS_FIGWIDTH * 1.05,
         ncol=3,
         bbox=(0, -0.21, 1, 0.1),
     )
@@ -253,8 +256,8 @@ def instructional_line_nsc_multiple(args):
 def instructional_line_sufficient(args):
     """Draw a single sufficient step of the fsals line algorithm."""
     figure_cfg = LineConfiguration(
-        width=3.486429134,
-        height=3.486429134 * 1.05,
+        width=THESIS_FIGWIDTH,
+        height=THESIS_FIGWIDTH * 1.05,
         ncol=3,
         bbox=(0, -0.21, 1, 0.1),
     )
@@ -376,9 +379,8 @@ def instructional_region_sufficient(args):
     """Draw a single sufficient fsals region step."""
     data = storage.read_data_from_path(f'output/data/region/pde_complex_instructional.data')
     cfg = RegionConfiguration(
-        width=3.486429134,
-        height=3.486429134,
-        # height=3.486429134 * 1.05,
+        width=THESIS_FIGWIDTH,
+        height=THESIS_FIGWIDTH * 1.06,
         ncol=2,
         bbox=(0, -0.19, 1, 0.1),
     )
@@ -412,7 +414,8 @@ def instructional_region_sufficient(args):
     # Add varepsilon_q
     eps = pregion.radius
     ax.plot([10, 10+eps], [10, 10], ':', linewidth=0.8, color='black')
-    ax.annotate(r'$\varepsilon_q$', [10+eps/2, 10], textcoords='offset points',
+    annotation = r'$\overline{\varepsilon}_{p, q}$'
+    ax.annotate(annotation, [10+eps/2, 10], textcoords='offset points',
                 xytext=(0, 5) , ha='center')
     logging.info(f'Drawing varepsilon_q = {eps}...')
 
@@ -429,12 +432,15 @@ def instructional_region_sufficient(args):
         Line2D(
             [0], [0],
             color=PREGION_COLOR,
-            label=r'$\mathcal{S}_1$',
+            label=r'Dobijena oblast $\mathcal{S}_1$',
             linewidth=8,
         )
     ]
     ax.legend(handles=legend_handles, loc='upper left', frameon=False,
               bbox_to_anchor=cfg.bbox, mode='expand', ncol=cfg.ncol)
+    tick_spacing = 5
+    ax.xaxis.set_major_locator(ticker.MultipleLocator(tick_spacing))
+    ax.yaxis.set_major_locator(ticker.MultipleLocator(tick_spacing))
 
     # Save fig
     dirname = f'output/custom'
@@ -452,6 +458,7 @@ def instructional_region_nsc(args):
         height=4.7747 / 3 * 4.2,
         # height=3.486429134 * 1.05,
         ncol=2,
+        ticks=TickConfiguration(5, 5, 5, 5),
         bbox=(0, -0.19, 1, 0.1),
     )
     PREGION_COLOR = 'lightsteelblue'

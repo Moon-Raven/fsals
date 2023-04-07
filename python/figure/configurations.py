@@ -18,7 +18,7 @@ COMMON_WIDTHS = {
     'double_column': 7.221889764,
     'triple_subfigure': 2.38403,
     'double_subfigure': 3.61217,
-    'thesis_standard': 3.486429134,
+    'thesis_standard': 3.256429134,
 }
 
 
@@ -111,7 +111,7 @@ class RegionConfiguration(FigureConfiguration):
 
 def retarded1_custom_func(ax, legend_handles, language='english'):
     """Add results from Gu2005 to given axes."""
-    SCS_LABELS = {'english': 'SCS', 'serbian': 'SPS'}
+    SCS_LABELS = {'english': 'SCS', 'serbian': 'SCS'}
     gu2005.add_gu2005_example1(ax)
     legend_handle = Line2D(
         [0], [0],
@@ -144,8 +144,8 @@ LINE_CONFIGURATIONS = {
 
     'retarded1_thesis' : LineConfiguration(
         rust_configuration='retarded1',
-        width=COMMON_WIDTHS['single_column'],
-        height=COMMON_WIDTHS['single_column'] * W2H_RATIO,
+        width=COMMON_WIDTHS['thesis_standard'],
+        height=COMMON_WIDTHS['thesis_standard'] * W2H_RATIO,
         ticks=TickConfiguration(1, 1, 0.25, 0.25),
         ncol=3,
         bbox=(0, -0.17, 1, 0.1),
@@ -217,8 +217,8 @@ LINE_CONFIGURATIONS = {
 
     'pde_complex_tau_sigma_instructional' : LineConfiguration(
         rust_configuration='pde_complex_tau_sigma_instructional',
-        width=COMMON_WIDTHS['single_column'],
-        height=COMMON_WIDTHS['single_column'] * PDE_W2HRATIO,
+        width=COMMON_WIDTHS['thesis_standard'],
+        height=COMMON_WIDTHS['thesis_standard'] * PDE_W2HRATIO,
         language='serbian',
         ncol=2,
         bbox=(0, -0.19, 1, 0.1),
@@ -347,8 +347,8 @@ REGION_CONFIGURATIONS = {
 
     'retarded1_thesis' : RegionConfiguration(
         rust_configuration='retarded1',
-        width=COMMON_WIDTHS['single_column'],
-        height=COMMON_WIDTHS['single_column'] * W2H_RATIO,
+        width=COMMON_WIDTHS['thesis_standard'],
+        height=COMMON_WIDTHS['thesis_standard'] * W2H_RATIO,
         ticks=TickConfiguration(1, 1, 0.25, 0.25),
         ncol=3,
         bbox=(0, -0.17, 1, 0.1),
@@ -513,11 +513,12 @@ REGION_CONFIGURATIONS = {
 
     'pde_complex_instructional' : RegionConfiguration(
         rust_configuration='pde_complex_tau_sigma',
-        width=COMMON_WIDTHS['single_column'],
-        height=COMMON_WIDTHS['single_column'] * PDE_W2HRATIO,
+        width=COMMON_WIDTHS['thesis_standard'],
+        height=COMMON_WIDTHS['thesis_standard'] * 1.15,
         ncol=2,
         bbox=(0, -0.19, 1, 0.1),
-        language='serbian'
+        language='serbian',
+        ticks=TickConfiguration(5, 5, 1, 1),
     ),
 
     'test_configuration' : RegionConfiguration(
