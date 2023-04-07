@@ -19,6 +19,7 @@ COMMON_WIDTHS = {
     'triple_subfigure': 2.38403,
     'double_subfigure': 3.61217,
     'thesis_standard': 3.256429134,
+    'thesis_textwidth': 4.9823,
 }
 
 
@@ -165,8 +166,8 @@ LINE_CONFIGURATIONS = {
 
     'distributed_delay1_thesis' : LineConfiguration(
         rust_configuration='distributed_delay1',
-        width=4.7747,
-        height=4.7747 / 3,
+        width=COMMON_WIDTHS['thesis_textwidth'],
+        height=COMMON_WIDTHS['thesis_textwidth'] / 3,
         ticks=TickConfiguration(2, 0.1, 1, 0.05),
         ncol=3,
         bbox=(0, -0.30, 1, 0.1),
@@ -185,6 +186,7 @@ LINE_CONFIGURATIONS = {
         rust_configuration='pde_complex_k_sigma',
         width=COMMON_WIDTHS['thesis_standard'],
         height=COMMON_WIDTHS['thesis_standard'] * 1.05,
+        ticks=TickConfiguration(5, 5, 1, 1),
         ncol=3,
         bbox=(0, -0.17, 1, 0.1),
         language='serbian',
@@ -394,9 +396,10 @@ REGION_CONFIGURATIONS = {
     ),
 
     'pde_complex_k_sigma_thesis' : RegionConfiguration(
-        rust_configuration='pde_complex_k_sigma',
         width=COMMON_WIDTHS['thesis_standard'],
-        height=COMMON_WIDTHS['thesis_standard'],
+        height=COMMON_WIDTHS['thesis_standard'] * 1.05,
+        ticks=TickConfiguration(5, 5, 1, 1),
+        rust_configuration='pde_complex_k_sigma',
         ncol=3,
         bbox=(0, -0.17, 1, 0.1),
         language='serbian',
