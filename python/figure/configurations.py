@@ -220,10 +220,11 @@ LINE_CONFIGURATIONS = {
     'pde_complex_tau_sigma_instructional' : LineConfiguration(
         rust_configuration='pde_complex_tau_sigma_instructional',
         width=COMMON_WIDTHS['thesis_standard'],
-        height=COMMON_WIDTHS['thesis_standard'] * PDE_W2HRATIO,
+        height=COMMON_WIDTHS['thesis_standard'] * 1.15,
         language='serbian',
         ncol=2,
         bbox=(0, -0.19, 1, 0.1),
+        ticks=TickConfiguration(5, 5, 1, 1),
     ),
 
     'telegrapher_x_k' : LineConfiguration(

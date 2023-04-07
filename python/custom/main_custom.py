@@ -34,6 +34,7 @@ def instructional_line_nsc(args):
         height=THESIS_FIGWIDTH * 1.05,
         ncol=3,
         bbox=(0, -0.21, 1, 0.1),
+        ticks=TickConfiguration(5, 5, 1, 1),
     )
     
     # Configuration
@@ -145,6 +146,7 @@ def instructional_line_nsc_multiple(args):
         height=THESIS_FIGWIDTH * 1.05,
         ncol=3,
         bbox=(0, -0.21, 1, 0.1),
+        ticks=TickConfiguration(5, 5, 1, 1),
     )
     
     # Configuration
@@ -260,6 +262,7 @@ def instructional_line_sufficient(args):
         height=THESIS_FIGWIDTH * 1.05,
         ncol=3,
         bbox=(0, -0.21, 1, 0.1),
+        ticks=TickConfiguration(5, 5, 1, 1),
     )
     
     # Configuration
@@ -383,6 +386,7 @@ def instructional_region_sufficient(args):
         height=THESIS_FIGWIDTH * 1.06,
         ncol=2,
         bbox=(0, -0.19, 1, 0.1),
+        ticks=TickConfiguration(5, 5, 1, 1),
     )
     PREGION_COLOR = 'lightsteelblue'
 
@@ -602,8 +606,8 @@ def main(args):
     logger.info(f'Running custom script {args.customscript}!')
 
     custom_scripts = {
-        'instructional_line_nsc' : instructional_line_nsc,
         'instructional_line_sufficient' : instructional_line_sufficient,
+        'instructional_line_nsc' : instructional_line_nsc,
         'instructional_line_nsc_multiple' : instructional_line_nsc_multiple,
         'instructional_region_sufficient' : instructional_region_sufficient,
         'instructional_region_nsc' : instructional_region_nsc,
