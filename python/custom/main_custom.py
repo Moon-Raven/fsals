@@ -5,6 +5,7 @@ import json
 from pathlib import Path
 
 import matplotlib.pyplot as plt
+import matplotlib.patches as mpatches
 from matplotlib.lines import Line2D
 import matplotlib.ticker as ticker
 import numpy as np
@@ -336,7 +337,13 @@ def instructional_line_sufficient(args):
     ax.plot(eta_1[0], eta_1[1], 'o', color='black', markersize=3)
 
     # Add \eta^1
-    ax.plot(intermediate[0][0], intermediate[0][1], 'o', color='black', markersize=3)
+    ax.plot(
+        intermediate[0][0],
+        intermediate[0][1],
+        'o',
+        color='black',
+        markersize=3,
+        )
     ax.annotate(
         fr'$\eta^1$',
         intermediate[0],
@@ -356,8 +363,9 @@ def instructional_line_sufficient(args):
     fig.savefig(figpath, dpi=1000)
 
 
-def add_pregions_to_ax(fig, ax, pregions, limits, color):
+def add_pregions_to_ax(fig, ax, pregions, limits, color, last_color=None, deep_origins=False):
     """Add pregions go given axes object."""
+    max_depth = max([p.depth for p in pregions])
     ratio = get_ax_ratio(fig, ax)
     width, height = get_image_dimensions(ratio)
     pixel_dimensions = np.array([width, height])
@@ -368,11 +376,36 @@ def add_pregions_to_ax(fig, ax, pregions, limits, color):
     spans = np.array([p1span, p2span])
     mins = np.array([limits.p1_min, limits.p2_min])
 
-    for pregion in pregions:
+    # Add deepest pregions
+    red_pregions = [pregion for pregion in pregions if pregion.depth == max_depth]
+    blue_pregions = [pregion for pregion in pregions if pregion.depth != max_depth]
+
+    for pregion in red_pregions:
+        corners = get_corners(pregion)
+        upper_np, lower_np = corners2pixels(corners, spans, pixel_dimensions, mins)
+        upper, lower = (upper_np[0], upper_np[1]), (lower_np[0], lower_np[1])
+        canvas.ellipse([upper, lower], fill=last_color)
+
+    # Add remaining pregions
+    for pregion in blue_pregions:
         corners = get_corners(pregion)
         upper_np, lower_np = corners2pixels(corners, spans, pixel_dimensions, mins)
         upper, lower = (upper_np[0], upper_np[1]), (lower_np[0], lower_np[1])
         canvas.ellipse([upper, lower], fill=color)
+
+    # Add origins
+    if deep_origins:
+        for pregion in red_pregions:
+            x, y = pregion.origin[1], pregion.origin[1]
+            ax.plot(
+                x,
+                y,
+                linestyle='',
+                marker=',',
+                color='black',
+                markersize=0.01,
+                fillstyle='full',
+            )
 
     box = [limits.p1_min, limits.p1_max, limits.p2_min, limits.p2_max]
     ax.imshow(image, extent=box, aspect='auto', origin='lower')
@@ -460,18 +493,20 @@ def instructional_region_nsc(args):
     cfg = RegionConfiguration(
         width=4.7747,
         height=4.7747 / 3 * 4.2,
-        # height=3.486429134 * 1.05,
         ncol=2,
         ticks=TickConfiguration(5, 5, 5, 5),
         bbox=(0, -0.19, 1, 0.1),
     )
-    PREGION_COLOR = 'lightsteelblue'
+    COLOR = 'lightsteelblue'
+    COLOR_LAST = 'lightcoral'
 
     set_general_parameters()
 
     # Fetch figure
     size = (cfg.width, cfg.height)
     rows, cols = 4, 3
+    # rows, cols = 2, 3 # Uncomment for more efficient testing
+    plot_count = rows * cols
     fig, axes = plt.subplots(rows, cols, figsize=size, constrained_layout=True)
 
     # Fetch region of interest
@@ -490,10 +525,11 @@ def instructional_region_nsc(args):
             configure_ticks(ax, cfg)
 
             pregions = [p for p in region.pregions if p.depth <= k]
-            add_pregions_to_ax(fig, ax, pregions, data.limits, PREGION_COLOR)
-
-            # Add origin
-            ax.plot(region.origin[0], region.origin[1], 'x', color='black', markersize=3)
+            origins = False
+            add_pregions_to_ax(fig, ax, pregions, data.limits, COLOR, COLOR_LAST, origins)
+            if k == 1:
+                x, y = region.origin[0], region.origin[1]
+                ax.plot(x, y, 'x', color='black', markersize=2)
 
     # Save fig
     dirname = f'output/custom'
@@ -540,6 +576,7 @@ def create_iterative_region_figure(
         k_start=1,
         k_step=1,
         k_list=None,
+        single_origin=False,
     ):
     """Draw step-by-step evolution of the region fsals algorithm for given example."""
     datapath = f'output/data/region/{data_filename}'
@@ -589,8 +626,11 @@ def create_iterative_region_figure(
             pregions = [p for p in region.pregions if p.depth <= k]
             add_pregions_to_ax(fig, ax, pregions, data.limits, color)
 
-            # Add origin
-            ax.plot(region.origin[0], region.origin[1], 'x', color='black', markersize=3)
+            # Add origin(s)
+            if single_origin:
+                ax.plot(region.origin[0], region.origin[1], 'x', color='black', markersize=3)
+            else:
+                pass
 
 
     # Save fig
