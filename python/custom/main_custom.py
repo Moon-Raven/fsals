@@ -5,7 +5,9 @@ import json
 from pathlib import Path
 
 import matplotlib.pyplot as plt
+import matplotlib.patches as mpatches
 from matplotlib.lines import Line2D
+import matplotlib.gridspec as gridspec
 import numpy as np
 
 import python.utils.geometry as geometry
@@ -369,19 +371,36 @@ def add_pregions_to_ax(fig, ax, pregions, limits, color, last_color=None, deep_o
     spans = np.array([p1span, p2span])
     mins = np.array([limits.p1_min, limits.p2_min])
 
-    for pregion in pregions:
+    # Add deepest pregions
+    red_pregions = [pregion for pregion in pregions if pregion.depth == max_depth]
+    blue_pregions = [pregion for pregion in pregions if pregion.depth != max_depth]
+
+    for pregion in red_pregions:
         corners = get_corners(pregion)
         upper_np, lower_np = corners2pixels(corners, spans, pixel_dimensions, mins)
         upper, lower = (upper_np[0], upper_np[1]), (lower_np[0], lower_np[1])
-        fill_color = color
-        if last_color:
-            if pregion.depth == max_depth:
-                fill_color = last_color
-        canvas.ellipse([upper, lower], fill=fill_color)
-        if deep_origins:
-            if pregion.depth == max_depth:
-                x, y = pregion.origin[0], pregion.origin[1]
-                ax.plot(x, y, linestyle='', marker='o', color='black', markersize=0.1, fillstyle='full')
+        canvas.ellipse([upper, lower], fill=last_color)
+
+    # Add remaining pregions
+    for pregion in blue_pregions:
+        corners = get_corners(pregion)
+        upper_np, lower_np = corners2pixels(corners, spans, pixel_dimensions, mins)
+        upper, lower = (upper_np[0], upper_np[1]), (lower_np[0], lower_np[1])
+        canvas.ellipse([upper, lower], fill=color)
+
+    # Add origins
+    if deep_origins:
+        for pregion in red_pregions:
+            x, y = pregion.origin[1], pregion.origin[1]
+            ax.plot(
+                x,
+                y,
+                linestyle='',
+                marker=',',
+                color='black',
+                markersize=0.01,
+                fillstyle='full',
+            )
 
     box = [limits.p1_min, limits.p1_max, limits.p2_min, limits.p2_max]
     ax.imshow(image, extent=box, aspect='auto', origin='lower')
@@ -465,7 +484,6 @@ def instructional_region_nsc(args):
     cfg = RegionConfiguration(
         width=4.7747,
         height=4.7747 / 3 * 4.2,
-        # height=3.486429134 * 1.05,
         ncol=2,
         bbox=(0, -0.19, 1, 0.1),
     )
@@ -476,8 +494,8 @@ def instructional_region_nsc(args):
 
     # Fetch figure
     size = (cfg.width, cfg.height)
-    # rows, cols = 2, 2
     rows, cols = 4, 3
+    # rows, cols = 2, 3 # Uncomment for more efficient testing
     plot_count = rows * cols
     fig, axes = plt.subplots(rows, cols, figsize=size, constrained_layout=True)
 
@@ -497,10 +515,11 @@ def instructional_region_nsc(args):
             configure_ticks(ax, cfg)
 
             pregions = [p for p in region.pregions if p.depth <= k]
-            add_pregions_to_ax(fig, ax, pregions, data.limits, COLOR, COLOR_LAST, True)
-
-            # Add origin
-            # ax.plot(region.origin[0], region.origin[1], 'x', color='black', markersize=3)
+            origins = False
+            add_pregions_to_ax(fig, ax, pregions, data.limits, COLOR, COLOR_LAST, origins)
+            if k == 1:
+                x, y = region.origin[0], region.origin[1]
+                ax.plot(x, y, 'x', color='black', markersize=2)
 
     # Save fig
     dirname = f'output/custom'
