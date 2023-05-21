@@ -641,6 +641,122 @@ def create_iterative_region_figure(
     fig.savefig(figpath, dpi=1000)
 
 
+def sample_p_norm_boundary(p, N, eta, eps):
+    # Make sure p is a number greater than or equal to 1 or infinity
+    assert p >= 1 or np.isinf(p), "p must be greater than or equal to 1 or infinity"
+    # Make sure N is a positive integer
+    assert isinstance(N, int) and N > 0, "N must be a positive integer"
+    # Make sure eta is a numpy array with exactly two elements
+    assert isinstance(eta, np.ndarray) and eta.shape == (2,), "eta must be a numpy array with exactly two elements"
+
+    if np.isinf(p):
+        # In case of infinity norm, sample the boundary of a square.
+        # Split N into 4 equal parts for the 4 edges of the square
+        edge_points = N // 4
+        # Generate points on each edge of the square
+        x_left = eta[0] - np.ones(edge_points) * eps
+        y_left = eta[1] + np.linspace(-eps, eps, edge_points)
+        x_right = eta[0] + np.ones(edge_points) * eps
+        y_right = eta[1] + np.linspace(eps, -eps, edge_points)
+        x_top = eta[0] + np.linspace(-eps, eps, edge_points)
+        y_top = eta[1] + np.ones(edge_points) * eps
+        x_bottom = eta[0] + np.linspace(eps, -eps, edge_points)
+        y_bottom = eta[1] - np.ones(edge_points) * eps
+        # Concatenate points from all edges
+        x = np.concatenate([x_left, x_top, x_right, x_bottom])
+        y = np.concatenate([y_left, y_top, y_right, y_bottom])
+    else:
+        # Generate N equally spaced angles between 0 and 2pi
+        theta = np.linspace(0, 2*np.pi, N)
+        # Compute x and y coordinates for each theta
+        x = eta[0] + eps * np.sign(np.cos(theta)) * (np.abs(np.cos(theta)) ** (2/p))
+        y = eta[1] + eps * np.sign(np.sin(theta)) * (np.abs(np.sin(theta)) ** (2/p))
+
+    return x, y
+
+
+def w_ball(args):
+    """Draw example W balls."""
+    cfg = RegionConfiguration(
+        width=4.7747,
+        height=4.7747 * 1.05,
+        ncol=2,
+        ticks=TickConfiguration(5, 5, 5, 5),
+        bbox=(0, -0.19, 1, 0.1),
+    )
+    COLOR = 'lightsteelblue'
+    COLOR_LAST = 'lightcoral'
+
+    set_general_parameters()
+
+    # Fetch figure
+    size = (cfg.width, cfg.height)
+    rows, cols = 2, 2
+    plot_count = rows * cols
+    fig, axes = plt.subplots(rows, cols, figsize=size, constrained_layout=True)
+
+    balls = [
+        {
+            'q' : 1,
+            'eps' : 2,
+        },
+        {
+            'q' : 2,
+            'eps' : 4,
+        },
+        {
+            'q' : 4,
+            'eps' : 3,
+        },
+        {
+            'q' : np.inf,
+            'eps' : 2,
+        },
+    ]
+    xmin, xmax = 0, 10
+    ymin, ymax = 0, 10
+    N = 64
+    eta = np.array([5, 5])
+    LABEL_OFFSET = (-3,-8)
+
+    # Configure axes
+    k = 0
+    for r in range(rows):
+        for c in range(cols):
+            ax = axes[r][c]
+            ball = balls[k]
+            q, eps = ball['q'], ball['eps']
+
+            if q == np.inf:
+                q_plot = '\\infty'
+            else:
+                q_plot = str(q)
+
+            ax.set_title(f'$\\eta=[5,5]$, $q={q_plot}$, $\\varepsilon={eps}$', fontsize=8)
+            ax.set_xlim(xmin, xmax)
+            ax.set_ylim(ymin, ymax)
+            configure_ticks(ax, cfg)
+            x, y = sample_p_norm_boundary(ball['q'], N, eta, eps)
+            ax.fill(x, y)
+            ax.plot([5], [5], 'x', color='black', markersize=3)
+            k += 1
+            ax.annotate(
+                r'$\eta$',
+                [5, 5],
+                textcoords='offset points',
+                xytext=LABEL_OFFSET,
+                ha='right'
+            )
+
+
+    # Save fig
+    dirname = f'output/custom'
+    dir = Path(dirname)
+    dir.mkdir(exist_ok=True, parents=True)
+    figpath = f'{dirname}/{args.customscript}.pdf'
+    fig.savefig(figpath, dpi=1000)
+
+
 def main(args):
     """Run a python function pre-written to serve a non-generic fsals purpose."""
     logger.info(f'Running custom script {args.customscript}!')
@@ -652,6 +768,7 @@ def main(args):
         'instructional_region_sufficient' : instructional_region_sufficient,
         'instructional_region_nsc' : instructional_region_nsc,
         'iterative_telegrapher_alpha_gamma_nsc' : iterative_telegrapher_alpha_gamma_nsc,
+        'w_ball' : w_ball,
     }
 
     if args.customscript in custom_scripts:
