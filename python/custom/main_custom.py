@@ -101,7 +101,7 @@ def instructional_line_nsc(args):
         color='black',
         linewidth=LINEWIDTH_THICK,
         solid_capstyle='round',
-        label='Segment ekvivalentne stabilnosti',
+        label='Segment invarijantne stabilnosti',
     )
 
     # Add all intermediate points to plot
@@ -213,7 +213,7 @@ def instructional_line_nsc_multiple(args):
             color='black',
             linewidth=LINEWIDTH_THICK,
             solid_capstyle='round',
-            label='Segment ekvivalentne stabilnosti',
+            label='Segment invarijantne stabilnosti',
         )
 
         # Add all intermediate points to plot
@@ -239,7 +239,7 @@ def instructional_line_nsc_multiple(args):
             linestyle='-',
             linewidth= LINEWIDTH_THICK,
             color='black',
-            label='Segmenti ekvivalente stabilnosti')
+            label='Segmenti invarijantne stabilnosti')
     ]
     ax.legend(
         handles=legend_handles,
@@ -312,7 +312,7 @@ def instructional_line_sufficient(args):
         color='black',
         linewidth=LINEWIDTH_THICK,
         solid_capstyle='round',
-        label='Segment ekvivalentne stabilnosti',
+        label='Segment invarijantne stabilnosti',
     )
 
     # Add dashed line resembling the ray
