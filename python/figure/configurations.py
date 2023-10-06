@@ -324,6 +324,24 @@ LINE_CONFIGURATIONS = {
         height=COMMON_WIDTHS['single_column'] * W2H_RATIO,
         bbox=(0, -0.17, 1, 0.1),
     ),
+
+    'ln_system1' : LineConfiguration(
+        rust_configuration='ln_system1',
+        ncol=3,
+        width=COMMON_WIDTHS['thesis_standard'],
+        height=COMMON_WIDTHS['thesis_standard'],
+        bbox=(0, -0.17, 1, 0.1),
+        ticks=TickConfiguration(5, 5, 1, 1),
+    ),
+
+    'ln_system1_negative' : LineConfiguration(
+        rust_configuration='ln_system1_negative',
+        ncol=3,
+        width=COMMON_WIDTHS['thesis_standard'],
+        height=COMMON_WIDTHS['thesis_standard'],
+        bbox=(0, -0.17, 1, 0.1),
+        ticks=TickConfiguration(5, 5, 1, 1),
+    ),
 }
 
 
@@ -531,5 +549,23 @@ REGION_CONFIGURATIONS = {
         width=COMMON_WIDTHS['single_column'],
         height=COMMON_WIDTHS['single_column'] * W2H_RATIO,
         bbox=(0, -0.17, 1, 0.1),
+    ),
+
+    'ln_system1' : RegionConfiguration(
+        rust_configuration='ln_system1',
+        width=COMMON_WIDTHS['thesis_standard'],
+        height=COMMON_WIDTHS['thesis_standard'],
+        ncol=3,
+        bbox=(0, -0.17, 1, 0.1),
+        ticks=TickConfiguration(5, 5, 1, 1),
+    ),
+
+    'ln_system1_negative' : RegionConfiguration(
+        rust_configuration='ln_system1_negative',
+        width=COMMON_WIDTHS['thesis_standard'],
+        height=COMMON_WIDTHS['thesis_standard'] * 1.1,
+        ncol=3,
+        bbox=(0, -0.17, 1, 0.1),
+        ticks=TickConfiguration(5, 5, 1, 1),
     ),
 }

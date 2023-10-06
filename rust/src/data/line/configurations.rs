@@ -12,6 +12,7 @@ use crate::systems::telegrapher_alpha_gamma;
 use crate::systems::telegrapher_x_k;
 use crate::systems::telegrapher_standard;
 use crate::systems::test_system;
+use crate::systems::ln_system1;
 
 use crate::utils::geometry::Delta;
 use crate::nu::ContourConfiguration;
@@ -367,6 +368,79 @@ lazy_static! {
             log_space_maxw: 1e4,
             log_space_steps: 1_000,
             w_steps_linear: 2_000,
+        });
+
+        configs.insert("ln_system1", LineConfiguration {
+            name: "ln_system1",
+            system: ln_system1::SYSTEM,
+            limits: Limits { p1_min: 0.0, p1_max: 20.0, p2_min: 0.0, p2_max: 20.0 },
+            ray_count: 160,
+            corrective_ratio: Option::None,
+            safeguard: 0.85,
+            origins: vec![
+                // Region 1
+                (0.9, 0.9),
+                // Region 2
+                (4.0, 5.5),
+                // Region 3
+                (13.0, 12.0),
+                // Region 4
+                (18.5, 18.0),
+                ],
+            contour_conf: ContourConfiguration {
+                w_min: 1e-3,
+                w_max: 1e3,
+                steps: 1_000usize,
+                },
+            delta: Delta::Abs(1e-3),
+            log_space_minw: 1e-4,
+            log_space_maxw: 1e3,
+            log_space_steps: 10_000,
+            w_steps_linear: 10_000,
+        });
+
+        configs.insert("ln_system1_negative", LineConfiguration {
+            name: "ln_system1_negative",
+            system: ln_system1::SYSTEM,
+            limits: Limits { p1_min: -20.0, p1_max: 20.0, p2_min: -20.0, p2_max: 20.0 },
+            ray_count: 160,
+            corrective_ratio: Option::None,
+            safeguard: 0.60,
+            origins: vec![
+                // Region 1
+                (0.0, 1.0),
+                // Region 2
+                (4.0, 5.5),
+                (-6.0, 1.5),
+                // Region 3
+                (13.0, 12.0),
+                // Region 4
+                (18.5, 18.0),
+                // Region 5
+                (3.0, -6.0),
+                // Region 6
+                (-16.0, -14.0),
+                // Region 7
+                (-16.0, 8.0),
+                // Region 8
+                (10.0, -5.0),
+                (-9.0, -5.0),
+                (8.0, -14.0),
+                // Region 9
+                (18.0, -4.0),
+                // Region 10
+                (-19.8, 1.0),
+                ],
+            contour_conf: ContourConfiguration {
+                w_min: 1e-3,
+                w_max: 1e3,
+                steps: 1_000usize,
+                },
+            delta: Delta::Abs(0.05),
+            log_space_minw: 1e-11,
+            log_space_maxw: 1e3,
+            log_space_steps: 200_000,
+            w_steps_linear: 800_000,
         });
 
         configs.insert("test_configuration", LineConfiguration {

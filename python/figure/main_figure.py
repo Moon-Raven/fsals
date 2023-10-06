@@ -23,8 +23,11 @@ COLORS = {
     0: 'g',
     1: 'pink',
     2: 'darkred',
+    3: 'peru',
     4: 'cornflowerblue',
+    5: 'dimgray',
     6: 'orange',
+    7: 'mediumvioletred',
     8: 'mediumpurple',
 }
 
@@ -44,6 +47,7 @@ def new_figure_inches(width, height, tight=True, constrained_layout=False):
     """Create new figure with size specified in inches."""
     size = (width, height)
     fig, ax = plt.subplots(figsize=size, constrained_layout=constrained_layout)
+    # ax.grid()
     if tight:
         fig.tight_layout(pad=0)
     return fig, ax
