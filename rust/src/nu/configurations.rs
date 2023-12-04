@@ -309,13 +309,13 @@ lazy_static! {
                 contour_conf: ContourConfiguration {
                     w_min: 1e-3,
                     w_max: 1e5,
-                    steps: 10_000usize,
+                    steps: 100_000usize,
                 },
                 limits: Limits {
                     p1_min: 0.0,
-                    p1_max: 3.0,
+                    p1_max: 1000.0,
                     p2_min: 0.0,
-                    p2_max: 3.0,
+                    p2_max: 1000.0,
                 },
                 grid_step: 20usize,
             },
