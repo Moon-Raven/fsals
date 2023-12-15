@@ -14,6 +14,8 @@ use crate::systems::telegrapher_x_k;
 use crate::systems::telegrapher_standard;
 use crate::systems::test_system;
 use crate::systems::ln_system1;
+use crate::systems::dopid2;
+use crate::systems::dopid3;
 
 use crate::nu::ContourConfiguration;
 use crate::types::{Limits, Par, System};
@@ -534,6 +536,59 @@ lazy_static! {
             max_iter: Option::None,
         });
 
+        configs.insert("dopid2", RegionConfiguration {
+            name: "dopid2",
+            system: dopid2::SYSTEM,
+            limits: Limits { p1_min: 0.0, p1_max: 100.0, p2_min: 0.0, p2_max: 5.0 },
+            safeguard: 1.0,
+            check_obsoletion: true,
+            origins: vec![
+                (20.0, 0.1),
+                // (50.0, 0.2),
+                ],
+            contour_conf: ContourConfiguration {
+                w_min: 1e-3,
+                w_max: 1e3,
+                steps: 10_000,
+                },
+            delta: Delta::Abs(1e-3),
+            spawn_count: 32,
+            enforce_limits: false,
+            log_space_minw: 1e-3,
+            log_space_maxw: 1e8,
+            log_space_steps: 10_000,
+            lin_steps: 10_000,
+            max_iter: Option::None,
+        });
+
+        configs.insert("dopid3", RegionConfiguration {
+            name: "dopid3",
+            system: dopid3::SYSTEM,
+            limits: Limits { p1_min: 0.0, p1_max: 10.0, p2_min: 0.0, p2_max: 10.0 },
+            safeguard: 0.95,
+            check_obsoletion: true,
+            origins: vec![
+                (1.0, 1.0),
+                (3.0, 3.0),
+                (5.5, 5.5),
+                (6.8, 6.8),
+                (8.2, 8.2),
+                (9.3, 9.3),
+                ],
+            contour_conf: ContourConfiguration {
+                w_min: 1e-3,
+                w_max: 1e3,
+                steps: 10_000,
+                },
+            delta: Delta::Abs(1e-3),
+            spawn_count: 32,
+            enforce_limits: false,
+            log_space_minw: 1e-1,
+            log_space_maxw: 1e2,
+            log_space_steps: 10_000,
+            lin_steps: 10_000,
+            max_iter: Option::None,
+        });
 
         configs
     };

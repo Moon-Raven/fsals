@@ -11,4 +11,6 @@ pub mod telegrapher_alpha_gamma;
 pub mod telegrapher_standard;
 pub mod ln_system1;
 pub mod dopid1;
+pub mod dopid2;
+pub mod dopid3;
 pub mod test_system;

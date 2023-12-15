@@ -20,15 +20,17 @@ ORIGIN_MARKERSIZE = 4
 ORIGIN_LABEL_LINE = {'english': 'Origins', 'serbian': 'Početne tačke'}
 ORIGIN_LABEL_REGION = 'Origins'
 COLORS = {
-    0: 'g',
-    1: 'pink',
-    2: 'darkred',
-    3: 'peru',
-    4: 'cornflowerblue',
-    5: 'dimgray',
-    6: 'orange',
-    7: 'mediumvioletred',
-    8: 'mediumpurple',
+     0: 'g',
+     1: 'pink',
+     2: 'darkred',
+     3: 'peru',
+     4: 'cornflowerblue',
+     5: 'dimgray',
+     6: 'orange',
+     7: 'mediumvioletred',
+     8: 'mediumpurple',
+    10: 'lightseagreen',
+    12: 'plum',
 }
 
 

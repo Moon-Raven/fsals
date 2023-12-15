@@ -1,5 +1,5 @@
 use lazy_static::lazy_static;
-use log::{debug, info};
+use log::{debug, info, warn};
 
 use iter_num_tools::{log_space, lin_space};
 use rayon::iter::Update;
@@ -108,7 +108,7 @@ pub fn get_linsearch_interval(
 
     let w_max =
         if index_of_logmin == last_index {
-            debug!("Minimum seems to be out of bounds");
+            warn!("Minimum seems to be out of bounds");
             return Option::None;
         } else {
             log_space[index_of_logmin + 1]

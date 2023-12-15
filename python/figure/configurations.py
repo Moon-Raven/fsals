@@ -560,6 +560,24 @@ REGION_CONFIGURATIONS = {
         ticks=TickConfiguration(5, 5, 1, 1),
     ),
 
+    'dopid2' : RegionConfiguration(
+        rust_configuration='dopid2',
+        width=COMMON_WIDTHS['thesis_standard'],
+        height=COMMON_WIDTHS['thesis_standard'],
+        ncol=3,
+        bbox=(0, -0.17, 1, 0.1),
+        ticks=TickConfiguration(10, 1, 1, 0.5),
+    ),
+
+    'dopid3' : RegionConfiguration(
+        rust_configuration='dopid3',
+        width=COMMON_WIDTHS['thesis_standard'],
+        height=COMMON_WIDTHS['thesis_standard'] * 1.1,
+        ncol=3,
+        bbox=(0, -0.17, 1, 0.1),
+        ticks=TickConfiguration(1, 1, 1, 1),
+    ),
+
     'ln_system1_negative' : RegionConfiguration(
         rust_configuration='ln_system1_negative',
         width=COMMON_WIDTHS['thesis_standard'],

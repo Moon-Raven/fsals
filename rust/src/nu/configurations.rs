@@ -14,6 +14,8 @@ use crate::systems::telegrapher_x_k;
 use crate::systems::telegrapher_standard;
 use crate::systems::ln_system1;
 use crate::systems::dopid1;
+use crate::systems::dopid2;
+use crate::systems::dopid3;
 use crate::systems::test_system;
 
 use crate::types::{Limits, System};
@@ -318,6 +320,47 @@ lazy_static! {
                     p2_max: 1000.0,
                 },
                 grid_step: 20usize,
+            },
+        );
+
+        configs.insert(
+            "dopid2",
+            NuConfiguration {
+                name: "dopid2",
+                system: dopid2::SYSTEM,
+                contour_conf: ContourConfiguration {
+                    w_min: 1e-3,
+                    w_max: 1e5,
+                    steps: 100_000usize,
+                },
+                limits: Limits {
+                    p1_min: 0.0,
+                    p1_max: 100.0,
+                    p2_min: 0.0,
+                    p2_max: 3.0,
+                },
+                grid_step: 20usize,
+            },
+        );
+
+
+        configs.insert(
+            "dopid3",
+            NuConfiguration {
+                name: "dopid3",
+                system: dopid3::SYSTEM,
+                contour_conf: ContourConfiguration {
+                    w_min: 1e-3,
+                    w_max: 1e5,
+                    steps: 10_000usize,
+                },
+                limits: Limits {
+                    p1_min: 0.0,
+                    p1_max: 10.0,
+                    p2_min: 0.0,
+                    p2_max: 10.0,
+                },
+                grid_step: 30usize,
             },
         );
 
