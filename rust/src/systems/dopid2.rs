@@ -1,3 +1,8 @@
+/*
+ * The dopid1 system is used only for NU purposes.
+ * It is not possible to run the data/figure algorithms on dopid2,
+ * since the system violates assumption #5.
+ */
 use crate::types::{Comp, Par, System};
 
 

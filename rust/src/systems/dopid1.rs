@@ -1,3 +1,8 @@
+/*
+ * The dopid1 system is used only for NU purposes.
+ * It is not possible to run the data/figure algorithms on dopid1.
+ */
+
 use crate::types::{Comp, Par, System};
 
 const PROCESS_ORDER: u32 = 1;
