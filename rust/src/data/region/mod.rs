@@ -252,6 +252,7 @@ pub fn get_region(conf: &RegionConfiguration, origin: Par) -> Region {
 
     let delta = absolutize_delta(&conf.delta, &conf.limits);
     let nu = nu::calculate_nu_single(&conf.contour_conf, conf.system.f_complex, origin);
+    let nu = nu + conf.nu_modifier; // In case we want to modify nu manually
     let mut pregions = Arc::new(RwLock::new(Vec::with_capacity(VEC_PREALLOCATION_SIZE)));
     let w_log_space: Vec<f64> = conf.get_log_space();
     let initial_depth = 1;

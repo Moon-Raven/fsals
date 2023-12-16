@@ -29,8 +29,8 @@ COLORS = {
      6: 'orange',
      7: 'mediumvioletred',
      8: 'mediumpurple',
-    10: 'lightseagreen',
-    12: 'plum',
+     9: 'lightseagreen',
+    11: 'plum',
 }
 
 

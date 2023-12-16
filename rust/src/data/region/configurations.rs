@@ -43,6 +43,7 @@ pub struct RegionConfiguration {
     pub log_space_steps: usize,              // Domain granularity for logarithmic minimization
     pub max_iter: Option<u32>,               // Maximal number of allowed iterations (depth)
     pub check_obsoletion: bool,              // Check if points are obsolete before evaluating them
+    pub nu_modifier: i32,                    // Modify resulting NU by this value
 }
 
 
@@ -84,6 +85,7 @@ lazy_static! {
             log_space_maxw: 1e5,
             log_space_steps: 10_000,
             max_iter: Option::None,
+            nu_modifier: 0,
         });
 
         configs.insert("retarded2", RegionConfiguration {
@@ -118,6 +120,7 @@ lazy_static! {
             log_space_maxw: 1e4,
             log_space_steps: 30_000,
             max_iter: Option::None,
+            nu_modifier: 0,
         });
 
 
@@ -152,6 +155,7 @@ lazy_static! {
             log_space_steps: 10_000,
             lin_steps: 10_000,
             max_iter: Option::None,
+            nu_modifier: 0,
         });
 
         configs.insert("pde_complex_k_sigma", RegionConfiguration {
@@ -177,6 +181,7 @@ lazy_static! {
             log_space_maxw: 1e5,    // 1e7 in python
             log_space_steps: 1_000, // 10_000 in python
             max_iter: Option::None,
+            nu_modifier: 0,
         });
 
         configs.insert("pde_complex_beta_sigma", RegionConfiguration {
@@ -202,6 +207,7 @@ lazy_static! {
             log_space_maxw: 1e5,    // 1e7 in python
             log_space_steps: 1_000, // 10_000 in python
             max_iter: Option::None,
+            nu_modifier: 0,
         });
 
         configs.insert("pde_complex_tau_sigma", RegionConfiguration {
@@ -230,6 +236,7 @@ lazy_static! {
             log_space_maxw: 1e5,
             log_space_steps: 1_000,
             max_iter: Option::None,
+            nu_modifier: 0,
         });
 
         configs.insert("telegrapher_x_k", RegionConfiguration {
@@ -255,6 +262,7 @@ lazy_static! {
             log_space_maxw: 1e5,
             log_space_steps: 1_000,
             max_iter: Option::None,
+            nu_modifier: 0,
         });
 
         configs.insert("telegrapher_alpha_gamma", RegionConfiguration {
@@ -282,6 +290,7 @@ lazy_static! {
             log_space_steps: 1_000,
             lin_steps: 1_000,
             max_iter: Option::None,
+            nu_modifier: 0,
         });
 
         configs.insert("telegrapher_alpha_gamma_single_region", RegionConfiguration {
@@ -306,6 +315,7 @@ lazy_static! {
             log_space_steps: 1_000,
             lin_steps: 1_000,
             max_iter: Option::None,
+            nu_modifier: 0,
         });
 
         configs.insert("semi_infinite_rod", RegionConfiguration {
@@ -331,6 +341,7 @@ lazy_static! {
             log_space_steps: 1_000,
             lin_steps: 1_000,
             max_iter: Option::None,
+            nu_modifier: 0,
         });
 
         configs.insert("finite_rod", RegionConfiguration {
@@ -356,6 +367,7 @@ lazy_static! {
             log_space_steps: 1_000,
             lin_steps: 1_000,
             max_iter: Option::None,
+            nu_modifier: 0,
         });
 
         configs.insert("telegrapher_standard", RegionConfiguration {
@@ -382,6 +394,7 @@ lazy_static! {
             log_space_steps: 1_000,
             lin_steps: 2_000,
             max_iter: Option::None,
+            nu_modifier: 0,
         });
 
         configs.insert("pde_complex_instructional", RegionConfiguration {
@@ -409,6 +422,7 @@ lazy_static! {
             log_space_maxw: 1e5,
             log_space_steps: 1_000,
             max_iter: Option::Some(12),
+            nu_modifier: 0,
         });
 
         configs.insert("test_configuration", RegionConfiguration {
@@ -434,6 +448,7 @@ lazy_static! {
             log_space_maxw: 1e5,
             log_space_steps: 10_000,
             max_iter: Option::None,
+            nu_modifier: 0,
         });
 
         configs.insert("telegrapher_alpha_gamma_instructional", RegionConfiguration {
@@ -461,6 +476,7 @@ lazy_static! {
             log_space_steps: 1_000,
             lin_steps: 1_000,
             max_iter: Option::Some(12),
+            nu_modifier: 0,
         });
         
         configs.insert("ln_system1", RegionConfiguration {
@@ -488,6 +504,7 @@ lazy_static! {
             log_space_steps: 10_000,
             lin_steps: 10_000,
             max_iter: Option::None,
+            nu_modifier: 0,
         });
 
         configs.insert("ln_system1_negative", RegionConfiguration {
@@ -534,6 +551,7 @@ lazy_static! {
             log_space_steps: 200_000,
             lin_steps: 3_000_000,
             max_iter: Option::None,
+            nu_modifier: 0,
         });
 
         configs.insert("dopid2", RegionConfiguration {
@@ -559,6 +577,7 @@ lazy_static! {
             log_space_steps: 10_000,
             lin_steps: 10_000,
             max_iter: Option::None,
+            nu_modifier: 0,
         });
 
         configs.insert("dopid3", RegionConfiguration {
@@ -588,6 +607,7 @@ lazy_static! {
             log_space_steps: 10_000,
             lin_steps: 10_000,
             max_iter: Option::None,
+            nu_modifier: -1,
         });
 
         configs
