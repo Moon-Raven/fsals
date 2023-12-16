@@ -580,7 +580,7 @@ lazy_static! {
                 w_max: 1e3,
                 steps: 10_000,
                 },
-            delta: Delta::Abs(1e-3),
+            delta: Delta::Abs(5.0 * 1e-4),
             spawn_count: 32,
             enforce_limits: false,
             log_space_minw: 1e-1,
