@@ -53,7 +53,7 @@ def parse_cli_arguments():
         '-p',
         '--parallel',
         action='store_true',
-        help='parellelize code execution',
+        help='deprecated (algorithms are always parallel)',
     )
 
     arg_parser.add_argument(
